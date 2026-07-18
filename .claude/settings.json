@@ -60,7 +60,9 @@
       "Bash(/e/xampp/mysql/bin/mysql -uroot --default-character-set=utf8mb4 mangoshop -e \"SELECT sort_order, title, subtitle FROM banners WHERE position='main' ORDER BY sort_order;\")",
       "Bash(/e/xampp/mysql/bin/mysql -uroot --default-character-set=utf8mb4 mangoshop -e \"SELECT sort_order,title,subtitle FROM banners WHERE position='main' ORDER BY sort_order;\")",
       "mcp__chrome-devtools__resize_page",
-      "mcp__chrome-devtools__emulate"
+      "mcp__chrome-devtools__emulate",
+      "Bash(/e/xampp/mysql/bin/mysql -uroot mangoshop -e \"SELECT slug FROM products WHERE sale_status='on_sale' LIMIT 1;\")",
+      "mcp__chrome-devtools__list_pages"
     ]
   }
 }

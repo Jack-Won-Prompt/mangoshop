@@ -52,7 +52,7 @@ function msApplyCoupon(code){var i=document.querySelector('input[name=code][form
                 </div>
                 <div class="field"><label>주소 <span class="req">*</span></label><input type="text" name="address1" id="address1" class="input" value="{{ old('address1', $user->address1) }}" placeholder="주소 찾기로 입력" required readonly></div>
                 <div class="field"><label>상세주소</label><input type="text" name="address2" id="address2" class="input" value="{{ old('address2', $user->address2) }}" placeholder="상세 주소 (동/호수 등)"></div>
-                <div class="field"><label>배송 메모</label><input type="text" name="memo" class="input" value="{{ old('memo') }}" placeholder="예) 부재 시 진료실 앞에 놓아주세요"></div>
+                <div class="field"><label>배송 메모</label><input type="text" name="memo" class="input" value="{{ old('memo') }}" placeholder="예) 부재 시 문 앞에 놓아주세요"></div>
             </div>
 
             {{-- 결제수단 --}}
@@ -138,3 +138,27 @@ function msApplyCoupon(code){var i=document.querySelector('input[name=code][form
 </form>
 </div>
 @endsection
+
+@push('scripts')
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script>
+function findAddr() {
+    if (typeof daum === 'undefined' || !daum.Postcode) {
+        alert('주소 검색 서비스를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
+        return;
+    }
+    new daum.Postcode({
+        oncomplete: function (data) {
+            var addr = data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
+            if (data.userSelectedType === 'R' && data.buildingName) {
+                addr += ' (' + data.buildingName + ')';
+            }
+            document.getElementById('postcode').value = data.zonecode;
+            document.getElementById('address1').value = addr;
+            var d = document.getElementById('address2');
+            if (d) d.focus();
+        }
+    }).open();
+}
+</script>
+@endpush
