@@ -46,6 +46,8 @@ body .site-footer { display: none !important; }
     background: linear-gradient(135deg, var(--mg-primary), #ff9838);
     color: #fff !important; padding: 4px 10px; border-radius: 20px; font-weight: 700;
 }
+/* 상단 유틸바 항목은 글자 세로 줄바꿈 방지 (항목 단위로만 줄바꿈) */
+.mg-tb-nav a, .mg-tb-right a, .mg-tb-point, .mg-tb-right span { white-space: nowrap; }
 
 /* ============================ 메인 헤더 (로고+검색) ============================ */
 .mg-head { background: #fff; padding: 22px 0 18px; text-align: center; }
@@ -207,8 +209,8 @@ body .site-footer { display: none !important; }
 .mg-price-hide { font-size: 13px; color: var(--mg-muted); font-weight: 600; background: var(--mg-soft); border-radius: 6px; padding: 8px 10px; text-align: center; }
 .mg-price-hide a { color: var(--mg-primary); font-weight: 700; }
 .mg-wprice { font-size: 12px; color: var(--mg-accent-d); font-weight: 700; }
-.mg-card .mg-actions { padding: 0 14px 14px; display: flex; gap: 8px; }
-.mg-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; font-weight: 700; font-size: 13.5px; padding: 10px 12px; cursor: pointer; border: 1px solid transparent; text-decoration: none; }
+.mg-card .mg-actions { padding: 0 14px 14px; display: flex; gap: 8px; align-items: stretch; }
+.mg-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; font-weight: 700; font-size: 13.5px; line-height: 1.4; padding: 10px 12px; cursor: pointer; border: 1px solid transparent; text-decoration: none; white-space: nowrap; }
 .mg-btn.pri { background: var(--mg-primary); color: #fff; flex: 1; }
 .mg-btn.pri:hover { background: var(--mg-primary-d); }
 .mg-btn.gho { background: #fff; border-color: var(--mg-line); color: var(--mg-sub); }
@@ -281,6 +283,14 @@ body .site-footer { display: none !important; }
 }
 @media (max-width: 700px) {
     .mg-topbar .mg-tb-left { display: none; }
+    /* 상단 유틸바: 좁은 폭에서 글자 세로 깨짐 방지 — 폰트·간격 축소 + 항목 단위 줄바꿈 허용 */
+    .mg-topbar { font-size: 11px; }
+    .mg-topbar .mg-wrap { height: auto; min-height: 36px; padding: 6px 12px; justify-content: flex-end; }
+    .mg-tb-right { gap: 6px 9px; flex-wrap: wrap; justify-content: flex-end; }
+    .mg-tb-point { padding: 3px 8px; }
+    /* 상품카드 액션 버튼: 좁은 카드에서 '담기' 세로 깨짐 방지 */
+    .mg-card .mg-actions { gap: 6px; padding: 0 10px 12px; }
+    .mg-btn { padding: 9px 6px; font-size: 12.5px; gap: 4px; }
     .mg-grid, .mg-grid.g5 { grid-template-columns: repeat(2, 1fr); gap: 14px; }
     .mg-gnb-list > li > a { padding: 12px 12px; font-size: 14px; }
     .mg-hero-track { height: 260px; }

@@ -58,7 +58,9 @@
       "Bash(/e/xampp/mysql/bin/mysql -uroot mangoshop -e \"SELECT id, thumbnail FROM products LIMIT 3; SELECT title, image FROM banners LIMIT 2;\")",
       "Bash(/e/xampp/mysql/bin/mysql -uroot mangoshop -e \"DELETE FROM banners WHERE title='도매회원 전용 여신 서비스';\")",
       "Bash(/e/xampp/mysql/bin/mysql -uroot --default-character-set=utf8mb4 mangoshop -e \"SELECT sort_order, title, subtitle FROM banners WHERE position='main' ORDER BY sort_order;\")",
-      "Bash(/e/xampp/mysql/bin/mysql -uroot --default-character-set=utf8mb4 mangoshop -e \"SELECT sort_order,title,subtitle FROM banners WHERE position='main' ORDER BY sort_order;\")"
+      "Bash(/e/xampp/mysql/bin/mysql -uroot --default-character-set=utf8mb4 mangoshop -e \"SELECT sort_order,title,subtitle FROM banners WHERE position='main' ORDER BY sort_order;\")",
+      "mcp__chrome-devtools__resize_page",
+      "mcp__chrome-devtools__emulate"
     ]
   }
 }
