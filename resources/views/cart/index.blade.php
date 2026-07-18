@@ -17,7 +17,7 @@
                         <td>
                             <div class="pname">
                                 <a href="{{ route('catalog.show', $it->product->slug) }}" class="pthumb">
-                                    @if($it->product->thumbnail)<img src="{{ $it->product->thumbnail }}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:8px">@else<x-icon :name="$it->product->category->icon ?? 'box'"/>@endif
+                                    @if($it->product->thumbnail)<img src="{{ $it->product->thumb_url }}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:8px">@else<x-icon :name="$it->product->category->icon ?? 'box'"/>@endif
                                 </a>
                                 <div>
                                     <div class="muted" style="font-size:12px">{{ $it->product->maker }}</div>

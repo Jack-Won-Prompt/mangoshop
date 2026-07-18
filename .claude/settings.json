@@ -53,7 +53,9 @@
       "Bash(php -d error_reporting=\"E_ALL & ~E_DEPRECATED\" artisan tinker --execute=\"echo config\\('broadcasting.connections.pusher.key'\\).' | '.config\\('broadcasting.connections.pusher.options.cluster'\\).' | app_id='.config\\('broadcasting.connections.pusher.app_id'\\);\")",
       "Bash(git commit -q -m ' *)",
       "Bash(/e/xampp/mysql/bin/mysql -uroot --default-character-set=utf8mb4 mangoshop -e \"SELECT ca.id, u.email AS buyer, ca.limit_amount AS credit_limit, ca.used_amount AS used, ca.terms, ca.status FROM credit_accounts ca JOIN users u ON u.id=ca.user_id;\")",
-      "Bash(grep -v '/\\\\.gitignore$')"
+      "Bash(grep -v '/\\\\.gitignore$')",
+      "Bash(/e/xampp/mysql/bin/mysql -uroot mangoshop -e \"SELECT id, thumbnail FROM products LIMIT 3;\")",
+      "Bash(/e/xampp/mysql/bin/mysql -uroot mangoshop -e \"SELECT id, thumbnail FROM products LIMIT 3; SELECT title, image FROM banners LIMIT 2;\")"
     ]
   }
 }

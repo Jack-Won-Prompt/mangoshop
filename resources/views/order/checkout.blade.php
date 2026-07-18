@@ -26,7 +26,7 @@ function msApplyCoupon(code){var i=document.querySelector('input[name=code][form
                         <tr>
                             <td>
                                 <div class="pname">
-                                    <span class="pthumb">@if($it->product->thumbnail)<img src="{{ $it->product->thumbnail }}" style="width:100%;height:100%;object-fit:cover;border-radius:8px" alt="">@else<x-icon :name="$it->product->category->icon ?? 'box'"/>@endif</span>
+                                    <span class="pthumb">@if($it->product->thumbnail)<img src="{{ $it->product->thumb_url }}" style="width:100%;height:100%;object-fit:cover;border-radius:8px" alt="">@else<x-icon :name="$it->product->category->icon ?? 'box'"/>@endif</span>
                                     <div><div style="font-weight:600">{{ $it->product->name }}</div><div class="muted" style="font-size:12px">{{ number_format($unit) }}원 × {{ $it->quantity }}{{ $it->product->unit }}</div></div>
                                 </div>
                             </td>

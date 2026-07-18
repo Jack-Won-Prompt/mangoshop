@@ -6,7 +6,7 @@
             <li>
                 <a href="{{ route('catalog.show', $rp->slug) }}" title="{{ $rp->name }}">
                     @if($rp->thumbnail)
-                        <img src="{{ $rp->thumbnail }}" alt="{{ $rp->name }}" loading="lazy">
+                        <img src="{{ $rp->thumb_url }}" alt="{{ $rp->name }}" loading="lazy">
                     @else
                         <span class="qr-ph"><x-icon :name="$rp->category->icon ?? 'box'" :size="22"/></span>
                     @endif

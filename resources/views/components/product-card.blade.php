@@ -33,7 +33,7 @@
             @if($inbound)<span class="mg-badge inbound">입고예정</span>@endif
         </div>
         @if($product->thumbnail)
-            <img src="{{ $product->thumbnail }}" alt="{{ $product->name }}" loading="lazy">
+            <img src="{{ $product->thumb_url }}" alt="{{ $product->name }}" loading="lazy">
         @else
             <span class="mg-thumb-ph" style="background:linear-gradient(135deg,#fff4ea,#ffe6cc)">{{ $emoji }}</span>
         @endif

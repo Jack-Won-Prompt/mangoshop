@@ -18,7 +18,7 @@
                     </div>
                     <div class="mg-slide-visual" aria-hidden="true">
                         <span class="mg-visual-ring"></span>
-                        <div class="mg-visual-main" style="background-image:url('{{ $b->image ?: $heroAcc[0] }}')"></div>
+                        <div class="mg-visual-main" style="background-image:url('{{ $b->image_url ?: $heroAcc[0] }}')"></div>
                         <span class="mg-visual-acc a1" style="background-image:url('{{ $heroAcc[0] }}')"></span>
                         <span class="mg-visual-acc a2" style="background-image:url('{{ $heroAcc[1] }}')"></span>
                         <span class="mg-visual-acc a3" style="background-image:url('{{ $heroAcc[2] }}')"></span>

@@ -25,7 +25,8 @@
 <div class="container" style="padding-top:30px">
     <div class="detail">
         @php
-            $gallery = collect([$product->thumbnail])->merge($product->images ?? [])->filter()->unique()->values();
+            $gallery = collect([$product->thumbnail])->merge($product->images ?? [])->filter()->unique()
+                ->map(fn ($u) => \App\Support\Media::url($u))->values();
         @endphp
         <div class="gallery">
             <div class="main-img">

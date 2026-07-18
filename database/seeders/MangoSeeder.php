@@ -177,7 +177,7 @@ class MangoSeeder extends Seeder
                 'seller_id'   => $seller->id,
                 'category_id' => $cat?->id,
                 'name'        => $name,
-                'thumbnail'   => asset('images/fruit/'.$img),
+                'thumbnail'   => 'images/fruit/'.$img,
                 'code'        => 'MG'.str_pad((string) ($i + 1), 4, '0', STR_PAD_LEFT),
                 'unit'        => 'BOX',
                 'origin'      => $origin,
@@ -213,7 +213,7 @@ class MangoSeeder extends Seeder
             'category_id' => $cats['durian']->id ?? null,
             'name' => '태국 몬통 두리안 (입고예정)', 'unit' => 'BOX', 'origin' => '태국',
             'variety' => '몬통', 'grade' => '특', 'box_spec' => '3kg',
-            'thumbnail' => asset('images/fruit/durian-fruit-0.jpg'),
+            'thumbnail' => 'images/fruit/durian-fruit-0.jpg',
             'price' => 89000, 'wholesale_price' => 72000, 'moq' => 1, 'stock' => 0,
             'sale_status' => 'inbound', 'expected_inbound_date' => now()->addDays(10),
             'summary' => '태국산 몬통 두리안 · 예약주문', 'is_active' => true, 'sort_order' => 99,
@@ -223,9 +223,9 @@ class MangoSeeder extends Seeder
     private function banners(): void
     {
         $main = [
-            ['title' => '태국 애플망고 산지직송', 'subtitle' => '남독마이 특품 5kg 최대 25% 도매 특가', 'bg_color' => '#ffffff', 'image' => asset('images/fruit/mango-nam-dok-mai-0.jpg')],
-            ['title' => '수입사 직거래 오픈마켓', 'subtitle' => '망고샵에서 검증된 수입사와 직접 거래하세요', 'bg_color' => '#ffffff', 'image' => asset('images/fruit/orange-fruit-0.jpg')],
-            ['title' => '도매회원 전용 여신 서비스', 'subtitle' => '사업자 승인 후 후불(월결제) 주문 가능', 'bg_color' => '#ffffff', 'image' => asset('images/fruit/pineapple-fruit-0.jpg')],
+            ['title' => '태국 애플망고 산지직송', 'subtitle' => '남독마이 특품 5kg 최대 25% 도매 특가', 'bg_color' => '#ffffff', 'image' => 'images/fruit/mango-nam-dok-mai-0.jpg'],
+            ['title' => '수입사 직거래 오픈마켓', 'subtitle' => '망고샵에서 검증된 수입사와 직접 거래하세요', 'bg_color' => '#ffffff', 'image' => 'images/fruit/orange-fruit-0.jpg'],
+            ['title' => '도매회원 전용 여신 서비스', 'subtitle' => '사업자 승인 후 후불(월결제) 주문 가능', 'bg_color' => '#ffffff', 'image' => 'images/fruit/pineapple-fruit-0.jpg'],
         ];
         foreach ($main as $i => $b) {
             Banner::updateOrCreate(['position' => 'main', 'title' => $b['title']],

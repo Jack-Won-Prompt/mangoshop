@@ -2,10 +2,17 @@
 
 namespace App\Models;
 
+use App\Support\Media;
 use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
+    /** 저장된 thumbnail을 현재 호스트(APP_URL) 기준 URL로 정규화 */
+    public function getThumbUrlAttribute(): ?string
+    {
+        return Media::url($this->thumbnail);
+    }
+
     protected $fillable = [
         'seller_id', 'category_id', 'brand_id', 'name', 'slug', 'code', 'unit', 'maker',
         'summary', 'description', 'spec', 'price', 'cost', 'member_price', 'wholesale_price', 'wholesale_only',
