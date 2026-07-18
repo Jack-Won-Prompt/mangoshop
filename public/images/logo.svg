@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 470 120" fill="none">
+  <defs>
+    <linearGradient id="lg-mango" x1="18" y1="18" x2="96" y2="104" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffb03a"/><stop offset="1" stop-color="#ff6b00"/>
+    </linearGradient>
+    <linearGradient id="lg-leaf" x1="60" y1="4" x2="100" y2="40" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5ec26a"/><stop offset="1" stop-color="#2f9e44"/>
+    </linearGradient>
+    <linearGradient id="lg-word" x1="132" y1="30" x2="132" y2="96" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ff8a1e"/><stop offset="1" stop-color="#ff6b00"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 망고 마크 -->
+  <g transform="rotate(-18 62 66)">
+    <ellipse cx="62" cy="66" rx="40" ry="46" fill="url(#lg-mango)"/>
+    <path d="M50 40c10 4 18 12 22 24" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".55" fill="none"/>
+  </g>
+  <!-- 잎 -->
+  <path d="M66 22c14-14 34-14 40-10-2 12-16 24-30 22-6-1-12-6-10-12z" fill="url(#lg-leaf)"/>
+  <path d="M72 20c8-4 18-5 26-4" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".5" fill="none"/>
+
+  <!-- 워드마크 -->
+  <text x="128" y="80" font-family="'Malgun Gothic','Apple SD Gothic Neo','Pretendard',sans-serif" font-size="60" font-weight="800" letter-spacing="-3" fill="url(#lg-word)">망고샵</text>
+</svg>

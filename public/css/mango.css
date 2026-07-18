@@ -1,0 +1,294 @@
+/* ==========================================================================
+   MANGOSHOP — 수입과일 오픈마켓 디자인 시스템 (exfresh 레이아웃 톤 재현)
+   site.css 이후에 로드되어 상단 헤더/홈/상품카드/푸터를 mg- 네임스페이스로 재정의.
+   ========================================================================== */
+:root {
+    --mg-primary: #ff6b00;
+    --mg-primary-d: #e85d00;
+    --mg-primary-l: #fff4ea;
+    --mg-accent: #16a34a;
+    --mg-accent-d: #0f7a37;
+    --mg-red: #e8382b;
+    --mg-ink: #222;
+    --mg-sub: #555;
+    --mg-muted: #8a8f99;
+    --mg-line: #ececef;
+    --mg-bg: #fff;
+    --mg-soft: #f6f7f9;
+    --mg-wrap: 1240px;
+    --mg-radius: 12px;
+    --mg-shadow: 0 2px 12px rgba(0,0,0,.06);
+}
+
+.mg-wrap { max-width: var(--mg-wrap); margin: 0 auto; padding: 0 16px; }
+
+/* 기존 레거시 헤더/푸터 숨김 (mango 헤더로 대체) */
+body .top-bar,
+body .site-header,
+body > footer.site-footer,
+body .site-footer { display: none !important; }
+
+/* ============================ 상단 유틸바 ============================ */
+.mg-topbar {
+    border-bottom: 1px solid var(--mg-line);
+    background: #fff;
+    font-size: 12.5px;
+}
+.mg-topbar .mg-wrap { display: flex; align-items: center; justify-content: space-between; height: 38px; }
+.mg-tb-nav { display: flex; gap: 18px; list-style: none; margin: 0; padding: 0; }
+.mg-tb-nav a { color: #666; }
+.mg-tb-nav a:hover { color: var(--mg-primary); }
+.mg-tb-right { display: flex; align-items: center; gap: 14px; }
+.mg-tb-right a { color: #555; display: inline-flex; align-items: center; gap: 4px; }
+.mg-tb-right a:hover { color: var(--mg-primary); }
+.mg-tb-right .sep { color: #ddd; }
+.mg-tb-point {
+    background: linear-gradient(135deg, var(--mg-primary), #ff9838);
+    color: #fff !important; padding: 4px 10px; border-radius: 20px; font-weight: 700;
+}
+
+/* ============================ 메인 헤더 (로고+검색) ============================ */
+.mg-head { background: #fff; padding: 22px 0 18px; text-align: center; }
+.mg-logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+.mg-logo .mark { font-size: 34px; line-height: 1; }
+.mg-logo .txt { display: flex; flex-direction: column; align-items: flex-start; line-height: 1; }
+.mg-logo .txt b {
+    font-size: 30px; font-weight: 900; letter-spacing: -1px;
+    background: linear-gradient(120deg, var(--mg-primary), #ffab00);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.mg-logo .txt small { font-size: 11px; color: var(--mg-muted); font-weight: 600; margin-top: 3px; letter-spacing: 1px; }
+
+.mg-search { max-width: 560px; margin: 16px auto 0; }
+.mg-search form {
+    display: flex; align-items: center;
+    border: 2.5px solid var(--mg-primary); border-radius: 30px; overflow: hidden; background: #fff;
+}
+.mg-search input {
+    flex: 1; border: 0; outline: 0; padding: 12px 20px; font-size: 15px; background: transparent; min-width: 0;
+}
+.mg-search button {
+    border: 0; background: var(--mg-primary); color: #fff; width: 56px; height: 46px;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.mg-search button:hover { background: var(--mg-primary-d); }
+.mg-pop { margin-top: 10px; font-size: 12.5px; color: var(--mg-muted); }
+.mg-pop b { color: var(--mg-sub); margin-right: 6px; }
+.mg-pop a { color: #777; margin: 0 6px; }
+.mg-pop a:hover { color: var(--mg-primary); text-decoration: underline; }
+
+/* ============================ GNB 카테고리 바 ============================ */
+.mg-gnb { border-top: 2px solid var(--mg-primary); border-bottom: 1px solid var(--mg-line); background: #fff; position: sticky; top: 0; z-index: 40; }
+.mg-gnb-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px; list-style: none; margin: 0; padding: 0; }
+.mg-gnb-list > li > a {
+    display: block; padding: 15px 20px; font-size: 15.5px; font-weight: 700; color: var(--mg-ink);
+    position: relative;
+}
+.mg-gnb-list > li > a:hover { color: var(--mg-primary); }
+.mg-gnb-list > li > a.biz { color: var(--mg-accent); }
+.mg-gnb-list > li > a .ic { display: inline-flex; vertical-align: -4px; margin-right: 7px; color: #9aa0ab; }
+.mg-gnb-list > li > a .ic svg { display: block; }
+.mg-gnb-list > li > a::after {
+    content: ""; position: absolute; left: 20px; right: 20px; bottom: 8px; height: 3px;
+    background: var(--mg-primary); border-radius: 2px; transform: scaleX(0); transition: transform .18s;
+}
+.mg-gnb-list > li > a:hover::after { transform: scaleX(1); }
+
+/* ============================ 히어로 (풀와이드 · 화이트 · 실사진) ============================ */
+.mg-hero { position: relative; width: 100%; overflow: hidden; background: #fff; }
+/* 은은한 컬러 블롭으로 화이트 배경에 생동감 */
+.mg-hero::before, .mg-hero::after { content: ""; position: absolute; border-radius: 50%; filter: blur(70px); opacity: .5; z-index: 0; pointer-events: none; }
+.mg-hero::before { width: 460px; height: 460px; background: radial-gradient(circle, #ffe0b8, transparent 70%); top: -140px; right: -80px; }
+.mg-hero::after { width: 420px; height: 420px; background: radial-gradient(circle, #d8f3d8, transparent 70%); bottom: -160px; left: -60px; }
+.mg-hero-track { position: relative; height: 480px; z-index: 1; }
+.mg-slide { position: absolute; inset: 0; opacity: 0; visibility: hidden; transition: opacity .6s ease; display: flex; align-items: center; }
+.mg-slide.on { opacity: 1; visibility: visible; }
+.mg-slide .mg-wrap { position: relative; width: 100%; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 30px; color: var(--mg-ink); }
+
+.mg-slide-txt { max-width: 560px; }
+.mg-slide-txt small { display: inline-block; font-weight: 800; letter-spacing: 2px; font-size: 12.5px; color: var(--mg-primary-d); margin-bottom: 14px; background: var(--mg-primary-l); padding: 6px 14px; border-radius: 20px; }
+.mg-slide-txt h2 { font-size: 46px; font-weight: 900; line-height: 1.18; letter-spacing: -1.6px; margin: 0 0 14px; color: #1a1a1a; }
+.mg-slide-txt p { font-size: 18px; color: var(--mg-sub); margin: 0 0 26px; line-height: 1.5; }
+.mg-slide-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--mg-primary); color: #fff; font-weight: 800; padding: 14px 30px; border-radius: 30px; font-size: 15px; box-shadow: 0 8px 22px rgba(255,107,0,.32); transition: transform .18s, box-shadow .18s; }
+.mg-slide-btn:hover { background: var(--mg-primary-d); transform: translateY(-2px); box-shadow: 0 12px 28px rgba(255,107,0,.4); }
+
+/* 활성 슬라이드 텍스트 등장 애니메이션(생동감) */
+.mg-slide.on .mg-slide-txt > * { animation: mgRise .6s both; }
+.mg-slide.on .mg-slide-txt small { animation-delay: .05s; }
+.mg-slide.on .mg-slide-txt h2 { animation-delay: .14s; }
+.mg-slide.on .mg-slide-txt p { animation-delay: .22s; }
+.mg-slide.on .mg-slide-txt .mg-slide-btn { animation-delay: .3s; }
+@keyframes mgRise { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+
+/* 오른쪽 실사진 비주얼 */
+.mg-slide-visual { position: relative; height: 400px; }
+.mg-visual-main { position: absolute; top: 50%; left: 50%; width: 340px; height: 340px; transform: translate(-50%,-50%); border-radius: 50%; background-size: cover; background-position: center; box-shadow: 0 26px 60px -18px rgba(0,0,0,.4); border: 8px solid #fff; }
+.mg-slide.on .mg-visual-main { animation: mgPop .7s cubic-bezier(.2,.9,.3,1.2) both, mgKen 9s ease-in-out .7s infinite alternate; }
+@keyframes mgPop { from { opacity: 0; transform: translate(-50%,-50%) scale(.82); } to { opacity: 1; transform: translate(-50%,-50%) scale(1); } }
+@keyframes mgKen { from { background-size: 108%; } to { background-size: 124%; } }
+/* 회전 점선 링 */
+.mg-visual-ring { position: absolute; top: 50%; left: 50%; width: 400px; height: 400px; transform: translate(-50%,-50%); border: 2px dashed #ffcf9e; border-radius: 50%; animation: mgSpin 26s linear infinite; }
+@keyframes mgSpin { to { transform: translate(-50%,-50%) rotate(360deg); } }
+/* 떠다니는 작은 과일 원형 */
+.mg-visual-acc { position: absolute; width: 88px; height: 88px; border-radius: 50%; background-size: cover; background-position: center; border: 5px solid #fff; box-shadow: 0 10px 24px rgba(0,0,0,.18); animation: mgFloat 5s ease-in-out infinite; }
+.mg-visual-acc.a1 { top: 8%; right: 10%; width: 96px; height: 96px; }
+.mg-visual-acc.a2 { bottom: 10%; right: 22%; animation-delay: 1s; }
+.mg-visual-acc.a3 { bottom: 22%; left: 6%; width: 74px; height: 74px; animation-delay: 2s; }
+@keyframes mgFloat { 0%,100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-16px) rotate(3deg); } }
+@media (max-width: 900px) {
+    .mg-slide .mg-wrap { grid-template-columns: 1fr; }
+    .mg-slide-visual { display: none; }
+    .mg-slide-txt { max-width: none; text-align: center; margin: 0 auto; }
+}
+
+.mg-hero-dots { position: absolute; left: 0; right: 0; bottom: 22px; display: flex; justify-content: center; gap: 9px; z-index: 3; }
+.mg-hero-dots button { width: 10px; height: 10px; border-radius: 50%; border: 0; background: #e0c3a6; cursor: pointer; padding: 0; transition: width .2s; }
+.mg-hero-dots button.on { background: var(--mg-primary); width: 26px; border-radius: 6px; }
+.mg-hero-arrow {
+    position: absolute; top: 50%; transform: translateY(-50%); z-index: 3;
+    width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--mg-line); background: rgba(255,255,255,.85); color: var(--mg-ink);
+    font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: var(--mg-shadow); backdrop-filter: blur(4px);
+}
+.mg-hero-arrow:hover { background: #fff; color: var(--mg-primary); }
+.mg-hero-arrow.prev { left: 24px; }
+.mg-hero-arrow.next { right: 24px; }
+
+/* ============================ 안내 스트립 (배송/혜택) ============================ */
+.mg-strip { border-bottom: 1px solid var(--mg-line); background: #fff; }
+.mg-strip .mg-wrap { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 40px; padding: 16px; }
+.mg-strip .item { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--mg-sub); }
+.mg-strip .item b { color: var(--mg-ink); }
+.mg-strip .item .ic { display: inline-flex; color: #9aa0ab; }
+.mg-strip .item .ic svg { display: block; }
+
+/* ============================ 섹션 / 상품 그리드 ============================ */
+.mg-section { padding: 46px 0; }
+.mg-section.alt { background: var(--mg-soft); }
+.mg-sec-head { text-align: center; margin-bottom: 30px; }
+.mg-sec-head .ki { color: var(--mg-primary); font-weight: 800; letter-spacing: 2px; font-size: 13px; }
+.mg-sec-head h3 { font-size: 28px; font-weight: 900; letter-spacing: -1px; margin: 6px 0 6px; color: var(--mg-ink); }
+.mg-sec-head p { color: var(--mg-muted); font-size: 14.5px; margin: 0; }
+.mg-sec-head.biz h3 { color: var(--mg-accent-d); }
+
+.mg-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+.mg-grid.g5 { grid-template-columns: repeat(5, 1fr); }
+.mg-sec-more { text-align: center; margin-top: 30px; }
+
+/* ============================ 상품 카드 ============================ */
+.mg-card { position: relative; background: #fff; border: 1px solid var(--mg-line); border-radius: var(--mg-radius); overflow: hidden; transition: box-shadow .18s, transform .18s; display: flex; flex-direction: column; }
+.mg-card:hover { box-shadow: 0 10px 26px rgba(0,0,0,.10); transform: translateY(-3px); }
+.mg-card .mg-thumb { position: relative; display: block; aspect-ratio: 1/1; overflow: hidden; background: var(--mg-soft); }
+.mg-card .mg-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s; }
+.mg-card:hover .mg-thumb img { transform: scale(1.05); }
+.mg-thumb-ph { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 76px; }
+.mg-badges { position: absolute; top: 10px; left: 10px; display: flex; flex-direction: column; gap: 5px; z-index: 2; }
+.mg-badge { font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 5px; color: #fff; }
+.mg-badge.best { background: var(--mg-red); }
+.mg-badge.new { background: var(--mg-accent); }
+.mg-badge.biz { background: #1f2937; }
+.mg-badge.origin { background: rgba(0,0,0,.62); font-weight: 700; }
+.mg-badge.inbound { background: #f59e0b; }
+.mg-soldout-cover { position: absolute; inset: 0; background: rgba(255,255,255,.72); display: flex; align-items: center; justify-content: center; font-weight: 800; color: #444; z-index: 3; }
+.mg-wish { position: absolute; top: 10px; right: 10px; z-index: 3; background: rgba(255,255,255,.92); border: 0; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 1px 5px rgba(0,0,0,.12); color: #c9ccd2; line-height: 1; }
+.mg-wish.on { color: var(--mg-red); }
+.mg-wish strong { font-size: 9px; font-weight: 700; }
+.mg-card .mg-info { padding: 14px 14px 16px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.mg-seller { font-size: 12px; color: var(--mg-accent-d); font-weight: 700; }
+.mg-name { font-size: 14.5px; font-weight: 600; color: var(--mg-ink); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 40px; }
+.mg-name:hover { color: var(--mg-primary); }
+.mg-meta { font-size: 11.5px; color: var(--mg-muted); display: flex; flex-wrap: wrap; gap: 6px; }
+.mg-meta span { position: relative; }
+.mg-meta span + span::before { content: "·"; margin-right: 6px; color: #ccc; }
+.mg-price-row { margin-top: auto; padding-top: 4px; }
+.mg-oprice { color: #b7bbc2; text-decoration: line-through; font-size: 13px; margin-right: 6px; }
+.mg-rate { color: var(--mg-red); font-weight: 900; font-size: 17px; margin-right: 6px; }
+.mg-price { font-size: 20px; font-weight: 900; color: var(--mg-ink); }
+.mg-price .won { font-size: 14px; font-weight: 700; margin-left: 1px; }
+.mg-price-hide { font-size: 13px; color: var(--mg-muted); font-weight: 600; background: var(--mg-soft); border-radius: 6px; padding: 8px 10px; text-align: center; }
+.mg-price-hide a { color: var(--mg-primary); font-weight: 700; }
+.mg-wprice { font-size: 12px; color: var(--mg-accent-d); font-weight: 700; }
+.mg-card .mg-actions { padding: 0 14px 14px; display: flex; gap: 8px; }
+.mg-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; font-weight: 700; font-size: 13.5px; padding: 10px 12px; cursor: pointer; border: 1px solid transparent; text-decoration: none; }
+.mg-btn.pri { background: var(--mg-primary); color: #fff; flex: 1; }
+.mg-btn.pri:hover { background: var(--mg-primary-d); }
+.mg-btn.gho { background: #fff; border-color: var(--mg-line); color: var(--mg-sub); }
+.mg-btn.gho:hover { border-color: var(--mg-primary); color: var(--mg-primary); }
+.mg-btn.block { width: 100%; }
+.mg-btn[disabled] { opacity: .5; cursor: not-allowed; }
+
+/* ============================ 프로모 밴드 (리뷰 적립 / 입점 모집) ============================ */
+.mg-promo { padding: 8px 0 46px; }
+.mg-promo .mg-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+.mg-promo-card {
+    position: relative; overflow: hidden; border-radius: 16px; padding: 30px 32px; color: #fff;
+    display: flex; flex-direction: column; justify-content: center; min-height: 210px; box-shadow: var(--mg-shadow);
+}
+.mg-promo-card.review { background: linear-gradient(135deg, #ff7a18, #ff9d3c); }
+.mg-promo-card.join { background: linear-gradient(135deg, #0f7a37, #1fb257); }
+.mg-promo-card .em { position: absolute; right: 16px; bottom: -14px; font-size: 118px; line-height: 1; opacity: .22; pointer-events: none; }
+.mg-promo-card .tag { font-size: 12px; font-weight: 800; letter-spacing: 1.5px; opacity: .92; }
+.mg-promo-card h4 { font-size: 25px; font-weight: 900; letter-spacing: -1px; line-height: 1.28; margin: 6px 0 14px; }
+.mg-promo-card h4 b { color: #fff2c2; }
+.mg-promo-rows { display: flex; flex-direction: column; gap: 7px; margin-bottom: 18px; }
+.mg-promo-row { display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; background: rgba(255,255,255,.16); padding: 8px 12px; border-radius: 8px; }
+.mg-promo-row b { color: #fff; }
+.mg-promo-row .n { flex: none; background: #fff; color: var(--mg-primary-d); font-weight: 800; font-size: 11px; border-radius: 5px; padding: 2px 7px; }
+.mg-promo-card.join .mg-promo-row .n { color: var(--mg-accent-d); }
+.mg-promo-card .tel { font-size: 26px; font-weight: 900; letter-spacing: -.5px; margin: 2px 0 12px; }
+.mg-promo-btn { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; background: #fff; color: var(--mg-ink); font-weight: 800; font-size: 14px; padding: 11px 22px; border-radius: 30px; text-decoration: none; position: relative; z-index: 1; }
+.mg-promo-card.review .mg-promo-btn:hover { color: var(--mg-primary-d); }
+.mg-promo-card.join .mg-promo-btn { color: var(--mg-accent-d); }
+
+/* ============================ 인스타그램 피드 ============================ */
+.mg-insta { padding: 8px 0 56px; text-align: center; }
+.mg-insta-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; margin-top: 26px; }
+.mg-insta-grid a { position: relative; aspect-ratio: 1/1; border-radius: 10px; overflow: hidden; display: block; text-decoration: none; background: var(--mg-soft); }
+.mg-insta-grid a img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s; }
+.mg-insta-grid a:hover img { transform: scale(1.1); }
+.mg-insta-grid a .ov { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #fff; background: rgba(0,0,0,.34); opacity: 0; transition: opacity .2s; }
+.mg-insta-grid a:hover .ov { opacity: 1; }
+.mg-insta-follow { margin-top: 24px; }
+
+@media (max-width: 1024px) {
+    .mg-insta-grid { grid-template-columns: repeat(4, 1fr); }
+}
+@media (max-width: 700px) {
+    .mg-promo .mg-wrap { grid-template-columns: 1fr; }
+    .mg-insta-grid { grid-template-columns: repeat(2, 1fr); }
+    .mg-promo-card h4 { font-size: 21px; }
+}
+
+/* ============================ 푸터 ============================ */
+.mg-footer { border-top: 3px solid var(--mg-primary); background: #fafafa; margin-top: 40px; }
+.mg-foot-top .mg-wrap { display: flex; flex-wrap: wrap; gap: 14px 26px; padding: 18px 16px; border-bottom: 1px solid var(--mg-line); }
+.mg-foot-top a { font-size: 13.5px; color: #555; font-weight: 600; }
+.mg-foot-top a:hover { color: var(--mg-primary); }
+.mg-foot-mid .mg-wrap { padding: 26px 16px; display: grid; grid-template-columns: 1.6fr 1fr; gap: 30px; }
+.mg-foot-info { font-size: 12.5px; color: #888; line-height: 1.9; }
+.mg-foot-info .fname { font-size: 20px; font-weight: 900; color: var(--mg-primary); margin-bottom: 10px; }
+.mg-foot-cs { text-align: right; }
+.mg-foot-cs .tel { font-size: 26px; font-weight: 900; color: var(--mg-ink); }
+.mg-foot-cs .hours { font-size: 12.5px; color: #999; margin-top: 4px; }
+.mg-foot-badges { display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px; }
+.mg-foot-badges span { font-size: 11px; color: #999; border: 1px solid var(--mg-line); border-radius: 6px; padding: 6px 10px; background: #fff; }
+.mg-foot-copy { text-align: center; font-size: 12px; color: #aaa; padding: 16px; border-top: 1px solid var(--mg-line); }
+
+/* ============================ 반응형 ============================ */
+@media (max-width: 1024px) {
+    .mg-grid, .mg-grid.g5 { grid-template-columns: repeat(3, 1fr); }
+    .mg-hero-track { height: 340px; }
+    .mg-slide-txt h2 { font-size: 32px; }
+}
+@media (max-width: 700px) {
+    .mg-topbar .mg-tb-left { display: none; }
+    .mg-grid, .mg-grid.g5 { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .mg-gnb-list > li > a { padding: 12px 12px; font-size: 14px; }
+    .mg-hero-track { height: 260px; }
+    .mg-slide-txt h2 { font-size: 24px; }
+    .mg-slide-txt p { font-size: 14px; }
+    .mg-hero-arrow { display: none; }
+    .mg-foot-mid .mg-wrap { grid-template-columns: 1fr; }
+    .mg-foot-cs, .mg-foot-badges { text-align: left; justify-content: flex-start; }
+    .mg-section { padding: 32px 0; }
+    .mg-sec-head h3 { font-size: 22px; }
+}
