@@ -55,7 +55,9 @@
       "Bash(/e/xampp/mysql/bin/mysql -uroot --default-character-set=utf8mb4 mangoshop -e \"SELECT ca.id, u.email AS buyer, ca.limit_amount AS credit_limit, ca.used_amount AS used, ca.terms, ca.status FROM credit_accounts ca JOIN users u ON u.id=ca.user_id;\")",
       "Bash(grep -v '/\\\\.gitignore$')",
       "Bash(/e/xampp/mysql/bin/mysql -uroot mangoshop -e \"SELECT id, thumbnail FROM products LIMIT 3;\")",
-      "Bash(/e/xampp/mysql/bin/mysql -uroot mangoshop -e \"SELECT id, thumbnail FROM products LIMIT 3; SELECT title, image FROM banners LIMIT 2;\")"
+      "Bash(/e/xampp/mysql/bin/mysql -uroot mangoshop -e \"SELECT id, thumbnail FROM products LIMIT 3; SELECT title, image FROM banners LIMIT 2;\")",
+      "Bash(/e/xampp/mysql/bin/mysql -uroot mangoshop -e \"DELETE FROM banners WHERE title='도매회원 전용 여신 서비스';\")",
+      "Bash(/e/xampp/mysql/bin/mysql -uroot --default-character-set=utf8mb4 mangoshop -e \"SELECT sort_order, title, subtitle FROM banners WHERE position='main' ORDER BY sort_order;\")"
     ]
   }
 }

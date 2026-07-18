@@ -42,7 +42,7 @@
     <div class="mg-wrap">
         <div class="item"><span class="ic"><x-icon name="truck" :size="21"/></span><b>콜드체인 냉장배송</b> 신선하게 산지직송</div>
         <div class="item"><span class="ic"><x-icon name="building" :size="21"/></span><b>수입사 직거래</b> 검증된 입점 수입사</div>
-        <div class="item"><span class="ic"><x-icon name="coin" :size="21"/></span><b>도매 여신결제</b> 승인 회원 후불·월결제</div>
+        <div class="item"><span class="ic"><x-icon name="coin" :size="21"/></span><b>수량구간 대량할인</b> 도매회원 구간별 도매가</div>
         <div class="item"><span class="ic"><x-icon name="doc" :size="21"/></span><b>세금계산서</b> 사업자 발행 지원</div>
     </div>
 </div>
@@ -71,7 +71,7 @@
         <div class="mg-sec-head biz">
             <div class="ki" style="color:var(--mg-accent-d)">FOR BUSINESS</div>
             <h3>사업자 전용 도매 특가</h3>
-            <p>도매회원 승인 후 도매가·수량구간 할인·여신결제로 만나보세요</p>
+            <p>도매회원 승인 후 도매 전용가와 수량구간 대량할인으로 만나보세요</p>
         </div>
         <div class="mg-grid g5">
             @foreach($featuredProducts->take(5) as $p)<x-product-card :product="$p"/>@endforeach

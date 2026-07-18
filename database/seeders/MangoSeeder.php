@@ -223,14 +223,16 @@ class MangoSeeder extends Seeder
     private function banners(): void
     {
         $main = [
-            ['title' => '태국 애플망고 산지직송', 'subtitle' => '남독마이 특품 5kg 최대 25% 도매 특가', 'bg_color' => '#ffffff', 'image' => 'images/fruit/mango-nam-dok-mai-0.jpg'],
+            ['title' => '태국 애플망고 산지직송', 'subtitle' => '남독마이 특품 5kg 최대 10% 도매 특가', 'bg_color' => '#ffffff', 'image' => 'images/fruit/mango-nam-dok-mai-0.jpg'],
             ['title' => '수입사 직거래 오픈마켓', 'subtitle' => '망고샵에서 검증된 수입사와 직접 거래하세요', 'bg_color' => '#ffffff', 'image' => 'images/fruit/orange-fruit-0.jpg'],
-            ['title' => '도매회원 전용 여신 서비스', 'subtitle' => '사업자 승인 후 후불(월결제) 주문 가능', 'bg_color' => '#ffffff', 'image' => 'images/fruit/pineapple-fruit-0.jpg'],
+            ['title' => '콜드체인 신선배송', 'subtitle' => '수입 과일을 산지 신선 그대로 냉장 직배송', 'bg_color' => '#ffffff', 'image' => 'images/fruit/pineapple-fruit-0.jpg'],
         ];
         foreach ($main as $i => $b) {
             Banner::updateOrCreate(['position' => 'main', 'title' => $b['title']],
                 $b + ['sort_order' => $i, 'link' => '/products']);
         }
+        // 현재 목록에 없는 옛 메인 배너 정리(재시드만으로 운영에서도 동기화)
+        Banner::where('position', 'main')->whereNotIn('title', array_column($main, 'title'))->delete();
     }
 
     private function community(): void
