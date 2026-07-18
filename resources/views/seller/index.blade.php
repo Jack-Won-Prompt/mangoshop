@@ -7,7 +7,7 @@
         <div class="mg-sec-head">
             <div class="ki">SELLERS</div>
             <h3>입점 수입사</h3>
-            <p>망고샵에 입점한 검증된 과일 수입사를 만나보세요</p>
+            <p>망고샵에 입점한 검증된 수입사의 과일을 만나보세요</p>
         </div>
         <div class="mg-grid g5">
             @foreach($sellers as $s)

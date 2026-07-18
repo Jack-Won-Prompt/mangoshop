@@ -224,7 +224,7 @@ class MangoSeeder extends Seeder
     {
         $main = [
             ['title' => '태국 애플망고 산지직송', 'subtitle' => '남독마이 특품 5kg 최대 10% 도매 특가', 'bg_color' => '#ffffff', 'image' => 'images/fruit/mango-nam-dok-mai-0.jpg'],
-            ['title' => '검증된 수입사 입점 마켓', 'subtitle' => '망고샵이 엄선한 수입사 과일을 한 곳에서', 'bg_color' => '#ffffff', 'image' => 'images/fruit/orange-fruit-0.jpg'],
+            ['title' => '검증된 수입사 과일 마켓', 'subtitle' => '엄선한 수입사 과일을 한 곳에서 만나보세요', 'bg_color' => '#ffffff', 'image' => 'images/fruit/orange-fruit-0.jpg'],
             ['title' => '콜드체인 신선배송', 'subtitle' => '수입 과일을 산지 신선 그대로 냉장 직배송', 'bg_color' => '#ffffff', 'image' => 'images/fruit/pineapple-fruit-0.jpg'],
         ];
         foreach ($main as $i => $b) {
