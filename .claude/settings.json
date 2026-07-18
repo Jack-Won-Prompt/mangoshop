@@ -50,7 +50,9 @@
       "Bash(sed -i 's/병원 대표자명/사업자 대표자명/g; s/공급받는자\\(병원\\)/공급받는자\\(사업자\\)/g' database/migrations/2026_07_01_000003_create_tax_invoices.php)",
       "Bash(/e/xampp/mysql/bin/mysql -uroot -e 'DROP DATABASE IF EXISTS mangonara;')",
       "Bash(/e/xampp/mysql/bin/mysql -uroot mangoshop -e \"SELECT COUNT\\(*\\) total, COUNT\\(thumbnail\\) with_thumb, SUM\\(is_best\\) best, SUM\\(is_featured\\) feat, SUM\\(is_new\\) new FROM products;\")",
-      "Bash(php -d error_reporting=\"E_ALL & ~E_DEPRECATED\" artisan tinker --execute=\"echo config\\('broadcasting.connections.pusher.key'\\).' | '.config\\('broadcasting.connections.pusher.options.cluster'\\).' | app_id='.config\\('broadcasting.connections.pusher.app_id'\\);\")"
+      "Bash(php -d error_reporting=\"E_ALL & ~E_DEPRECATED\" artisan tinker --execute=\"echo config\\('broadcasting.connections.pusher.key'\\).' | '.config\\('broadcasting.connections.pusher.options.cluster'\\).' | app_id='.config\\('broadcasting.connections.pusher.app_id'\\);\")",
+      "Bash(git commit -q -m ' *)",
+      "Bash(/e/xampp/mysql/bin/mysql -uroot --default-character-set=utf8mb4 mangoshop -e \"SELECT ca.id, u.email AS buyer, ca.limit_amount AS credit_limit, ca.used_amount AS used, ca.terms, ca.status FROM credit_accounts ca JOIN users u ON u.id=ca.user_id;\")"
     ]
   }
 }
