@@ -41,7 +41,7 @@
 <div class="mg-strip">
     <div class="mg-wrap">
         <div class="item"><span class="ic"><x-icon name="truck" :size="21"/></span><b>콜드체인 냉장배송</b> 신선하게 산지직송</div>
-        <div class="item"><span class="ic"><x-icon name="building" :size="21"/></span><b>수입사 직거래</b> 검증된 입점 수입사</div>
+        <div class="item"><span class="ic"><x-icon name="building" :size="21"/></span><b>검증된 수입사</b> 엄선 입점 수입사</div>
         <div class="item"><span class="ic"><x-icon name="coin" :size="21"/></span><b>수량구간 대량할인</b> 도매회원 구간별 도매가</div>
         <div class="item"><span class="ic"><x-icon name="doc" :size="21"/></span><b>세금계산서</b> 사업자 발행 지원</div>
     </div>

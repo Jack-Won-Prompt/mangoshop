@@ -7,7 +7,7 @@
     <meta name="pusher-key" content="{{ config('broadcasting.connections.pusher.key') }}">
     <meta name="pusher-cluster" content="{{ config('broadcasting.connections.pusher.options.cluster') }}">
     <title>@yield('title', $site['name'].' — '.$site['tagline'])</title>
-    <meta name="description" content="@yield('desc', '수입 과일 도매·소매 오픈마켓 망고샵 — 태국·베트남·필리핀 애플망고, 아보카도, 열대과일을 검증된 수입사와 직거래하세요.')">
+    <meta name="description" content="@yield('desc', '수입 과일 도매·소매 오픈마켓 망고샵 — 태국·베트남·필리핀 애플망고, 아보카도, 열대과일을 검증된 수입사에서 만나보세요.')">
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A5%AD%3C/text%3E%3C/svg%3E">
