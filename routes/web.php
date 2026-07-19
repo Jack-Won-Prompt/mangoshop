@@ -140,6 +140,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/users/{user}/prices/export', [AdminUserController::class, 'exportPrices'])->name('users.prices.export');
     Route::post('/users/{user}/prices/import', [AdminUserController::class, 'importPrices'])->name('users.prices.import');
 
+    // 로그인 이력
+    Route::get('/login-history', [\App\Http\Controllers\Admin\LoginHistoryController::class, 'index'])->name('login-history.index');
+
     // CSV 내보내기
     Route::get('/export/orders', [AdminExportController::class, 'orders'])->name('export.orders');
     Route::get('/export/products', [AdminExportController::class, 'products'])->name('export.products');
