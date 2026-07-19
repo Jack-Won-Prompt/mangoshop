@@ -81,6 +81,14 @@ Route::middleware('auth')->group(function () {
         Route::put('/profile', 'updateProfile')->name('profile.update');
     });
     Route::get('/mypage/wishlist', [WishlistController::class, 'index'])->name('mypage.wishlist');
+
+    // ===== 구매 대행자 콘솔 =====
+    Route::prefix('agent')->name('agent.')->controller(\App\Http\Controllers\AgentController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::post('/buyers', 'storeBuyer')->name('buyers.store');
+        Route::put('/buyers/{buyer}', 'updateBuyer')->name('buyers.update');
+        Route::delete('/buyers/{buyer}', 'destroyBuyer')->name('buyers.destroy');
+    });
 });
 
 // ===== 커뮤니티 / 고객지원 =====

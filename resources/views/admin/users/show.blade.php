@@ -95,7 +95,15 @@
                     <div class="afield" style="margin:0"><label>대표자명(계산서용)</label><input type="text" name="biz_ceo" class="ainput" value="{{ old('biz_ceo', $user->biz_ceo) }}"></div>
                     <div class="afield" style="margin:0"><label>종별</label><input type="text" name="biz_type" class="ainput" value="{{ old('biz_type', $user->biz_type) }}"></div>
                 </div>
-                <button class="abtn abtn-pri" style="width:100%;justify-content:center">정보 저장</button>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line,#e3e8f1)">
+                    <div class="afield" style="margin:0"><label>구매 대행자</label>
+                        <label style="display:inline-flex;align-items:center;gap:7px;font-weight:600;cursor:pointer;height:38px">
+                            <input type="checkbox" name="is_agent" value="1" {{ old('is_agent', $user->is_agent) ? 'checked' : '' }} style="width:16px;height:16px"> 구매 대행자로 지정
+                        </label>
+                    </div>
+                    <div class="afield" style="margin:0"><label>캐시백율(%)</label><input type="number" step="0.01" min="0" max="100" name="cashback_rate" class="ainput" value="{{ old('cashback_rate', rtrim(rtrim(number_format($user->cashback_rate,2),'0'),'.')) }}" placeholder="예: 2"></div>
+                </div>
+                <button class="abtn abtn-pri" style="width:100%;justify-content:center;margin-top:12px">정보 저장</button>
             </form>
         </div>
     </div>

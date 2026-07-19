@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AgentBuyer;
+use App\Models\AgentCashback;
 use App\Models\Coupon;
 use App\Models\CouponRedemption;
 use App\Models\Order;
@@ -31,6 +33,7 @@ class OrderController extends Controller
             'items' => $items, 'summary' => $summary, 'user' => $user,
             'coupon' => $coupon, 'couponDiscount' => $couponDiscount, 'couponError' => $couponError,
             'availableCoupons' => $availableCoupons,
+            'agentBuyers' => $user->isAgent() ? $user->buyers()->get() : collect(),
         ]);
     }
 
@@ -68,7 +71,9 @@ class OrderController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate([
+        $user = $request->user();
+
+        $rules = [
             'receiver_name'  => ['required', 'string', 'max:50'],
             'receiver_phone' => ['required', 'string', 'max:30'],
             'postcode'       => ['nullable', 'string', 'max:10'],
@@ -79,11 +84,18 @@ class OrderController extends Controller
             'depositor'      => ['required_if:payment_method,bank', 'nullable', 'string', 'max:50'],
             'bank'           => ['required_if:payment_method,bank', 'nullable', 'string', 'max:50'],
             'point_used'     => ['nullable', 'integer', 'min:0'],
-        ]);
+        ];
+        // 구매 대행자: 구매자(소매처) 정보 필수
+        if ($user->isAgent()) {
+            $rules['buyer_name']   = ['required', 'string', 'max:50'];
+            $rules['buyer_biz_no'] = ['nullable', 'string', 'max:30'];
+            $rules['buyer_phone']  = ['nullable', 'string', 'max:30'];
+            $rules['save_buyer']   = ['nullable', 'boolean'];
+        }
+        $data = $request->validate($rules);
 
         $isPg = $data['payment_method'] !== 'bank';
 
-        $user = $request->user();
         $items = $user->cartItems()->with('product')->get()
             ->filter(fn ($i) => $i->product !== null);
 
@@ -99,10 +111,19 @@ class OrderController extends Controller
         $pointUsed = min((int) ($data['point_used'] ?? 0), $user->point, $pointCap);
         $total = max(0, $summary['subtotal'] + $summary['shipping'] - $couponDiscount - $pointUsed);
 
-        $order = DB::transaction(function () use ($user, $items, $summary, $data, $pointUsed, $isPg, $coupon, $couponDiscount, $total) {
+        // 구매 대행자 캐시백 = 주문금액(최종 결제액)의 cashback_rate%
+        $isAgent = $user->isAgent();
+        $cashback = $isAgent ? (int) round($total * ((float) $user->cashback_rate) / 100) : 0;
+
+        $order = DB::transaction(function () use ($user, $items, $summary, $data, $pointUsed, $isPg, $coupon, $couponDiscount, $total, $isAgent, $cashback) {
             $order = Order::create([
                 'order_no'       => 'MS'.now()->format('ymd').strtoupper(substr(uniqid(), -5)),
                 'user_id'        => $user->id,
+                'agent_id'       => $isAgent ? $user->id : null,
+                'buyer_name'     => $isAgent ? ($data['buyer_name'] ?? null) : null,
+                'buyer_biz_no'   => $isAgent ? ($data['buyer_biz_no'] ?? null) : null,
+                'buyer_phone'    => $isAgent ? ($data['buyer_phone'] ?? null) : null,
+                'cashback_amount' => $cashback,
                 'status'         => 'pending',
                 'payment_method' => $data['payment_method'],
                 'pay_provider'   => $isPg ? $data['payment_method'] : null,
@@ -152,6 +173,27 @@ class OrderController extends Controller
                     $coupon->userCoupons()->where('user_id', $user->id)->whereNull('used_at')
                         ->limit(1)->update(['used_at' => now(), 'order_id' => $order->id]);
                 }
+            }
+
+            // 구매 대행자 캐시백 적립(주문 즉시 적립금으로 지급)
+            if ($isAgent && $cashback > 0) {
+                AgentCashback::create([
+                    'agent_id'     => $user->id,
+                    'order_id'     => $order->id,
+                    'buyer_name'   => $data['buyer_name'] ?? null,
+                    'order_amount' => $total,
+                    'rate'         => $user->cashback_rate,
+                    'amount'       => $cashback,
+                    'status'       => 'paid',
+                ]);
+                $user->adjustPoint($cashback, "구매대행 캐시백 ({$order->order_no})", $order->id);
+            }
+            // 신규 구매자(소매처)를 명부에 저장 (요청 시)
+            if ($isAgent && ! empty($data['save_buyer']) && ! empty($data['buyer_name'])) {
+                AgentBuyer::firstOrCreate(
+                    ['agent_id' => $user->id, 'name' => $data['buyer_name'], 'biz_no' => $data['buyer_biz_no'] ?? null],
+                    ['phone' => $data['buyer_phone'] ?? null],
+                );
             }
 
             $user->cartItems()->delete();

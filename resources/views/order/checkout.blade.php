@@ -37,6 +37,32 @@ function msApplyCoupon(code){var i=document.querySelector('input[name=code][form
                 </table>
             </div>
 
+            @if($user->isAgent())
+            {{-- 구매 대행 · 구매자(소매처) 정보 --}}
+            <div class="form-card">
+                <h3><x-icon name="user"/> 구매 대행 · 구매자 정보</h3>
+                <p class="muted" style="font-size:13px;margin:-4px 0 12px">구매자(소매처)를 대신해 주문합니다. 주문금액의 <b style="color:var(--navy-800)">{{ rtrim(rtrim(number_format($user->cashback_rate,2),'0'),'.') }}%</b>가 대행 캐시백으로 적립됩니다.</p>
+                @if($agentBuyers->isNotEmpty())
+                <div class="field"><label>등록된 구매자에서 선택</label>
+                    <select class="select" id="buyerPick" onchange="pickBuyer(this)">
+                        <option value="">직접 입력</option>
+                        @foreach($agentBuyers as $b)
+                            <option value="{{ $b->id }}" data-name="{{ $b->name }}" data-biz="{{ $b->biz_no }}" data-phone="{{ $b->phone }}">{{ $b->name }}@if($b->biz_no) ({{ $b->biz_no }})@endif</option>
+                        @endforeach
+                    </select>
+                </div>
+                @endif
+                <div class="row2">
+                    <div class="field"><label>구매자 이름 <span class="req">*</span></label><input type="text" name="buyer_name" id="buyer_name" class="input" value="{{ old('buyer_name') }}" required></div>
+                    <div class="field"><label>구매자 사업자번호</label><input type="text" name="buyer_biz_no" id="buyer_biz_no" class="input" value="{{ old('buyer_biz_no') }}" placeholder="000-00-00000"></div>
+                </div>
+                <div class="row2">
+                    <div class="field"><label>구매자 전화번호</label><input type="text" name="buyer_phone" id="buyer_phone" class="input" value="{{ old('buyer_phone') }}" placeholder="010-0000-0000"></div>
+                    <div class="field" style="display:flex;align-items:flex-end"><label style="display:inline-flex;align-items:center;gap:7px;font-weight:600;cursor:pointer"><input type="checkbox" name="save_buyer" value="1" style="width:16px;height:16px"> 이 구매자를 명부에 저장</label></div>
+                </div>
+            </div>
+            @endif
+
             {{-- 배송지 --}}
             <div class="form-card">
                 <h3><x-icon name="pin"/> 배송지 정보</h3>
@@ -160,6 +186,12 @@ function findAddr() {
             if (d) d.focus();
         }
     }).open();
+}
+function pickBuyer(sel) {
+    var o = sel.options[sel.selectedIndex];
+    document.getElementById('buyer_name').value  = o.dataset.name || '';
+    document.getElementById('buyer_biz_no').value = o.dataset.biz || '';
+    document.getElementById('buyer_phone').value = o.dataset.phone || '';
 }
 </script>
 @endpush

@@ -11,6 +11,7 @@ class Order extends Model
         'pay_provider', 'payment_key', 'pay_status', 'pay_method',
         'receiver_name', 'receiver_phone', 'postcode', 'address1', 'address2', 'memo',
         'desired_delivery_date', 'is_credit',
+        'agent_id', 'buyer_name', 'buyer_biz_no', 'buyer_phone', 'cashback_amount',
         'subtotal', 'shipping_fee', 'discount', 'coupon_id', 'coupon_code', 'point_used', 'total',
         'bank', 'depositor', 'paid_at',
         'va_bank', 'va_account', 'va_holder', 'va_due_at',
@@ -43,6 +44,17 @@ class Order extends Model
     public function seller()
     {
         return $this->belongsTo(Seller::class);
+    }
+
+    /** 구매 대행자 */
+    public function agent()
+    {
+        return $this->belongsTo(User::class, 'agent_id');
+    }
+
+    public function cashback()
+    {
+        return $this->hasOne(AgentCashback::class);
     }
 
     public function items()

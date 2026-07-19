@@ -64,7 +64,14 @@
       "Bash(/e/xampp/mysql/bin/mysql -uroot mangoshop -e \"SELECT slug FROM products WHERE sale_status='on_sale' LIMIT 1;\")",
       "mcp__chrome-devtools__list_pages",
       "Bash(php -d error_reporting=\"E_ALL & ~E_DEPRECATED\" artisan view:cache)",
-      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" http://localhost/mangoshop/)"
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" http://localhost/mangoshop/)",
+      "Bash(grep -nE 'protected \\\\$fillable|=>|function |belongsTo|hasMany' app/Models/Order.php)",
+      "Bash(/e/xampp/mysql/bin/mysql -uroot --default-character-set=utf8mb4 mangoshop -e \"SELECT email,is_agent,cashback_rate FROM users WHERE is_agent=1; SELECT COUNT\\(*\\) buyers FROM agent_buyers; SHOW COLUMNS FROM orders LIKE 'agent_id'; SHOW TABLES LIKE 'agent_cashbacks';\")",
+      "Bash(php -d error_reporting=\"E_ALL & ~E_DEPRECATED\" artisan route:clear)",
+      "Bash(php -d error_reporting=\"E_ALL & ~E_DEPRECATED\" artisan route:list --name=agent)",
+      "Bash(curl -s -o /dev/null -w \"home: %{http_code}\\\\n\" http://localhost/mangoshop/)",
+      "Bash(curl -s -o /dev/null -w \"checkout: %{http_code} \\(302=로그인 리다이렉트 정상\\)\\\\n\" http://localhost/mangoshop/checkout)",
+      "Bash(/e/xampp/mysql/bin/mysql -uroot mangoshop -e ' *)"
     ]
   }
 }

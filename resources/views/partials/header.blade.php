@@ -17,6 +17,9 @@
                 @if(auth()->user()->seller)
                     <a href="{{ url('/seller') }}">판매자센터</a><span class="sep">|</span>
                 @endif
+                @if(auth()->user()->isAgent())
+                    <a href="{{ route('agent.index') }}">대행자센터</a><span class="sep">|</span>
+                @endif
                 <a href="{{ route('mypage.index') }}">마이쇼핑</a>
                 <span class="sep">|</span>
                 <a href="{{ route('mypage.orders') }}">주문내역</a>

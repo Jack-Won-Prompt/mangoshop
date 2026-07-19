@@ -75,6 +75,21 @@ class MangoSeeder extends Seeder
             'member_type' => 'wholesale', 'biz_status' => 'pending',
             'company_name' => '대기청과', 'biz_no' => '123-45-67890', 'phone' => '010-9999-8888',
         ]);
+
+        // 구매 대행자 — 여러 구매자(소매처)를 대신해 주문, 주문금액의 2% 캐시백
+        $agent = User::updateOrCreate(['email' => 'agent@test.com'], [
+            'name' => '이대행', 'password' => Hash::make('test1234'),
+            'member_type' => 'wholesale', 'biz_status' => 'approved', 'grade' => 'gold',
+            'company_name' => '대행상사', 'biz_no' => '507-81-55555', 'phone' => '010-7777-6666',
+            'is_agent' => true, 'cashback_rate' => 2.00,
+        ]);
+        foreach ([
+            ['현대청과', '111-22-33333', '010-1000-0001'],
+            ['우리마트', '222-33-44444', '010-1000-0002'],
+            ['신선상회', '333-44-55555', '010-1000-0003'],
+        ] as [$bn, $biz, $ph]) {
+            $agent->buyers()->firstOrCreate(['name' => $bn], ['biz_no' => $biz, 'phone' => $ph]);
+        }
     }
 
     /** 카테고리: 과일 대분류 + 망고 품종 중분류 */
