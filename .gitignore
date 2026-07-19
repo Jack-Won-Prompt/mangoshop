@@ -21,3 +21,6 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# Playwright MCP 임시 산출물
+/.playwright-mcp
