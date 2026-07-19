@@ -58,8 +58,8 @@ class CartController extends Controller
         foreach ($items as $i) {
             $subtotal += $i->product->priceFor($user) * $i->quantity;
         }
-        $freeOver = config('site.free_ship_over');
-        $shipping = ($subtotal > 0 && $subtotal < $freeOver) ? config('site.shipping_fee') : 0;
+        // 배송비 별도 — 콜드체인·수입사/지역별로 상이하여 주문 후 별도 정산(결제금액 미포함)
+        $shipping = 0;
 
         return [
             'subtotal' => $subtotal,

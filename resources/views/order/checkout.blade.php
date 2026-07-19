@@ -119,7 +119,8 @@ function msApplyCoupon(code){var i=document.querySelector('input[name=code][form
             </div>
 
             <div class="sum-row"><span>상품금액</span><span>{{ number_format($summary['subtotal']) }}원</span></div>
-            <div class="sum-row"><span>배송비</span><span>{{ $summary['shipping'] ? '+'.number_format($summary['shipping']).'원' : '무료' }}</span></div>
+            <div class="sum-row"><span>배송비</span><span>별도</span></div>
+            <p class="muted" style="font-size:12px;margin:2px 0 0;text-align:right">콜드체인·지역별 배송비는 주문 후 별도 안내됩니다</p>
             @if($couponDiscount ?? 0)
                 <div class="sum-row" style="color:var(--red)"><span>쿠폰 할인</span><span>-{{ number_format($couponDiscount) }}원</span></div>
             @endif

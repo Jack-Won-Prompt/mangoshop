@@ -62,7 +62,8 @@
       "mcp__chrome-devtools__resize_page",
       "mcp__chrome-devtools__emulate",
       "Bash(/e/xampp/mysql/bin/mysql -uroot mangoshop -e \"SELECT slug FROM products WHERE sale_status='on_sale' LIMIT 1;\")",
-      "mcp__chrome-devtools__list_pages"
+      "mcp__chrome-devtools__list_pages",
+      "Bash(php -d error_reporting=\"E_ALL & ~E_DEPRECATED\" artisan view:cache)"
     ]
   }
 }
