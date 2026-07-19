@@ -1,0 +1,709 @@
+- generic [active] [ref=f3e1]:
+  - generic [ref=f3e3]:
+    - list [ref=f3e4]:
+      - listitem [ref=f3e5]:
+        - link "공지사항" [ref=f3e6] [cursor=pointer]:
+          - /url: http://localhost/mangoshop/community/notices
+      - listitem [ref=f3e7]:
+        - link "Q&A" [ref=f3e8] [cursor=pointer]:
+          - /url: http://localhost/mangoshop/community/qna
+      - listitem [ref=f3e9]:
+        - link "상품후기" [ref=f3e10] [cursor=pointer]:
+          - /url: http://localhost/mangoshop/community/reviews
+      - listitem [ref=f3e11]:
+        - link "이벤트" [ref=f3e12] [cursor=pointer]:
+          - /url: http://localhost/mangoshop/community/notices
+    - generic [ref=f3e13]:
+      - link "로그인" [ref=f3e14] [cursor=pointer]:
+        - /url: http://localhost/mangoshop/login
+      - generic [ref=f3e15]: "|"
+      - link "회원가입" [ref=f3e16] [cursor=pointer]:
+        - /url: http://localhost/mangoshop/register
+      - generic [ref=f3e17]: "|"
+      - link "장바구니" [ref=f3e18] [cursor=pointer]:
+        - /url: http://localhost/mangoshop/cart
+      - generic [ref=f3e19]: "|"
+      - link "주문내역" [ref=f3e20] [cursor=pointer]:
+        - /url: http://localhost/mangoshop/mypage/orders
+      - link "가입시 3,000P" [ref=f3e21] [cursor=pointer]:
+        - /url: http://localhost/mangoshop/register
+  - banner [ref=f3e22]:
+    - link "망고샵 홈" [ref=f3e23] [cursor=pointer]:
+      - /url: http://localhost/mangoshop
+      - generic [ref=f3e24]: 🥭
+      - generic [ref=f3e25]:
+        - generic [ref=f3e26]: 망고샵
+        - generic [ref=f3e27]: MANGOSHOP · 수입과일 오픈마켓
+    - generic [ref=f3e28]:
+      - generic [ref=f3e29]:
+        - textbox "상품 검색" [ref=f3e30]:
+          - /placeholder: "원산지·품종·수입사로 검색 (예: 태국 애플망고)"
+        - button "검색" [ref=f3e31] [cursor=pointer]
+      - generic [ref=f3e34]:
+        - text: 인기검색어
+        - link "애플망고" [ref=f3e35] [cursor=pointer]:
+          - /url: http://localhost/mangoshop/search?q=%EC%95%A0%ED%94%8C%EB%A7%9D%EA%B3%A0
+        - link "옐로우망고" [ref=f3e36] [cursor=pointer]:
+          - /url: http://localhost/mangoshop/search?q=%EC%98%90%EB%A1%9C%EC%9A%B0%EB%A7%9D%EA%B3%A0
+        - link "아보카도" [ref=f3e37] [cursor=pointer]:
+          - /url: http://localhost/mangoshop/search?q=%EC%95%84%EB%B3%B4%EC%B9%B4%EB%8F%84
+        - link "두리안" [ref=f3e38] [cursor=pointer]:
+          - /url: http://localhost/mangoshop/search?q=%EB%91%90%EB%A6%AC%EC%95%88
+        - link "망고스틴" [ref=f3e39] [cursor=pointer]:
+          - /url: http://localhost/mangoshop/search?q=%EB%A7%9D%EA%B3%A0%EC%8A%A4%ED%8B%B4
+        - link "용과" [ref=f3e40] [cursor=pointer]:
+          - /url: http://localhost/mangoshop/search?q=%EC%9A%A9%EA%B3%BC
+        - link "리치" [ref=f3e41] [cursor=pointer]:
+          - /url: http://localhost/mangoshop/search?q=%EB%A6%AC%EC%B9%98
+  - navigation "카테고리" [ref=f3e42]:
+    - list [ref=f3e44]:
+      - listitem [ref=f3e45]:
+        - link [ref=f3e46] [cursor=pointer]:
+          - /url: http://localhost/mangoshop/category/mango
+      - listitem [ref=f3e50]:
+        - link [ref=f3e51] [cursor=pointer]:
+          - /url: http://localhost/mangoshop/category/avocado
+      - listitem [ref=f3e55]:
+        - link [ref=f3e56] [cursor=pointer]:
+          - /url: http://localhost/mangoshop/category/tropical
+      - listitem [ref=f3e60]:
+        - link [ref=f3e61] [cursor=pointer]:
+          - /url: http://localhost/mangoshop/category/citrus
+      - listitem [ref=f3e65]:
+        - link [ref=f3e66] [cursor=pointer]:
+          - /url: http://localhost/mangoshop/category/berry
+      - listitem [ref=f3e70]:
+        - link [ref=f3e71] [cursor=pointer]:
+          - /url: http://localhost/mangoshop/category/giftset
+      - listitem [ref=f3e75]:
+        - link [ref=f3e76] [cursor=pointer]:
+          - /url: http://localhost/mangoshop/products?grade=wholesale
+  - main [ref=f3e80]:
+    - region "메인 배너" [ref=f3e81]:
+      - generic [ref=f3e82]:
+        - generic [ref=f3e85]:
+          - generic [ref=f3e86]: MANGOSHOP
+          - heading "태국 애플망고 산지직송" [level=2] [ref=f3e87]
+          - paragraph [ref=f3e88]: 남독마이 특품 5kg 최대 10% 도매 특가
+          - link "상품 보러가기" [ref=f3e89] [cursor=pointer]:
+            - /url: /products
+        - button "이전" [ref=f3e98] [cursor=pointer]: ‹
+        - button "다음" [ref=f3e99] [cursor=pointer]: ›
+        - generic [ref=f3e100]:
+          - button "배너 1" [ref=f3e101] [cursor=pointer]
+          - button "배너 2" [ref=f3e102] [cursor=pointer]
+          - button "배너 3" [ref=f3e103] [cursor=pointer]
+    - generic [ref=f3e105]:
+      - generic [ref=f3e106]:
+        - generic [ref=f3e110]: 콜드체인 냉장배송
+        - text: 신선하게 산지직송
+      - generic [ref=f3e111]:
+        - generic [ref=f3e115]: 검증된 수입사 상품
+        - text: 엄선한 수입 과일
+      - generic [ref=f3e116]:
+        - generic [ref=f3e120]: 수량구간 대량할인
+        - text: 도매회원 구간별 도매가
+      - generic [ref=f3e121]:
+        - generic [ref=f3e125]: 세금계산서
+        - text: 사업자 발행 지원
+    - generic [ref=f3e127]:
+      - generic [ref=f3e128]:
+        - generic [ref=f3e129]: BEST ITEM
+        - heading "이달의 베스트 과일" [level=3] [ref=f3e130]
+        - paragraph [ref=f3e131]: 망고샵에서 가장 많이 찾는 인기 수입 과일
+      - generic [ref=f3e132]:
+        - generic [ref=f3e133]:
+          - link "관심상품(로그인)" [ref=f3e134] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/login
+          - link "태국 BEST 태국 남독마이 애플망고 5kg" [ref=f3e137] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/product/tropical-import-apple-mango-1
+            - generic [ref=f3e138]:
+              - generic [ref=f3e139]: 태국
+              - generic [ref=f3e140]: BEST
+            - img "태국 남독마이 애플망고 5kg" [ref=f3e141]
+          - generic [ref=f3e142]:
+            - generic [ref=f3e143]: 트로피컬수입
+            - link "태국 남독마이 애플망고 5kg" [ref=f3e144] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/tropical-import-apple-mango-1
+            - generic [ref=f3e145]:
+              - generic [ref=f3e146]: 남독마이
+              - generic [ref=f3e147]: ·특등급
+              - generic [ref=f3e148]: ·5kg/9~12과
+            - generic [ref=f3e149]:
+              - generic [ref=f3e150]: 59,000원
+              - generic [ref=f3e152]: 도매회원 전용가 별도
+              - generic [ref=f3e153]: 5박스↑ 추가할인
+          - generic [ref=f3e154]:
+            - link "상세" [ref=f3e155] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/tropical-import-apple-mango-1
+            - button "담기" [ref=f3e157] [cursor=pointer]
+        - generic [ref=f3e160]:
+          - link "관심상품(로그인)" [ref=f3e161] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/login
+          - link "태국 BEST 태국 그린망고 5kg (조리용)" [ref=f3e164] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/product/tropical-import-green-mango-3
+            - generic [ref=f3e165]:
+              - generic [ref=f3e166]: 태국
+              - generic [ref=f3e167]: BEST
+            - img "태국 그린망고 5kg (조리용)" [ref=f3e168]
+          - generic [ref=f3e169]:
+            - generic [ref=f3e170]: 트로피컬수입
+            - link "태국 그린망고 5kg (조리용)" [ref=f3e171] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/tropical-import-green-mango-3
+            - generic [ref=f3e172]:
+              - generic [ref=f3e173]: 키유사워이
+              - generic [ref=f3e174]: ·상등급
+              - generic [ref=f3e175]: ·5kg
+            - generic [ref=f3e176]:
+              - generic [ref=f3e177]: 32,000원
+              - generic [ref=f3e179]: 도매회원 전용가 별도
+          - generic [ref=f3e180]:
+            - link "상세" [ref=f3e181] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/tropical-import-green-mango-3
+            - button "담기" [ref=f3e183] [cursor=pointer]
+        - generic [ref=f3e186]:
+          - link "관심상품(로그인)" [ref=f3e187] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/login
+          - link "태국 BEST 망고스틴 3kg" [ref=f3e190] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/product/tropical-import-mangosteen-4
+            - generic [ref=f3e191]:
+              - generic [ref=f3e192]: 태국
+              - generic [ref=f3e193]: BEST
+            - img "망고스틴 3kg" [ref=f3e194]
+          - generic [ref=f3e195]:
+            - generic [ref=f3e196]: 트로피컬수입
+            - link "망고스틴 3kg" [ref=f3e197] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/tropical-import-mangosteen-4
+            - generic [ref=f3e198]:
+              - generic [ref=f3e199]: "-"
+              - generic [ref=f3e200]: ·특등급
+              - generic [ref=f3e201]: ·3kg
+            - generic [ref=f3e202]:
+              - generic [ref=f3e203]: 45,000원
+              - generic [ref=f3e205]: 도매회원 전용가 별도
+          - generic [ref=f3e206]:
+            - link "상세" [ref=f3e207] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/tropical-import-mangosteen-4
+            - button "담기" [ref=f3e209] [cursor=pointer]
+        - generic [ref=f3e212]:
+          - link "관심상품(로그인)" [ref=f3e213] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/login
+          - link "베트남 BEST 베트남 옐로우망고 6kg" [ref=f3e216] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/product/viet-fresh-yellow-mango-5
+            - generic [ref=f3e217]:
+              - generic [ref=f3e218]: 베트남
+              - generic [ref=f3e219]: BEST
+            - img "베트남 옐로우망고 6kg" [ref=f3e220]
+          - generic [ref=f3e221]:
+            - generic [ref=f3e222]: 비엣프레시
+            - link "베트남 옐로우망고 6kg" [ref=f3e223] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/viet-fresh-yellow-mango-5
+            - generic [ref=f3e224]:
+              - generic [ref=f3e225]: 캇추
+              - generic [ref=f3e226]: ·특등급
+              - generic [ref=f3e227]: ·6kg/12~15과
+            - generic [ref=f3e228]:
+              - generic [ref=f3e229]: 42,000원
+              - generic [ref=f3e231]: 도매회원 전용가 별도
+              - generic [ref=f3e232]: 5박스↑ 추가할인
+          - generic [ref=f3e233]:
+            - link "상세" [ref=f3e234] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/viet-fresh-yellow-mango-5
+            - button "담기" [ref=f3e236] [cursor=pointer]
+        - generic [ref=f3e239]:
+          - link "관심상품(로그인)" [ref=f3e240] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/login
+          - link "베트남 BEST NEW 베트남 레드용과 5kg" [ref=f3e243] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/product/viet-fresh-dragonfruit-7
+            - generic [ref=f3e244]:
+              - generic [ref=f3e245]: 베트남
+              - generic [ref=f3e246]: BEST
+              - generic [ref=f3e247]: NEW
+            - img "베트남 레드용과 5kg" [ref=f3e248]
+          - generic [ref=f3e249]:
+            - generic [ref=f3e250]: 비엣프레시
+            - link "베트남 레드용과 5kg" [ref=f3e251] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/viet-fresh-dragonfruit-7
+            - generic [ref=f3e252]:
+              - generic [ref=f3e253]: 레드
+              - generic [ref=f3e254]: ·상등급
+              - generic [ref=f3e255]: ·5kg
+            - generic [ref=f3e256]:
+              - generic [ref=f3e257]: 38,000원
+              - generic [ref=f3e259]: 도매회원 전용가 별도
+          - generic [ref=f3e260]:
+            - link "상세" [ref=f3e261] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/viet-fresh-dragonfruit-7
+            - button "담기" [ref=f3e263] [cursor=pointer]
+        - generic [ref=f3e266]:
+          - link "관심상품(로그인)" [ref=f3e267] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/login
+          - link "베트남 BEST 베트남 리치 3kg" [ref=f3e270] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/product/viet-fresh-lychee-8
+            - generic [ref=f3e271]:
+              - generic [ref=f3e272]: 베트남
+              - generic [ref=f3e273]: BEST
+            - img "베트남 리치 3kg" [ref=f3e274]
+          - generic [ref=f3e275]:
+            - generic [ref=f3e276]: 비엣프레시
+            - link "베트남 리치 3kg" [ref=f3e277] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/viet-fresh-lychee-8
+            - generic [ref=f3e278]:
+              - generic [ref=f3e279]: "-"
+              - generic [ref=f3e280]: ·상등급
+              - generic [ref=f3e281]: ·3kg
+            - generic [ref=f3e282]:
+              - generic [ref=f3e283]: 29,000원
+              - generic [ref=f3e285]: 도매회원 전용가 별도
+          - generic [ref=f3e286]:
+            - link "상세" [ref=f3e287] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/viet-fresh-lychee-8
+            - button "담기" [ref=f3e289] [cursor=pointer]
+        - generic [ref=f3e292]:
+          - link "관심상품(로그인)" [ref=f3e293] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/login
+          - link "필리핀 BEST 필리핀 세부 애플망고 5kg" [ref=f3e296] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/product/ph-gold-apple-mango-9
+            - generic [ref=f3e297]:
+              - generic [ref=f3e298]: 필리핀
+              - generic [ref=f3e299]: BEST
+            - img "필리핀 세부 애플망고 5kg" [ref=f3e300]
+          - generic [ref=f3e301]:
+            - generic [ref=f3e302]: 필리핀골드
+            - link "필리핀 세부 애플망고 5kg" [ref=f3e303] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/ph-gold-apple-mango-9
+            - generic [ref=f3e304]:
+              - generic [ref=f3e305]: 카라바오
+              - generic [ref=f3e306]: ·특등급
+              - generic [ref=f3e307]: ·5kg/10~13과
+            - generic [ref=f3e308]:
+              - generic [ref=f3e309]: 55,000원
+              - generic [ref=f3e311]: 도매회원 전용가 별도
+              - generic [ref=f3e312]: 5박스↑ 추가할인
+          - generic [ref=f3e313]:
+            - link "상세" [ref=f3e314] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/ph-gold-apple-mango-9
+            - button "담기" [ref=f3e316] [cursor=pointer]
+        - generic [ref=f3e319]:
+          - link "관심상품(로그인)" [ref=f3e320] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/login
+          - link "필리핀 BEST 필리핀 골드 파인애플 6입" [ref=f3e323] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/product/ph-gold-pineapple-11
+            - generic [ref=f3e324]:
+              - generic [ref=f3e325]: 필리핀
+              - generic [ref=f3e326]: BEST
+            - img "필리핀 골드 파인애플 6입" [ref=f3e327]
+          - generic [ref=f3e328]:
+            - generic [ref=f3e329]: 필리핀골드
+            - link "필리핀 골드 파인애플 6입" [ref=f3e330] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/ph-gold-pineapple-11
+            - generic [ref=f3e331]:
+              - generic [ref=f3e332]: MD2
+              - generic [ref=f3e333]: ·상등급
+              - generic [ref=f3e334]: ·6입
+            - generic [ref=f3e335]:
+              - generic [ref=f3e336]: 27,000원
+              - generic [ref=f3e338]: 도매회원 전용가 별도
+          - generic [ref=f3e339]:
+            - link "상세" [ref=f3e340] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/ph-gold-pineapple-11
+            - button "담기" [ref=f3e342] [cursor=pointer]
+        - generic [ref=f3e345]:
+          - link "관심상품(로그인)" [ref=f3e346] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/login
+          - link "페루 BEST 페루 하스 아보카도 4kg" [ref=f3e349] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/product/zest-farm-hass-avocado-12
+            - generic [ref=f3e350]:
+              - generic [ref=f3e351]: 페루
+              - generic [ref=f3e352]: BEST
+            - img "페루 하스 아보카도 4kg" [ref=f3e353]
+          - generic [ref=f3e354]:
+            - generic [ref=f3e355]: 제스트팜
+            - link "페루 하스 아보카도 4kg" [ref=f3e356] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/zest-farm-hass-avocado-12
+            - generic [ref=f3e357]:
+              - generic [ref=f3e358]: 하스
+              - generic [ref=f3e359]: ·상등급
+              - generic [ref=f3e360]: ·4kg/18~22입
+            - generic [ref=f3e361]:
+              - generic [ref=f3e362]: 32,000원
+              - generic [ref=f3e364]: 도매회원 전용가 별도
+              - generic [ref=f3e365]: 10박스↑ 추가할인
+          - generic [ref=f3e366]:
+            - link "상세" [ref=f3e367] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/zest-farm-hass-avocado-12
+            - button "담기" [ref=f3e369] [cursor=pointer]
+        - generic [ref=f3e372]:
+          - link "관심상품(로그인)" [ref=f3e373] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/login
+          - link "남아공 BEST NEW 남아공 자몽 8kg" [ref=f3e376] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/product/zest-farm-grapefruit-14
+            - generic [ref=f3e377]:
+              - generic [ref=f3e378]: 남아공
+              - generic [ref=f3e379]: BEST
+              - generic [ref=f3e380]: NEW
+            - img "남아공 자몽 8kg" [ref=f3e381]
+          - generic [ref=f3e382]:
+            - generic [ref=f3e383]: 제스트팜
+            - link "남아공 자몽 8kg" [ref=f3e384] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/zest-farm-grapefruit-14
+            - generic [ref=f3e385]:
+              - generic [ref=f3e386]: 스타루비
+              - generic [ref=f3e387]: ·상등급
+              - generic [ref=f3e388]: ·8kg
+            - generic [ref=f3e389]:
+              - generic [ref=f3e390]: 34,000원
+              - generic [ref=f3e392]: 도매회원 전용가 별도
+          - generic [ref=f3e393]:
+            - link "상세" [ref=f3e394] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/zest-farm-grapefruit-14
+            - button "담기" [ref=f3e396] [cursor=pointer]
+      - link "베스트 전체보기" [ref=f3e400] [cursor=pointer]:
+        - /url: http://localhost/mangoshop/products?sort=best
+    - generic [ref=f3e404]:
+      - generic [ref=f3e405]:
+        - generic [ref=f3e406]: FOR BUSINESS
+        - heading "사업자 전용 도매 특가" [level=3] [ref=f3e407]
+        - paragraph [ref=f3e408]: 도매회원 승인 후 도매 전용가와 수량구간 대량할인으로 만나보세요
+      - generic [ref=f3e409]:
+        - generic [ref=f3e410]:
+          - link "관심상품(로그인)" [ref=f3e411] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/login
+          - link "태국 BEST 태국 남독마이 애플망고 5kg" [ref=f3e414] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/product/tropical-import-apple-mango-1
+            - generic [ref=f3e415]:
+              - generic [ref=f3e416]: 태국
+              - generic [ref=f3e417]: BEST
+            - img "태국 남독마이 애플망고 5kg" [ref=f3e418]
+          - generic [ref=f3e419]:
+            - generic [ref=f3e420]: 트로피컬수입
+            - link "태국 남독마이 애플망고 5kg" [ref=f3e421] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/tropical-import-apple-mango-1
+            - generic [ref=f3e422]:
+              - generic [ref=f3e423]: 남독마이
+              - generic [ref=f3e424]: ·특등급
+              - generic [ref=f3e425]: ·5kg/9~12과
+            - generic [ref=f3e426]:
+              - generic [ref=f3e427]: 59,000원
+              - generic [ref=f3e429]: 도매회원 전용가 별도
+              - generic [ref=f3e430]: 5박스↑ 추가할인
+          - generic [ref=f3e431]:
+            - link "상세" [ref=f3e432] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/tropical-import-apple-mango-1
+            - button "담기" [ref=f3e434] [cursor=pointer]
+        - generic [ref=f3e437]:
+          - link "관심상품(로그인)" [ref=f3e438] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/login
+          - link "베트남 BEST 베트남 옐로우망고 6kg" [ref=f3e441] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/product/viet-fresh-yellow-mango-5
+            - generic [ref=f3e442]:
+              - generic [ref=f3e443]: 베트남
+              - generic [ref=f3e444]: BEST
+            - img "베트남 옐로우망고 6kg" [ref=f3e445]
+          - generic [ref=f3e446]:
+            - generic [ref=f3e447]: 비엣프레시
+            - link "베트남 옐로우망고 6kg" [ref=f3e448] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/viet-fresh-yellow-mango-5
+            - generic [ref=f3e449]:
+              - generic [ref=f3e450]: 캇추
+              - generic [ref=f3e451]: ·특등급
+              - generic [ref=f3e452]: ·6kg/12~15과
+            - generic [ref=f3e453]:
+              - generic [ref=f3e454]: 42,000원
+              - generic [ref=f3e456]: 도매회원 전용가 별도
+              - generic [ref=f3e457]: 5박스↑ 추가할인
+          - generic [ref=f3e458]:
+            - link "상세" [ref=f3e459] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/viet-fresh-yellow-mango-5
+            - button "담기" [ref=f3e461] [cursor=pointer]
+        - generic [ref=f3e464]:
+          - link "관심상품(로그인)" [ref=f3e465] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/login
+          - link "베트남 베트남 옐로우망고 실속 10kg" [ref=f3e468] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/product/viet-fresh-yellow-mango-6
+            - generic [ref=f3e469]: 베트남
+            - img "베트남 옐로우망고 실속 10kg" [ref=f3e471]
+          - generic [ref=f3e472]:
+            - generic [ref=f3e473]: 비엣프레시
+            - link "베트남 옐로우망고 실속 10kg" [ref=f3e474] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/viet-fresh-yellow-mango-6
+            - generic [ref=f3e475]:
+              - generic [ref=f3e476]: 캇추
+              - generic [ref=f3e477]: ·중등급
+              - generic [ref=f3e478]: ·10kg
+            - generic [ref=f3e479]:
+              - generic [ref=f3e480]: 59,000원
+              - generic [ref=f3e482]: 도매회원 전용가 별도
+          - generic [ref=f3e483]:
+            - link "상세" [ref=f3e484] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/viet-fresh-yellow-mango-6
+            - button "담기" [ref=f3e486] [cursor=pointer]
+        - generic [ref=f3e489]:
+          - link "관심상품(로그인)" [ref=f3e490] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/login
+          - link "필리핀 BEST 필리핀 세부 애플망고 5kg" [ref=f3e493] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/product/ph-gold-apple-mango-9
+            - generic [ref=f3e494]:
+              - generic [ref=f3e495]: 필리핀
+              - generic [ref=f3e496]: BEST
+            - img "필리핀 세부 애플망고 5kg" [ref=f3e497]
+          - generic [ref=f3e498]:
+            - generic [ref=f3e499]: 필리핀골드
+            - link "필리핀 세부 애플망고 5kg" [ref=f3e500] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/ph-gold-apple-mango-9
+            - generic [ref=f3e501]:
+              - generic [ref=f3e502]: 카라바오
+              - generic [ref=f3e503]: ·특등급
+              - generic [ref=f3e504]: ·5kg/10~13과
+            - generic [ref=f3e505]:
+              - generic [ref=f3e506]: 55,000원
+              - generic [ref=f3e508]: 도매회원 전용가 별도
+              - generic [ref=f3e509]: 5박스↑ 추가할인
+          - generic [ref=f3e510]:
+            - link "상세" [ref=f3e511] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/ph-gold-apple-mango-9
+            - button "담기" [ref=f3e513] [cursor=pointer]
+        - generic [ref=f3e516]:
+          - link "관심상품(로그인)" [ref=f3e517] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/login
+          - link "페루 BEST 페루 하스 아보카도 4kg" [ref=f3e520] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/product/zest-farm-hass-avocado-12
+            - generic [ref=f3e521]:
+              - generic [ref=f3e522]: 페루
+              - generic [ref=f3e523]: BEST
+            - img "페루 하스 아보카도 4kg" [ref=f3e524]
+          - generic [ref=f3e525]:
+            - generic [ref=f3e526]: 제스트팜
+            - link "페루 하스 아보카도 4kg" [ref=f3e527] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/zest-farm-hass-avocado-12
+            - generic [ref=f3e528]:
+              - generic [ref=f3e529]: 하스
+              - generic [ref=f3e530]: ·상등급
+              - generic [ref=f3e531]: ·4kg/18~22입
+            - generic [ref=f3e532]:
+              - generic [ref=f3e533]: 32,000원
+              - generic [ref=f3e535]: 도매회원 전용가 별도
+              - generic [ref=f3e536]: 10박스↑ 추가할인
+          - generic [ref=f3e537]:
+            - link "상세" [ref=f3e538] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/zest-farm-hass-avocado-12
+            - button "담기" [ref=f3e540] [cursor=pointer]
+      - link "사업자 전용몰" [ref=f3e544] [cursor=pointer]:
+        - /url: http://localhost/mangoshop/products?grade=wholesale
+    - generic [ref=f3e548]:
+      - generic [ref=f3e549]:
+        - generic: 🎁
+        - generic [ref=f3e550]: MEMBERSHIP BENEFIT
+        - heading "상품 후기 작성만 해도 3% 적립금 지급" [level=4] [ref=f3e551]: 상품 후기 작성만 해도3% 적립금 지급
+        - generic [ref=f3e552]:
+          - generic [ref=f3e553]:
+            - generic [ref=f3e554]: 혜택1
+            - text: 신규 회원가입 시
+            - generic [ref=f3e555]: 3,000P
+            - text: 즉시 지급
+          - generic [ref=f3e556]:
+            - generic [ref=f3e557]: 혜택2
+            - text: 구매금액 3% + 상품후기 3% 적립
+        - link "후기 쓰고 적립받기" [ref=f3e558] [cursor=pointer]:
+          - /url: http://localhost/mangoshop/community/reviews
+      - generic [ref=f3e561]:
+        - generic: 🏬
+        - generic [ref=f3e562]: FOR SELLERS
+        - heading "수입사 입점 파트너 상시 모집합니다" [level=4] [ref=f3e563]: 수입사 입점 파트너상시 모집합니다
+        - generic [ref=f3e564]: 1600-0000
+        - paragraph [ref=f3e565]: 검증된 수입사라면 누구나 · 수수료·정산·콜드체인 배송까지 원스톱 지원
+        - link "입점 문의하기" [ref=f3e566] [cursor=pointer]:
+          - /url: http://localhost/mangoshop/community/inquiry
+    - generic [ref=f3e570]:
+      - generic [ref=f3e571]:
+        - generic [ref=f3e572]: NEW ARRIVAL
+        - heading "새로 들어온 과일" [level=3] [ref=f3e573]
+        - paragraph [ref=f3e574]: 이번 주 새롭게 입고된 신상품
+      - generic [ref=f3e575]:
+        - generic [ref=f3e576]:
+          - link "관심상품(로그인)" [ref=f3e577] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/login
+          - link "태국 NEW 태국 애플망고 프리미엄 3kg" [ref=f3e580] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/product/tropical-import-apple-mango-2
+            - generic [ref=f3e581]:
+              - generic [ref=f3e582]: 태국
+              - generic [ref=f3e583]: NEW
+            - img "태국 애플망고 프리미엄 3kg" [ref=f3e584]
+          - generic [ref=f3e585]:
+            - generic [ref=f3e586]: 트로피컬수입
+            - link "태국 애플망고 프리미엄 3kg" [ref=f3e587] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/tropical-import-apple-mango-2
+            - generic [ref=f3e588]:
+              - generic [ref=f3e589]: 남독마이
+              - generic [ref=f3e590]: ·상등급
+              - generic [ref=f3e591]: ·3kg/6과
+            - generic [ref=f3e592]:
+              - generic [ref=f3e593]: 39,000원
+              - generic [ref=f3e595]: 도매회원 전용가 별도
+              - generic [ref=f3e596]: 10박스↑ 추가할인
+          - generic [ref=f3e597]:
+            - link "상세" [ref=f3e598] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/tropical-import-apple-mango-2
+            - button "담기" [ref=f3e600] [cursor=pointer]
+        - generic [ref=f3e603]:
+          - link "관심상품(로그인)" [ref=f3e604] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/login
+          - link "베트남 BEST NEW 베트남 레드용과 5kg" [ref=f3e607] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/product/viet-fresh-dragonfruit-7
+            - generic [ref=f3e608]:
+              - generic [ref=f3e609]: 베트남
+              - generic [ref=f3e610]: BEST
+              - generic [ref=f3e611]: NEW
+            - img "베트남 레드용과 5kg" [ref=f3e612]
+          - generic [ref=f3e613]:
+            - generic [ref=f3e614]: 비엣프레시
+            - link "베트남 레드용과 5kg" [ref=f3e615] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/viet-fresh-dragonfruit-7
+            - generic [ref=f3e616]:
+              - generic [ref=f3e617]: 레드
+              - generic [ref=f3e618]: ·상등급
+              - generic [ref=f3e619]: ·5kg
+            - generic [ref=f3e620]:
+              - generic [ref=f3e621]: 38,000원
+              - generic [ref=f3e623]: 도매회원 전용가 별도
+          - generic [ref=f3e624]:
+            - link "상세" [ref=f3e625] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/viet-fresh-dragonfruit-7
+            - button "담기" [ref=f3e627] [cursor=pointer]
+        - generic [ref=f3e630]:
+          - link "관심상품(로그인)" [ref=f3e631] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/login
+          - link "필리핀 NEW 필리핀 애플망고 항공직송 2kg" [ref=f3e634] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/product/ph-gold-apple-mango-10
+            - generic [ref=f3e635]:
+              - generic [ref=f3e636]: 필리핀
+              - generic [ref=f3e637]: NEW
+            - img "필리핀 애플망고 항공직송 2kg" [ref=f3e638]
+          - generic [ref=f3e639]:
+            - generic [ref=f3e640]: 필리핀골드
+            - link "필리핀 애플망고 항공직송 2kg" [ref=f3e641] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/ph-gold-apple-mango-10
+            - generic [ref=f3e642]:
+              - generic [ref=f3e643]: 카라바오
+              - generic [ref=f3e644]: ·특등급
+              - generic [ref=f3e645]: ·2kg/4~5과
+            - generic [ref=f3e646]:
+              - generic [ref=f3e647]: 29,000원
+              - generic [ref=f3e649]: 도매회원 전용가 별도
+          - generic [ref=f3e650]:
+            - link "상세" [ref=f3e651] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/ph-gold-apple-mango-10
+            - button "담기" [ref=f3e653] [cursor=pointer]
+        - generic [ref=f3e656]:
+          - link "관심상품(로그인)" [ref=f3e657] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/login
+          - link "칠레 NEW 칠레 네이블 오렌지 10kg" [ref=f3e660] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/product/zest-farm-orange-13
+            - generic [ref=f3e661]:
+              - generic [ref=f3e662]: 칠레
+              - generic [ref=f3e663]: NEW
+            - img "칠레 네이블 오렌지 10kg" [ref=f3e664]
+          - generic [ref=f3e665]:
+            - generic [ref=f3e666]: 제스트팜
+            - link "칠레 네이블 오렌지 10kg" [ref=f3e667] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/zest-farm-orange-13
+            - generic [ref=f3e668]:
+              - generic [ref=f3e669]: 네이블
+              - generic [ref=f3e670]: ·상등급
+              - generic [ref=f3e671]: ·10kg
+            - generic [ref=f3e672]:
+              - generic [ref=f3e673]: 39,000원
+              - generic [ref=f3e675]: 도매회원 전용가 별도
+          - generic [ref=f3e676]:
+            - link "상세" [ref=f3e677] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/zest-farm-orange-13
+            - button "담기" [ref=f3e679] [cursor=pointer]
+        - generic [ref=f3e682]:
+          - link "관심상품(로그인)" [ref=f3e683] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/login
+          - link "남아공 BEST NEW 남아공 자몽 8kg" [ref=f3e686] [cursor=pointer]:
+            - /url: http://localhost/mangoshop/product/zest-farm-grapefruit-14
+            - generic [ref=f3e687]:
+              - generic [ref=f3e688]: 남아공
+              - generic [ref=f3e689]: BEST
+              - generic [ref=f3e690]: NEW
+            - img "남아공 자몽 8kg" [ref=f3e691]
+          - generic [ref=f3e692]:
+            - generic [ref=f3e693]: 제스트팜
+            - link "남아공 자몽 8kg" [ref=f3e694] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/zest-farm-grapefruit-14
+            - generic [ref=f3e695]:
+              - generic [ref=f3e696]: 스타루비
+              - generic [ref=f3e697]: ·상등급
+              - generic [ref=f3e698]: ·8kg
+            - generic [ref=f3e699]:
+              - generic [ref=f3e700]: 34,000원
+              - generic [ref=f3e702]: 도매회원 전용가 별도
+          - generic [ref=f3e703]:
+            - link "상세" [ref=f3e704] [cursor=pointer]:
+              - /url: http://localhost/mangoshop/product/zest-farm-grapefruit-14
+            - button "담기" [ref=f3e706] [cursor=pointer]
+    - generic [ref=f3e710]:
+      - generic [ref=f3e711]:
+        - generic [ref=f3e712]: INSTAGRAM
+        - heading "@mangoshop" [level=3] [ref=f3e713]
+        - paragraph [ref=f3e714]: 망고샵의 신선한 순간을 인스타그램에서 만나보세요
+      - generic [ref=f3e715]:
+        - link "망고샵 인스타그램" [ref=f3e716] [cursor=pointer]:
+          - /url: http://localhost/mangoshop/products
+          - img "망고샵 인스타그램" [ref=f3e717]
+        - link "망고샵 인스타그램" [ref=f3e721] [cursor=pointer]:
+          - /url: http://localhost/mangoshop/products
+          - img "망고샵 인스타그램" [ref=f3e722]
+        - link "망고샵 인스타그램" [ref=f3e726] [cursor=pointer]:
+          - /url: http://localhost/mangoshop/products
+          - img "망고샵 인스타그램" [ref=f3e727]
+        - link "망고샵 인스타그램" [ref=f3e731] [cursor=pointer]:
+          - /url: http://localhost/mangoshop/products
+          - img "망고샵 인스타그램" [ref=f3e732]
+        - link "망고샵 인스타그램" [ref=f3e736] [cursor=pointer]:
+          - /url: http://localhost/mangoshop/products
+          - img "망고샵 인스타그램" [ref=f3e737]
+        - link "망고샵 인스타그램" [ref=f3e741] [cursor=pointer]:
+          - /url: http://localhost/mangoshop/products
+          - img "망고샵 인스타그램" [ref=f3e742]
+        - link "망고샵 인스타그램" [ref=f3e746] [cursor=pointer]:
+          - /url: http://localhost/mangoshop/products
+          - img "망고샵 인스타그램" [ref=f3e747]
+        - link "망고샵 인스타그램" [ref=f3e751] [cursor=pointer]:
+          - /url: http://localhost/mangoshop/products
+          - img "망고샵 인스타그램" [ref=f3e752]
+      - link "FOLLOW" [ref=f3e757] [cursor=pointer]:
+        - /url: https://www.instagram.com/
+  - contentinfo [ref=f3e760]:
+    - generic [ref=f3e762]:
+      - link "공지사항" [ref=f3e763] [cursor=pointer]:
+        - /url: http://localhost/mangoshop/community/notices
+      - link "Q&A" [ref=f3e764] [cursor=pointer]:
+        - /url: http://localhost/mangoshop/community/qna
+      - link "상품후기" [ref=f3e765] [cursor=pointer]:
+        - /url: http://localhost/mangoshop/community/reviews
+      - link "자주묻는질문" [ref=f3e766] [cursor=pointer]:
+        - /url: http://localhost/mangoshop/community/faq
+      - link "배송조회" [ref=f3e767] [cursor=pointer]:
+        - /url: http://localhost/mangoshop/mypage/orders
+      - link "회사소개" [ref=f3e768] [cursor=pointer]:
+        - /url: http://localhost/mangoshop/community/qna
+      - link "이용약관" [ref=f3e769] [cursor=pointer]:
+        - /url: http://localhost/mangoshop/community/qna
+      - link "개인정보처리방침" [ref=f3e770] [cursor=pointer]:
+        - /url: http://localhost/mangoshop/community/qna
+    - generic [ref=f3e772]:
+      - generic [ref=f3e773]:
+        - generic [ref=f3e774]: 🥭 망고샵
+        - text: "상호 : 망고샵 | 대표 : 홍길동 사업자등록번호 : 000-00-00000 | 통신판매업 신고 : 제2026-서울-00000호 주소 : 서울특별시 송파구 가락동 농수산물시장 000호 이메일 : help@mangoshop.co.kr 여러 수입사가 입점하는 오픈마켓으로, 각 상품의 판매·배송·정산 책임은 해당 수입사에 있습니다."
+        - generic [ref=f3e775]: © 2026 MANGOSHOP. All rights reserved.
+      - generic [ref=f3e776]:
+        - generic [ref=f3e777]: 고객센터
+        - generic [ref=f3e778]: 1600-0000
+        - generic [ref=f3e779]: 평일 09:00 ~ 18:00 (점심 12:00~13:00) / 주말·공휴일 휴무
+        - generic [ref=f3e780]:
+          - generic [ref=f3e781]: 공정거래위원회
+          - generic [ref=f3e782]: 에스크로 안전거래
+          - generic [ref=f3e783]: 콜드체인 배송
+  - button "상담하기" [ref=f3e785] [cursor=pointer]: 상담

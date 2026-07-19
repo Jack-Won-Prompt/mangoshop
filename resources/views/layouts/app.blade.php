@@ -12,7 +12,7 @@
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A5%AD%3C/text%3E%3C/svg%3E">
     <link rel="stylesheet" href="{{ asset('css/site.css') }}?v=19">
-    <link rel="stylesheet" href="{{ asset('css/mango.css') }}?v=4">
+    <link rel="stylesheet" href="{{ asset('css/mango.css') }}?v=5">
     @stack('head')
 </head>
 <body>

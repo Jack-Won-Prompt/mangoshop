@@ -220,10 +220,10 @@ body .site-footer { display: none !important; }
 
 /* ============================ 프로모 밴드 (리뷰 적립 / 입점 모집) ============================ */
 .mg-promo { padding: 8px 0 46px; }
-.mg-promo .mg-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+.mg-promo .mg-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: stretch; }
 .mg-promo-card {
     position: relative; overflow: hidden; border-radius: 16px; padding: 30px 32px; color: #fff;
-    display: flex; flex-direction: column; justify-content: center; min-height: 210px; box-shadow: var(--mg-shadow);
+    display: flex; flex-direction: column; justify-content: center; min-height: 210px; height: 100%; box-shadow: var(--mg-shadow);
 }
 .mg-promo-card.review { background: linear-gradient(135deg, #ff7a18, #ff9d3c); }
 .mg-promo-card.join { background: linear-gradient(135deg, #0f7a37, #1fb257); }
