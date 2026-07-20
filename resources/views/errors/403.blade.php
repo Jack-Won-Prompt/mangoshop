@@ -1,0 +1,5 @@
+@extends('errors.layout')
+@section('emoji', '🔒')
+@section('code', '403')
+@section('title', '접근 권한이 없습니다')
+@section('message', "이 페이지에 접근할 수 있는 권한이 없습니다.\n로그인 상태나 회원 등급을 확인해 주세요.")

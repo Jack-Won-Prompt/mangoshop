@@ -1,0 +1,5 @@
+@extends('errors.layout')
+@section('emoji', '🥭')
+@section('code', '500')
+@section('title', '일시적인 오류가 발생했습니다')
+@section('message', "서버에 문제가 발생해 요청을 처리하지 못했습니다.\n잠시 후 다시 시도해 주세요. 문제가 계속되면 고객센터로 문의해 주세요.")

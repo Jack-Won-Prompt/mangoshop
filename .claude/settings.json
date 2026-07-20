@@ -71,7 +71,8 @@
       "Bash(php -d error_reporting=\"E_ALL & ~E_DEPRECATED\" artisan route:list --name=agent)",
       "Bash(curl -s -o /dev/null -w \"home: %{http_code}\\\\n\" http://localhost/mangoshop/)",
       "Bash(curl -s -o /dev/null -w \"checkout: %{http_code} \\(302=로그인 리다이렉트 정상\\)\\\\n\" http://localhost/mangoshop/checkout)",
-      "Bash(/e/xampp/mysql/bin/mysql -uroot mangoshop -e ' *)"
+      "Bash(/e/xampp/mysql/bin/mysql -uroot mangoshop -e ' *)",
+      "Bash(curl -s -o /tmp/404.html -w \"HTTP %{http_code}\\\\n\" http://localhost/mangoshop/this-page-does-not-exist-xyz)"
     ]
   }
 }
