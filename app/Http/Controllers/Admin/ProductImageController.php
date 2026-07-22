@@ -10,31 +10,23 @@ use Illuminate\Support\Str;
 
 /**
  * 관리자 상품 이미지 자동검색 + 확인 후 다운로드.
- * - 후보: 수입과일몰(mediversal/drmro/openmedical/aboutmedi/medisale) + 네이버 이미지검색
- * - 관리자가 후보 중 맞는 이미지를 선택하면 서버가 내려받아 로컬 저장 → 썸네일 지정
+ * - 후보: 네이버 이미지검색(상품명 기반) — 관리자가 맞는 이미지를 선택하면 서버가 내려받아 로컬 저장 → 썸네일 지정
+ * - 필요 시 외부 상품몰 스크래핑 소스를 $sources 에 추가할 수 있음.
  */
 class ProductImageController extends Controller
 {
+    /** 영문 품종/과일명 → 한글 검색어 보강 사전 */
     private array $dic = [
-        'silicone' => '실리콘', 'foley' => '폴리', 'catheter' => '카테터', 'suction' => '석션', 'surgical' => '수술',
-        'gown' => '가운', 'glove' => '장갑', 'gloves' => '장갑', 'syringe' => '주사기', 'needle' => '니들', 'gauze' => '거즈',
-        'dressing' => '드레싱', 'mask' => '마스크', 'cannula' => '캐뉼라', 'tube' => '튜브', 'tubing' => '튜브',
-        'drape' => '드레이프', 'suture' => '봉합사', 'silk' => '실크', 'forceps' => '포셉', 'forcep' => '포셉',
-        'holder' => '홀더', 'foam' => '폼', 'oxygen' => '산소', 'nasal' => '비강', 'disposable' => '일회용',
-        'extension' => '연장', 'stopcock' => '스탑콕', 'infusion' => '수액', 'filter' => '필터', 'stent' => '스텐트',
-        'balloon' => '벌룬', 'sheath' => '시스', 'blade' => '블레이드', 'scalpel' => '메스', 'trocar' => '트로카',
-        'sponge' => '스폰지', 'drain' => '배액', 'bag' => '백', 'wire' => '와이어', 'guidewire' => '가이드와이어',
-        'tape' => '테이프', 'band' => '밴드', 'nephrostomy' => '신루', 'urine' => '소변', 'set' => '세트',
+        'mango' => '망고', 'avocado' => '아보카도', 'pineapple' => '파인애플', 'durian' => '두리안',
+        'mangosteen' => '망고스틴', 'lychee' => '리치', 'orange' => '오렌지', 'grapefruit' => '자몽',
+        'dragonfruit' => '용과', 'pitaya' => '용과', 'blueberry' => '블루베리', 'kiwi' => '키위',
+        'banana' => '바나나', 'coconut' => '코코넛', 'lemon' => '레몬', 'lime' => '라임',
+        'grape' => '포도', 'cherry' => '체리', 'peach' => '복숭아', 'apple' => '사과', 'pear' => '배',
+        'box' => '박스', 'fresh' => '신선', 'organic' => '유기농', 'premium' => '프리미엄',
     ];
 
-    /** [소스명, 검색URL템플릿, 종류(cafe24/godo), 이미지 다운로드 referer] */
-    private array $sources = [
-        ['mediversal', 'https://mediversal.co.kr/product/search.html?keyword=%s', 'cafe24', 'https://mediversal.co.kr/'],
-        ['drmro', 'https://www.drmro.com/goods/goods_search.php?keyword=%s', 'godo', null],
-        ['openmedical', 'https://openmedical.co.kr/product/search.html?keyword=%s', 'cafe24', 'https://openmedical.co.kr/'],
-        ['aboutmedi', 'https://aboutmedi.com/product/search.html?keyword=%s', 'cafe24', 'https://aboutmedi.com/'],
-        ['medisale', 'https://medisale.co.kr/product/search.html?keyword=%s', 'cafe24', 'https://medisale.co.kr/'],
-    ];
+    /** 외부 상품몰 스크래핑 소스(선택) — [소스명, 검색URL템플릿, 종류(cafe24/godo), referer]. 기본은 네이버 이미지검색 사용. */
+    private array $sources = [];
 
     /** 후보 이미지 검색 → data-URI 미리보기 목록 반환 */
     public function search(Product $product)

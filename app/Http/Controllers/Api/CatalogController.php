@@ -60,7 +60,7 @@ class CatalogController extends Controller
         $brands = Brand::whereIn('id', $scopeBrandIds)->orderBy('name')
             ->withCount(['products' => fn ($q) => $q->active()])->get();
 
-        $query = $base->with('brand');
+        $query = $base->with('brand', 'seller');
 
         // 필터
         $brandIds = array_filter((array) $request->get('brand', []));
@@ -111,14 +111,14 @@ class CatalogController extends Controller
     public function show(Request $request, string $slug)
     {
         $product = Product::active()
-            ->with(['brand', 'category', 'reviews' => fn ($q) => $q->visible()->latest()])
+            ->with(['brand', 'seller', 'category', 'reviews' => fn ($q) => $q->visible()->latest()])
             ->where('slug', $slug)->firstOrFail();
         $product->increment('view_count');
 
         $related = Product::active()
             ->where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
-            ->with('brand')->take(6)->get();
+            ->with('brand', 'seller')->take(6)->get();
 
         $wished = false;
         if ($user = $request->user()) {

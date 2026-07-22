@@ -9,7 +9,7 @@
         <div style="flex:none;width:64px;height:64px;border-radius:16px;background:var(--navy-50);color:var(--navy-800);display:flex;align-items:center;justify-content:center"><x-icon name="truck" :size="34"/></div>
         <div>
             <h2 style="font-size:22px;font-weight:800;color:var(--navy-800)">평일 오후 2시 이전 결제 완료 시 당일출고</h2>
-            <p class="muted" style="font-size:14px;margin-top:6px">병의원 진료에 차질 없도록 빠르게 발송합니다. (재고 보유 상품 기준)</p>
+            <p class="muted" style="font-size:14px;margin-top:6px">신선도 손실 없이 콜드체인으로 빠르게 발송합니다. (재고 보유 상품 기준)</p>
         </div>
     </div>
 

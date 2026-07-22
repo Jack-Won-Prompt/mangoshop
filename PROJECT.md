@@ -31,7 +31,7 @@ UI/UX 레퍼런스: **exfresh.co.kr** (청과 B2B몰 레이아웃/구성/톤 재
   - 소매: 승인 없이 **소매가(정가)** 로 구매.
   - 비로그인/미승인 도매: **가격 숨김** (`Product::priceVisibleFor()`).
 - 가격 우선순위 `Product::priceFor($user)`:
-  1. 회원별 개별 계약가 (레거시 `hospital_prices` 재활용)
+  1. 회원별 개별 계약가 (`contract_prices` / `ContractPrice`)
   2. 도매 승인회원 → `products.wholesale_price`
   3. 소매/정가 → `products.price`
 - **수량구간 할인** `Product::unitPriceFor($user,$qty)` — `products.price_tiers` `[{min_qty,price}]`.
@@ -73,6 +73,6 @@ CreditTransaction, SellerSettlement}` + 확장된 `Product/Order/OrderItem/User`
 - **레거시 정리(2026-07-18 완료)**: 라이브 앱 소스 전반의 브랜드/도메인 문구 정리 완료.
   - `메디셀/MEDISELL→망고샵/MANGOSHOP`, `의료소모품/의료기기→수입 과일/농수산물`,
     회원 구분 `병원→도매·사업자`, stale 데모계정(clinic@/admin@medisell)→실계정, `logo.svg`→망고 로고.
-  - `hospital_prices` 테이블/`HospitalPrice` 모델명은 "회원별 개별 계약가"로 의미 재정의해 **유지**(주석만 정리).
+  - 병원 관련 DB 명칭 정리: `hospital_prices`→`contract_prices`, `HospitalPrice`→`ContractPrice`(회원별 개별 계약가).
   - 휴면 레거시(미등록·미사용)로 **보존**: `ColsImportSeeder`, `database/data/sames_*·mulpum_*.json`,
     CoupangController/CoupangSearchService(운영자 가격비교 도구). 추후 제거 검토.

@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 
 /**
  * 삼에스 제품 엑셀(→ database/data/sames_products.json)을 망고샵 상품으로 임포트.
- * - mediversal식 6개 카테고리로 키워드 자동 분류
+ * - 키워드 기반 6개 카테고리 자동 분류
  * - 이미지는 포함하지 않음(요청사항: 데이터만 먼저)
  */
 class ImportSamesProducts extends Command

@@ -26,7 +26,7 @@ return new class extends Migration
             $table->string('address1')->nullable();
             $table->string('address2')->nullable();
 
-            // 사업자(병의원) 정보 + 승인 상태
+            // 사업자 정보 + 승인 상태
             $table->string('company_name')->nullable();
             $table->string('biz_no', 20)->nullable();      // 사업자등록번호
             $table->string('biz_type')->nullable();        // 업태/종목 또는 사업자 종별

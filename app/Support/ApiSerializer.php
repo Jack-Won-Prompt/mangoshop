@@ -65,8 +65,9 @@ class ApiSerializer
     /** 상품 카드(목록)용 요약 */
     public static function productCard(Product $p, Request $request): array
     {
-        $user  = $request->user();
-        $price = $p->priceFor($user);
+        $user    = $request->user();
+        $price   = $p->priceFor($user);
+        $visible = $p->priceVisibleFor($user);
 
         return [
             'id'          => $p->id,
@@ -77,10 +78,12 @@ class ApiSerializer
             'maker'       => $p->maker,
             'summary'     => $p->summary,
             'thumbnail'   => self::image($p->thumbnail, $request),
-            'price'       => $price,                       // 회원유형별 실판매가
-            'list_price'  => (int) $p->price,              // 정가
-            'discount_rate' => $p->discountRateFor($price),
+            'price'       => $visible ? $price : null,     // 회원유형별 실판매가 (숨김 시 null)
+            'list_price'  => $visible ? (int) $p->price : null, // 정가
+            'discount_rate' => $visible ? $p->discountRateFor($price) : 0,
             'has_special' => $p->hasSpecialPriceFor($user),
+            'price_visible' => $visible,                   // false → "로그인 후 가격 확인"
+            'wholesale_only' => (bool) $p->wholesale_only,
             'stock'       => (int) $p->stock,
             'is_best'     => (bool) $p->is_best,
             'is_new'      => (bool) $p->is_new,
@@ -89,7 +92,49 @@ class ApiSerializer
             'brand'       => $p->relationLoaded('brand') && $p->brand
                 ? ['id' => $p->brand->id, 'name' => $p->brand->name, 'slug' => $p->brand->slug]
                 : null,
+
+            // ===== 멀티벤더 / 신선식품 속성 =====
+            'seller'      => $p->relationLoaded('seller') && $p->seller
+                ? self::sellerBrief($p->seller, $request)
+                : null,
+            'origin'      => $p->origin,
+            'variety'     => $p->variety,
+            'grade'       => $p->grade,
+            'box_spec'    => $p->box_spec,
+            'weight_kg'   => $p->weight_kg !== null ? (float) $p->weight_kg : null,
+            'moq'         => (int) ($p->moq ?: 1),
+            'sale_status' => $p->sale_status,
+            'sale_status_label' => $p->saleStatusLabel(),
+            'purchasable' => $p->isPurchasable(),
         ];
+    }
+
+    /** 수입사(판매자) 요약 */
+    public static function sellerBrief($s, Request $request): array
+    {
+        return [
+            'id'        => $s->id,
+            'name'      => $s->name,
+            'slug'      => $s->slug,
+            'logo'      => self::image($s->logo, $request),
+            'origin_focus' => $s->origin_focus,
+            'coldchain' => (bool) $s->coldchain,
+            'rating'    => $s->rating_count > 0
+                ? round($s->rating_sum / $s->rating_count, 1) : 0,
+            'rating_count' => (int) $s->rating_count,
+        ];
+    }
+
+    /** 수입사 상세 — 배송정책 포함 */
+    public static function sellerDetail($s, Request $request): array
+    {
+        return array_merge(self::sellerBrief($s, $request), [
+            'intro'                  => $s->intro,
+            'banner'                 => self::image($s->banner, $request),
+            'shipping_fee'           => (int) $s->shipping_fee,
+            'free_shipping_threshold' => (int) $s->free_shipping_threshold,
+            'shipping_notice'        => $s->shipping_notice,
+        ]);
     }
 
     /** 상품 상세 */
@@ -110,10 +155,35 @@ class ApiSerializer
             }, $p->description)
             : null;
 
+        // 수량구간 할인표 — 회원 등급 기준가보다 저렴한 구간만 노출
+        $tiers = [];
+        foreach ((array) $p->price_tiers as $t) {
+            $min = (int) ($t['min_qty'] ?? 0);
+            $tp  = (int) ($t['price'] ?? 0);
+            if ($min > 0 && $tp > 0 && $tp < $price) {
+                $tiers[] = ['min_qty' => $min, 'price' => $tp];
+            }
+        }
+        usort($tiers, fn ($a, $b) => $a['min_qty'] <=> $b['min_qty']);
+
         return array_merge(self::productCard($p, $request), [
             'description' => $description,
             'spec'        => $p->spec,
             'tax_type'    => $p->tax_type,
+
+            // ===== 멀티벤더 / 신선식품 상세 =====
+            'seller'      => $p->relationLoaded('seller') && $p->seller
+                ? self::sellerDetail($p->seller, $request)
+                : null,
+            'price_tiers' => $p->priceVisibleFor($user) ? $tiers : [],
+            'wholesale_price' => $user && $user->isApprovedBusiness() && $p->wholesale_price
+                ? (int) $p->wholesale_price : null,
+            'inbound_date'   => $p->inbound_date?->format('Y-m-d'),
+            'expiry_date'    => $p->expiry_date?->format('Y-m-d'),
+            'storage_method' => $p->storage_method,
+            'lot_no'         => $p->lot_no,
+            'expected_inbound_date' => $p->expected_inbound_date?->format('Y-m-d'),
+            'sales_count'    => (int) $p->sales_count,
             'view_count'  => (int) $p->view_count,
             'gallery'     => $gallery,
             'category'    => $p->relationLoaded('category') && $p->category
@@ -203,7 +273,10 @@ class ApiSerializer
             'name'         => $u->name,
             'email'        => $u->email,
             'member_type'  => $u->member_type,
-            'is_business'  => $u->member_type === 'business',
+            // 망고샵 회원 구분 — 도매(wholesale/business 레거시) vs 소매(retail)
+            'is_wholesale' => $u->isWholesale(),
+            'is_retail'    => ! $u->isWholesale(),
+            'is_business'  => $u->isWholesale(),
             'is_approved_business' => $u->isApprovedBusiness(),
             'biz_status'   => $u->biz_status,
             'grade'        => $u->grade,

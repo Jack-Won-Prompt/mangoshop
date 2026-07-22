@@ -72,7 +72,10 @@
       "Bash(curl -s -o /dev/null -w \"home: %{http_code}\\\\n\" http://localhost/mangoshop/)",
       "Bash(curl -s -o /dev/null -w \"checkout: %{http_code} \\(302=로그인 리다이렉트 정상\\)\\\\n\" http://localhost/mangoshop/checkout)",
       "Bash(/e/xampp/mysql/bin/mysql -uroot mangoshop -e ' *)",
-      "Bash(curl -s -o /tmp/404.html -w \"HTTP %{http_code}\\\\n\" http://localhost/mangoshop/this-page-does-not-exist-xyz)"
+      "Bash(curl -s -o /tmp/404.html -w \"HTTP %{http_code}\\\\n\" http://localhost/mangoshop/this-page-does-not-exist-xyz)",
+      "Bash(grep -viE 'node_modules|\\\\.map$')",
+      "Bash(grep -nE 'function queries|function naver|\\\\$this->dic|\\\\$this->sources|refererFor|dic\\\\[' app/Http/Controllers/Admin/ProductImageController.php)",
+      "Bash(sed -n '/function refererFor/,/^    }/p' app/Http/Controllers/Admin/ProductImageController.php)"
     ]
   }
 }

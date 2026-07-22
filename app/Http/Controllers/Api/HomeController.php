@@ -20,14 +20,14 @@ class HomeController extends Controller
         $deals = Product::active()
             ->whereColumn('member_price', '<', 'price')->where('member_price', '>', 0)
             ->orderByRaw('(price - member_price) / price DESC')
-            ->with('brand')->take(12)->get();
+            ->with('brand', 'seller')->take(12)->get();
 
         $categoryTabs = Category::whereNull('parent_id')->where('is_active', true)
             ->orderBy('sort_order')->with('children.children.children')->get()
             ->map(fn ($c) => [
                 'category' => S::categoryBrief($c),
                 'products' => Product::active()->whereIn('category_id', $c->descendantIds())
-                    ->with('brand')->latest('view_count')->take(8)->get()->map($card)->all(),
+                    ->with('brand', 'seller')->latest('view_count')->take(8)->get()->map($card)->all(),
             ])
             ->filter(fn ($t) => count($t['products']) > 0)->values();
 
@@ -40,11 +40,11 @@ class HomeController extends Controller
             ],
             'deals'    => $deals->map($card),
             'category_tabs' => $categoryTabs,
-            'best'     => Product::active()->where('is_best', true)->with('brand')
+            'best'     => Product::active()->where('is_best', true)->with('brand', 'seller')
                 ->latest('view_count')->take(10)->get()->map($card),
-            'featured' => Product::active()->where('is_featured', true)->with('brand')
+            'featured' => Product::active()->where('is_featured', true)->with('brand', 'seller')
                 ->latest()->take(8)->get()->map($card),
-            'new'      => Product::active()->where('is_new', true)->with('brand')
+            'new'      => Product::active()->where('is_new', true)->with('brand', 'seller')
                 ->latest()->take(8)->get()->map($card),
             'notices'  => Notice::orderByDesc('is_pinned')->latest('published_at')->take(5)
                 ->get()->map(fn ($n) => S::noticeBrief($n)),

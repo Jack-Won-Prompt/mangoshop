@@ -20,7 +20,7 @@
     </div>
 
     <a href="{{ route('community.inquiry', ['type' => 'quote']) }}" class="side-banner" style="background:linear-gradient(135deg,var(--navy-800),var(--navy-600))">
-        <small>대량구매 병의원이라면</small>
+        <small>대량구매 사업자라면</small>
         <strong>견적문의 바로가기 →</strong>
     </a>
 </aside>

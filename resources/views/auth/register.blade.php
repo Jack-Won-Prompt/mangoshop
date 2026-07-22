@@ -37,7 +37,7 @@
             {{-- 사업자 전용 --}}
             <div id="biz-fields" style="display:none;background:var(--navy-50);border:1px solid var(--navy-100);border-radius:10px;padding:16px;margin-bottom:16px">
                 <div style="font-size:13px;font-weight:700;color:var(--navy-800);margin-bottom:12px">사업자 정보 (승인용)</div>
-                <div class="field"><label>상호(병의원명)</label><input type="text" name="company_name" class="input" value="{{ old('company_name') }}"></div>
+                <div class="field"><label>상호(업체명)</label><input type="text" name="company_name" class="input" value="{{ old('company_name') }}"></div>
                 <div class="row2">
                     <div class="field"><label>사업자등록번호</label><input type="text" name="biz_no" class="input" value="{{ old('biz_no') }}" placeholder="000-00-00000"></div>
                     <div class="field"><label>업태/종별</label><input type="text" name="biz_type" class="input" value="{{ old('biz_type') }}" placeholder="예: 의원"></div>

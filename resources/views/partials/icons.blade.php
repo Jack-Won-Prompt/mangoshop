@@ -38,7 +38,7 @@
     <symbol id="i-tools" viewBox="0 0 24 24"><path d="M14 6a3.5 3.5 0 0 1 4.5 4.5L21 13M14 6l-9 9 4 4 9-9M14 6l3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M5 13h3l1.5-3 2 5 1.5-2.5 1 .5h5" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 
-    {{-- 진료재료 카테고리 --}}
+    {{-- 기타 아이콘(레거시, 일부 미사용) --}}
     <symbol id="i-syringe" viewBox="0 0 24 24"><path d="M14 3l7 7M18 6l-9 9-4 1 1-4 9-9M9 12l3 3M5 19l-2 2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="i-ivbag" viewBox="0 0 24 24"><rect x="8" y="3" width="8" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M12 3V1M10 7h4M10 10h4M12 14v4a2 2 0 0 1-2 2H9" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></symbol>
     <symbol id="i-catheter" viewBox="0 0 24 24"><path d="M3 7l5 5M5 5l5 5M4 6l6 6 3-3 8 8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>

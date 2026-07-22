@@ -562,7 +562,7 @@ main{min-height:60vh}
 .mobile-nav{display:none}
 
 /* =========================================================
-   mediversal 구조: 탭바 / 3단 정보 / 대형 프로모 / 브랜드카드
+   레거시 참고 레이아웃 구조: 탭바 / 3단 정보 / 대형 프로모 / 브랜드카드
    ========================================================= */
 /* 탭 바 (슬라이드 하단) */
 .home-tabbar{display:flex;gap:2px;background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin-bottom:20px}

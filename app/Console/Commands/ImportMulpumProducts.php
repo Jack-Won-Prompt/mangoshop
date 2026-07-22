@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 
 /**
  * 물품명.xlsx(→ database/data/mulpum.json) 508개를 망고샵 상품으로 임포트.
- * - mediversal식 6개 카테고리로 키워드 자동 분류 (삼에스 임포트와 동일 규칙)
+ * - 키워드 기반 6개 카테고리 자동 분류 (삼에스 임포트와 동일 규칙)
  * - database/data/mulpum_images.json 매칭 이미지(public/product/mulpum/)를 썸네일로 연결
  * - 가격 정보는 원본에 없음 → price=0 (관리자가 추후 입력)
  */
