@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CatalogController;
@@ -83,5 +84,30 @@ Route::prefix('v1')->group(function () {
 
         // 푸시 알림 토큰 등록 (로그인 회원과 연결)
         Route::post('/push/register', [\App\Http\Controllers\Api\PushController::class, 'register']);
+
+        // ===== 관리자 전용 (is_admin) =====
+        Route::prefix('admin')->middleware('admin')->group(function () {
+            Route::get('/dashboard', [AdminController::class, 'dashboard']);
+
+            // 주문
+            Route::get('/orders', [AdminController::class, 'orders']);
+            Route::get('/orders/{order}', [AdminController::class, 'order']);
+            Route::put('/orders/{order}/status', [AdminController::class, 'updateOrderStatus']);
+            Route::put('/orders/{order}/shipping', [AdminController::class, 'updateOrderShipping']);
+
+            // 회원 (도매 사업자 승인)
+            Route::get('/users', [AdminController::class, 'users']);
+            Route::get('/users/{user}', [AdminController::class, 'user']);
+            Route::put('/users/{user}/approve', [AdminController::class, 'approveUser']);
+
+            // 문의
+            Route::get('/inquiries', [AdminController::class, 'inquiries']);
+            Route::post('/inquiries/{inquiry}/answer', [AdminController::class, 'answerInquiry']);
+
+            // 후기
+            Route::get('/reviews', [AdminController::class, 'reviews']);
+            Route::put('/reviews/{review}/toggle', [AdminController::class, 'toggleReview']);
+            Route::delete('/reviews/{review}', [AdminController::class, 'destroyReview']);
+        });
     });
 });
