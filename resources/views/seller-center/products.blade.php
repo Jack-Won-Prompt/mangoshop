@@ -12,40 +12,39 @@
         <input type="text" name="q" value="{{ request('q') }}" placeholder="상품명 검색">
         <button><x-icon name="search" :size="16"/></button>
     </form>
+    <a href="{{ route('seller.center.products.create') }}" class="abtn abtn-pri abtn-sm"><x-icon name="plus" :size="15"/> 상품등록</a>
 </div>
 
 <div class="adm-card">
     <table class="atable">
-        <thead><tr><th>상품명</th><th style="width:120px">판매가</th><th style="width:120px">도매가</th><th style="width:90px">재고</th><th style="width:130px">판매상태</th><th style="width:70px"></th></tr></thead>
+        <thead><tr><th style="width:64px">이미지</th><th>상품명</th><th style="text-align:right;width:110px">판매가</th><th style="text-align:right;width:80px">재고</th><th style="width:90px">상태</th><th style="width:130px"></th></tr></thead>
         <tbody>
         @forelse($products as $p)
             <tr>
                 <td>
-                    <b>{{ $p->name }}</b>
-                    <div style="color:#97a0b8;font-size:11.5px">{{ $p->code }} · {{ $p->origin }} {{ $p->box_spec }}</div>
+                    @if($p->thumbnail)<img src="{{ $p->thumb_url }}" alt="" style="width:44px;height:44px;object-fit:cover;border-radius:8px">
+                    @else<div style="width:44px;height:44px;border-radius:8px;background:#f7f9fc;display:flex;align-items:center;justify-content:center;color:#c7cedd"><x-icon name="package" :size="18"/></div>@endif
                 </td>
-                <td><input form="pf{{ $p->id }}" type="number" name="price" value="{{ $p->price }}" class="ainput" style="height:34px;padding:4px 8px"></td>
-                <td><input form="pf{{ $p->id }}" type="number" name="wholesale_price" value="{{ $p->wholesale_price }}" class="ainput" style="height:34px;padding:4px 8px"></td>
-                <td><input form="pf{{ $p->id }}" type="number" name="stock" value="{{ $p->stock }}" class="ainput" style="height:34px;padding:4px 8px"></td>
+                <td><b>{{ $p->name }}</b><div style="color:#97a0b8;font-size:11.5px">{{ $p->code }} · {{ $p->origin }} {{ $p->box_spec }}</div></td>
+                <td style="text-align:right">{{ number_format($p->price) }}원</td>
+                <td style="text-align:right">{{ $p->stock }}</td>
                 <td>
-                    <select form="pf{{ $p->id }}" name="sale_status" class="aselect" style="height:34px;padding:4px 8px">
-                        @foreach($statuses as $k=>$v)<option value="{{ $k }}" {{ $p->sale_status===$k?'selected':'' }}>{{ $v }}</option>@endforeach
-                    </select>
+                    @php($st = $p->sale_status)
+                    <span class="pill {{ $st==='on_sale'?'pill-y':($st==='soldout'||$st==='closed'?'pill-n':'pill-w') }}">{{ $statuses[$st] ?? $st }}</span>
                 </td>
-                <td><button form="pf{{ $p->id }}" class="abtn abtn-pri abtn-sm" type="submit">저장</button></td>
+                <td style="text-align:right;white-space:nowrap">
+                    <a href="{{ route('seller.center.products.edit', $p) }}" class="abtn abtn-ghost abtn-sm">수정</a>
+                    <form method="POST" action="{{ route('seller.center.products.destroy', $p) }}" style="display:inline" onsubmit="return confirm('삭제하시겠습니까?')">@csrf @method('DELETE')
+                        <button class="abtn abtn-ghost abtn-sm" type="submit">삭제</button>
+                    </form>
+                </td>
             </tr>
         @empty
-            <tr><td colspan="6" style="text-align:center;color:#97a0b8;padding:34px">상품이 없습니다.</td></tr>
+            <tr><td colspan="6" style="text-align:center;color:#97a0b8;padding:34px">등록된 상품이 없습니다. <a href="{{ route('seller.center.products.create') }}" style="color:var(--a-navy);font-weight:700">첫 상품 등록하기 →</a></td></tr>
         @endforelse
         </tbody>
     </table>
 </div>
 
-{{-- 행별 폼(HTML5 form 속성 연결) --}}
-@foreach($products as $p)
-    <form id="pf{{ $p->id }}" method="POST" action="{{ route('seller.center.products.update', $p) }}" style="display:none">@csrf @method('PUT')</form>
-@endforeach
-
 {{ $products->links('pagination.simple') }}
-<p style="color:#97a0b8;font-size:12.5px;margin-top:12px">※ 판매가·도매가·재고·판매상태를 수정할 수 있습니다. 신규 상품 등록은 순차 제공됩니다.</p>
 @endsection

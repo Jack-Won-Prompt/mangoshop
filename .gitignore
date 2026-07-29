@@ -28,3 +28,6 @@ yarn-error.log
 # 디자인 산출물(대용량) — 저장소 제외
 /이미지
 *.zip
+
+# 판매자 상품 업로드(런타임)
+/public/product/uploads

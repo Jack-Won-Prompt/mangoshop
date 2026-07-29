@@ -92,7 +92,11 @@ Route::middleware('auth')->group(function () {
     Route::prefix('seller')->name('seller.center.')->controller(\App\Http\Controllers\SellerCenterController::class)->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/products', 'products')->name('products');
+        Route::get('/products/create', 'createProduct')->name('products.create');
+        Route::post('/products', 'storeProduct')->name('products.store');
+        Route::get('/products/{product}/edit', 'editProduct')->name('products.edit');
         Route::put('/products/{product}', 'updateProduct')->name('products.update');
+        Route::delete('/products/{product}', 'destroyProduct')->name('products.destroy');
         Route::get('/orders', 'orders')->name('orders');
         Route::get('/settlements', 'settlements')->name('settlements');
         Route::get('/store', 'store')->name('store');
