@@ -8,9 +8,9 @@
     <meta name="pusher-cluster" content="{{ config('broadcasting.connections.pusher.options.cluster') }}">
     <title>@yield('title', '관리자') — 망고샵 관리자</title>
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
-    <link rel="icon" href="{{ asset('images/logo-mark.svg') }}">
-    <link rel="stylesheet" href="{{ asset('css/site.css') }}?v=19">
-    <link rel="stylesheet" href="{{ asset('css/admin.css') }}?v=5">
+    <link rel="icon" href="{{ asset('images/logo-mark.svg') }}?v=2">
+    <link rel="stylesheet" href="{{ asset('css/site.css') }}?v=21">
+    <link rel="stylesheet" href="{{ asset('css/admin.css') }}?v=6">
 </head>
 <body>
     @include('partials.icons')
@@ -20,7 +20,7 @@
     <div class="adm">
         <aside class="adm-side">
             <a href="{{ route('admin.dashboard') }}" class="adm-brand">
-                <img src="{{ asset('images/logo-mark.svg') }}" alt="" class="mark" style="width:32px;height:32px;background:#fff;border-radius:7px;padding:2px">
+                <img src="{{ asset('images/logo-mark.svg') }}?v=2" alt="" class="mark" style="width:32px;height:32px;background:#fff;border-radius:7px;padding:2px">
                 <span><strong>망고샵</strong><span>ADMIN</span></span>
             </a>
             <nav class="adm-nav">

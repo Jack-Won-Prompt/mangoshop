@@ -1,33 +1,33 @@
 /* MANGOSHOP Admin */
-:root{--a-navy:#0b3d91;--a-ink:#16213e;--a-line:#e3e8f1;--a-bg:#f4f6fb}
+:root{--a-navy:#ff6b00;--a-ink:#16213e;--a-line:#e3e8f1;--a-bg:#f4f6fb}
 .adm{display:flex;min-height:100vh;background:var(--a-bg)}
-.adm-side{width:240px;background:var(--a-ink);color:#aeb8d4;flex:none;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
-.adm-brand{display:flex;align-items:center;gap:10px;padding:20px 18px;border-bottom:1px solid #2a3450}
+.adm-side{width:240px;background:#fff;color:#4b5878;border-right:1px solid var(--a-line);flex:none;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.adm-brand{display:flex;align-items:center;gap:10px;padding:20px 18px;border-bottom:1px solid var(--a-line)}
 .adm-brand .mark{width:32px;height:32px;color:#fff}
-.adm-brand strong{display:block;color:#fff;font-size:18px;font-weight:900}
-.adm-brand span span{font-size:10px;letter-spacing:.2em;color:#7a86a8}
+.adm-brand strong{display:block;color:var(--a-ink);font-size:18px;font-weight:900}
+.adm-brand span span{font-size:10px;letter-spacing:.2em;color:#9aa0ab}
 .adm-nav{flex:1;padding:12px 10px}
 .adm-nav .grp{font-size:11px;font-weight:800;color:#6b7794;text-transform:uppercase;letter-spacing:.08em;padding:14px 10px 6px}
-.adm-nav a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;color:#aeb8d4;font-size:14px;font-weight:600;margin-bottom:2px}
+.adm-nav a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;color:#4b5878;font-size:14px;font-weight:600;margin-bottom:2px}
 .adm-nav a .icon{width:18px;height:18px}
-.adm-nav a:hover{background:#222d49;color:#fff}
+.adm-nav a:hover{background:#fff4ea;color:var(--a-navy)}
 .adm-nav a.on{background:var(--a-navy);color:#fff}
-.adm-foot{padding:14px;border-top:1px solid #2a3450}
-.adm-foot a,.adm-foot button{display:flex;align-items:center;gap:8px;color:#7a86a8;font-size:13px;padding:8px 10px;background:none;border:0;cursor:pointer;font-family:inherit;width:100%;text-align:left}
-.adm-foot a:hover,.adm-foot button:hover{color:#fff}
+.adm-foot{padding:14px;border-top:1px solid var(--a-line)}
+.adm-foot a,.adm-foot button{display:flex;align-items:center;gap:8px;color:#9aa0ab;font-size:13px;padding:8px 10px;background:none;border:0;cursor:pointer;font-family:inherit;width:100%;text-align:left}
+.adm-foot a:hover,.adm-foot button:hover{color:var(--a-navy)}
 .adm-main{flex:1;min-width:0}
 .adm-top{background:#fff;border-bottom:1px solid var(--a-line);padding:18px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
 .adm-top h1{font-size:20px;font-weight:800;color:var(--a-ink)}
 .adm-top .who{font-size:13px;color:#6b7794;display:flex;align-items:center;gap:6px}
 .adm-body{padding:28px}
-.flash{display:flex;align-items:center;gap:10px;background:#e5edff;border:1px solid #c9d8ff;color:var(--a-navy);padding:12px 16px;border-radius:10px;font-weight:700;font-size:14px;margin-bottom:18px}
+.flash{display:flex;align-items:center;gap:10px;background:#fff4ea;border:1px solid #ffd9a6;color:var(--a-navy);padding:12px 16px;border-radius:10px;font-weight:700;font-size:14px;margin-bottom:18px}
 .flash .icon{width:18px;height:18px}
 
 /* 통계 카드 */
 .adm-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
 .adm-stat{background:#fff;border:1px solid var(--a-line);border-radius:12px;padding:20px;display:flex;align-items:center;gap:14px;transition:.15s}
 .adm-stat:hover{box-shadow:0 6px 22px rgba(16,33,62,.08)}
-.adm-stat .ic{width:46px;height:46px;border-radius:12px;background:#e5edff;color:var(--a-navy);display:flex;align-items:center;justify-content:center}
+.adm-stat .ic{width:46px;height:46px;border-radius:12px;background:#fff4ea;color:var(--a-navy);display:flex;align-items:center;justify-content:center}
 .adm-stat .ic .icon{width:24px;height:24px}
 .adm-stat .v{font-size:24px;font-weight:900;color:var(--a-ink)}
 .adm-stat .l{font-size:12.5px;color:#6b7794}
@@ -45,7 +45,7 @@
 
 /* 버튼 */
 .abtn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:8px;font-weight:700;font-size:13.5px;cursor:pointer;border:1.5px solid transparent;transition:.15s}
-.abtn-pri{background:var(--a-navy);color:#fff}.abtn-pri:hover{background:#06256b}
+.abtn-pri{background:var(--a-navy);color:#fff}.abtn-pri:hover{background:#e85d00}
 .abtn-ghost{background:#fff;color:var(--a-navy);border-color:#c7cedd}.abtn-ghost:hover{border-color:var(--a-navy)}
 .abtn-red{background:#e0322d;color:#fff}.abtn-red:hover{background:#c0392b}
 .abtn-sm{padding:6px 12px;font-size:12.5px}
@@ -55,7 +55,7 @@
 .afield{margin-bottom:16px}
 .afield>label{display:block;font-size:13px;font-weight:700;color:#33415c;margin-bottom:6px}
 .ainput,.aselect,.atextarea{width:100%;border:1.5px solid #c7cedd;border-radius:8px;padding:10px 13px;font-size:14px;font-family:inherit;outline:0;background:#fff}
-.ainput:focus,.aselect:focus,.atextarea:focus{border-color:var(--a-navy);box-shadow:0 0 0 3px #e5edff}
+.ainput:focus,.aselect:focus,.atextarea:focus{border-color:var(--a-navy);box-shadow:0 0 0 3px #fff4ea}
 .atextarea{resize:vertical;min-height:100px}
 .acheck{display:flex;align-items:center;gap:8px;font-size:14px}
 .ahint{font-size:12px;color:#97a0b8;margin-top:5px}
@@ -67,7 +67,7 @@
 .search-mini input{border:1.5px solid #c7cedd;border-radius:8px 0 0 8px;padding:8px 12px;font-size:13.5px;outline:0;min-width:200px}
 .search-mini button{border:1.5px solid var(--a-navy);background:var(--a-navy);color:#fff;border-radius:0 8px 8px 0;padding:0 14px;cursor:pointer}
 .pill{display:inline-flex;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:800}
-.pill-y{background:#dcfce7;color:#166534}.pill-n{background:#fee2e2;color:#991b1b}.pill-w{background:#fef3c7;color:#92590a}.pill-b{background:#e5edff;color:#0b3d91}
+.pill-y{background:#dcfce7;color:#166534}.pill-n{background:#fee2e2;color:#991b1b}.pill-w{background:#fef3c7;color:#92590a}.pill-b{background:#fff4ea;color:#0b3d91}
 .filter-tabs{display:flex;gap:4px}
 .filter-tabs a{padding:7px 14px;border-radius:999px;font-size:13px;font-weight:700;color:#6b7794;background:#fff;border:1px solid var(--a-line)}
 .filter-tabs a.on{background:var(--a-navy);color:#fff;border-color:var(--a-navy)}
