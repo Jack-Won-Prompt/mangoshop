@@ -9,7 +9,7 @@
     <title>@yield('title', '관리자') — 망고샵 관리자</title>
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
     <link rel="icon" href="{{ asset('images/logo-mark.svg') }}?v=2">
-    <link rel="stylesheet" href="{{ asset('css/site.css') }}?v=21">
+    <link rel="stylesheet" href="{{ asset('css/site.css') }}?v=22">
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}?v=6">
 </head>
 <body>
