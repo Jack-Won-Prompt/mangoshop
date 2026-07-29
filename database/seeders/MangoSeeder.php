@@ -28,6 +28,7 @@ class MangoSeeder extends Seeder
         $cats = $this->categories();
         $sellers = $this->sellers();
         $this->products($cats, $sellers);
+        $this->giftSets($cats, $sellers);
         $this->banners();
         $this->community();
     }
@@ -233,6 +234,65 @@ class MangoSeeder extends Seeder
             'sale_status' => 'inbound', 'expected_inbound_date' => now()->addDays(10),
             'summary' => '태국산 몬통 두리안 · 예약주문', 'is_active' => true, 'sort_order' => 99,
         ]);
+    }
+
+    /** 선물세트 — /images/giftset 브랜드 박스 이미지 기반 20종 */
+    private function giftSets(array $cats, array $sellers): void
+    {
+        $cat = $cats['giftset'] ?? null;
+
+        // [name, image-slug, origin, box_spec, price, wholesale, seller_slug, flags]
+        $rows = [
+            ['애플망고 선물세트', 'apple-mango', '태국', '6과 (개당 250g↑)', 45000, 38000, 'tropical-import', ['best' => true]],
+            ['옐로우망고 선물세트', 'yellow-mango', '베트남', '6과', 49000, 40000, 'viet-fresh', ['new' => true]],
+            ['망고스틴 선물세트', 'mangosteen', '태국', '2kg', 55000, 45000, 'tropical-import', ['best' => true]],
+            ['하스 아보카도 선물세트', 'avocado', '페루', '8입', 39000, 32000, 'zest-farm', []],
+            ['몬통 두리안 선물세트', 'durian', '태국', '1통 (약 3kg)', 89000, 72000, 'tropical-import', []],
+            ['레드용과 선물세트', 'dragon-fruit', '베트남', '6입', 42000, 34000, 'viet-fresh', []],
+            ['리치 선물세트', 'lychee', '베트남', '2kg', 45000, 37000, 'viet-fresh', []],
+            ['골드 파인애플 선물세트', 'pineapple', '필리핀', '3입', 35000, 28000, 'ph-gold', []],
+            ['자몽 선물세트', 'grapefruit', '남아공', '8입', 39000, 31000, 'zest-farm', []],
+            ['레몬 선물세트', 'lemon', '미국', '2kg', 33000, 26000, 'zest-farm', []],
+            ['패션프루트 선물세트', 'passion-fruit', '베트남', '2kg', 43000, 35000, 'viet-fresh', ['new' => true]],
+            ['람부탄 선물세트', 'rambutan', '태국', '2kg', 46000, 38000, 'tropical-import', []],
+            ['포멜로 선물세트', 'pomelo', '태국', '3입', 38000, 30000, 'tropical-import', []],
+            ['스타프루트 선물세트', 'star-fruit', '말레이시아', '2kg', 41000, 33000, 'ph-gold', []],
+            ['코코넛 선물세트', 'coconut', '태국', '4입', 37000, 29000, 'tropical-import', []],
+            ['구아바 선물세트', 'guava', '태국', '2kg', 36000, 29000, 'tropical-import', []],
+            ['파파야 선물세트', 'papaya', '필리핀', '4입', 34000, 27000, 'ph-gold', []],
+            ['망고·아보카도 혼합세트', 'mango-avocado-mix', '혼합', '망고3 + 아보카도4', 52000, 43000, 'zest-farm', ['best' => true]],
+            ['트로피컬 믹스 세트', 'tropical-mix', '혼합', '열대과일 5종 구성', 59000, 48000, 'tropical-import', ['best' => true, 'new' => true]],
+            ['프리미엄 종합 선물세트', 'premium-assortment', '혼합', '프리미엄 8종 구성', 99000, 82000, 'tropical-import', ['best' => true]],
+        ];
+
+        foreach ($rows as $i => [$name, $img, $origin, $box, $price, $wholesale, $ss, $flags]) {
+            $seller = $sellers[$ss];
+            Product::updateOrCreate(['slug' => 'giftset-'.$img], [
+                'seller_id'   => $seller->id,
+                'category_id' => $cat?->id,
+                'name'        => $name,
+                'thumbnail'   => 'images/giftset/'.$img.'.jpg',
+                'code'        => 'GS'.str_pad((string) ($i + 1), 4, '0', STR_PAD_LEFT),
+                'unit'        => 'BOX',
+                'origin'      => $origin,
+                'grade'       => '선물용',
+                'box_spec'    => $box,
+                'storage_method' => '냉장 0~5℃ 보관, 후숙 후 섭취',
+                'summary'     => "{$origin}산 · 선물용 프리미엄 구성 · {$box}",
+                'description' => "<p>망고샵 전용 선물 패키지로 정성껏 구성한 <b>{$name}</b>입니다. 콜드체인 냉장배송으로 신선하게 전해드립니다. (명절·기념일 선물 추천)</p>",
+                'price'           => $price,
+                'wholesale_price' => $wholesale,
+                'member_price'    => $wholesale,
+                'moq'         => 1,
+                'stock'       => 50,
+                'sale_status' => 'on_sale',
+                'is_active'   => true,
+                'is_best'     => $flags['best'] ?? false,
+                'is_new'      => $flags['new'] ?? false,
+                'sales_count' => (20 - $i) * 3,
+                'sort_order'  => 100 + $i,
+            ]);
+        }
     }
 
     private function banners(): void
