@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 /**
  * 저장된 이미지 값(절대 URL/상대경로 혼재)을 현재 배포 호스트(APP_URL) 기준으로 정규화.
  * - 로컬(서브폴더 /mangoshop)과 운영(도메인 루트) 어디서든 동일 저장값이 올바르게 렌더되도록 함.
- * - 시드 시점에 박제된 http://localhost/mangoshop/... 절대 URL도 현재 호스트로 재구성.
+ * - 시드/과거 배포 시점에 박제된 절대 URL도 현재 호스트로 재구성.
  * - 외부 도메인 이미지는 원본 유지.
  */
 class Media

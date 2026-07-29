@@ -33,6 +33,8 @@ class SettingController extends Controller
             'banks'   => $site['banks'] ?? [],
             'popular_keywords' => $site['popular_keywords'] ?? [],
             'payment_pg' => $site['payment_pg'] ?? 'toss',
+            // 앱 버전 관리 (강제/선택 업데이트) — 플랫폼별 최신·최소 빌드 + 스토어 링크
+            'app' => $site['app'] ?? null,
         ]);
     }
 }

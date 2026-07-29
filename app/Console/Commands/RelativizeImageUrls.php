@@ -8,25 +8,25 @@ use App\Models\Product;
 use Illuminate\Console\Command;
 
 /**
- * DB에 저장된 이미지 절대경로(http://localhost/mangoshop/public/...)를
+ * DB에 저장된 이미지 절대경로(APP_URL 기준 http(s)://도메인/.../public/...)를
  * 상대경로(/product/...)로 일괄 변환한다. (도메인 이전/배포용)
  *
  * 예) php artisan images:relativize
- *     php artisan images:relativize --from="http://localhost/mangoshop/public" --to=""
+ *     php artisan images:relativize --from="https://도메인/public" --to=""
  *     php artisan images:relativize --dry   (미리보기, 변경 안 함)
  */
 class RelativizeImageUrls extends Command
 {
     protected $signature = 'images:relativize
-        {--from= : 제거할 절대경로 접두사 (기본: http://localhost/mangoshop/public)}
+        {--from= : 제거할 절대경로 접두사 (기본: APP_URL/public)}
         {--to= : 대체 문자열 (기본: 빈 문자열 → /product/... 형태)}
         {--dry : 실제 변경 없이 대상 건수만 표시}';
 
-    protected $description = '이미지 절대경로(localhost)를 상대경로로 일괄 변환';
+    protected $description = '이미지 절대경로를 상대경로로 일괄 변환';
 
     public function handle(): int
     {
-        $from = rtrim($this->option('from') ?: 'http://localhost/mangoshop/public', '/');
+        $from = rtrim($this->option('from') ?: rtrim(config('app.url'), '/').'/public', '/');
         $to = (string) ($this->option('to') ?? '');
         $dry = (bool) $this->option('dry');
 

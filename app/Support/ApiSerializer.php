@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 
 /**
  * 모바일 API용 JSON 직렬화 헬퍼.
- * 저장된 이미지 URL은 http://localhost/mangoshop/... 형태의 절대경로이므로
+ * 저장된 이미지 URL이 절대경로(과거 배포 도메인)일 수 있으므로
  * 요청 호스트(에뮬레이터 10.0.2.2 / 실기기 LAN IP)에 맞춰 host 부분을 재작성한다.
  */
 class ApiSerializer

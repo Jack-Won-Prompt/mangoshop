@@ -39,4 +39,27 @@ return [
     'point_rate'     => 1,
 
     'popular_keywords' => ['애플망고', '옐로우망고', '아보카도', '두리안', '망고스틴', '용과', '리치'],
+
+    /*
+    | 모바일 앱 버전 관리 (강제/선택 업데이트)
+    | - latest_build : 최신 배포 빌드(versionCode). 이보다 낮으면 "업데이트 있음" 안내.
+    | - min_build    : 최소 지원 빌드. 이보다 낮으면 강제 업데이트(사용 차단).
+    | - store_url    : 스토어 이동 링크.
+    | 관리자 사이트설정(DB)에서 platform별로 오버라이드 가능.
+    */
+    'app' => [
+        'android' => [
+            'latest_build'   => 1,
+            'latest_version' => '1.0.0',
+            'min_build'      => 1,
+            'store_url'      => 'https://play.google.com/store/apps/details?id=com.mangoshop.mangoshop_app',
+        ],
+        'ios' => [
+            'latest_build'   => 1,
+            'latest_version' => '1.0.0',
+            'min_build'      => 1,
+            'store_url'      => 'https://apps.apple.com/app/id000000000',
+        ],
+        'update_message' => '더 나은 망고샵을 위해 새로운 버전이 출시되었습니다.\n최신 버전으로 업데이트해 주세요.',
+    ],
 ];
