@@ -107,6 +107,11 @@ Route::view('/event/signup', 'guide.event')->name('guide.event');       // 신�
 Route::view('/guide/delivery', 'guide.delivery')->name('guide.delivery'); // 당일출고 안내
 Route::view('/guide/payment', 'guide.payment')->name('guide.payment');   // 간편결제 안내
 
+// ===== 약관·정책 (앱스토어 필수 공개 페이지) =====
+Route::view('/privacy', 'legal.privacy')->name('legal.privacy');                    // 개인정보처리방침
+Route::view('/terms', 'legal.terms')->name('legal.terms');                          // 이용약관
+Route::view('/account-deletion', 'legal.account-deletion')->name('legal.account-deletion'); // 계정·데이터 삭제
+
 // ===== 관리자 =====
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
