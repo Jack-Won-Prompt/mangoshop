@@ -18,7 +18,7 @@ class SellerInviteMail extends Mailable
 
     public function envelope(): Envelope
     {
-        $siteName = config('app.name', '망고샵');
+        $siteName = config('site.name') ?: '망고샵';
 
         return new Envelope(
             from: new Address(config('mail.from.address'), $siteName),
@@ -31,7 +31,7 @@ class SellerInviteMail extends Mailable
         return new Content(view: 'emails.seller-invite', with: [
             'invite'    => $this->invite,
             'acceptUrl' => $this->invite->url(),
-            'siteName'  => config('app.name', '망고샵'),
+            'siteName'  => config('site.name') ?: '망고샵',
             'site'      => config('site'),
         ]);
     }
