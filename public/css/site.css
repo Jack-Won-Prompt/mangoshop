@@ -2,8 +2,9 @@
    MANGOSHOP — 수입과일 오픈마켓 · Base Theme
    ========================================================= */
 :root{
-  --navy-900:#06256b; --navy-800:#0b3d91; --navy-700:#12459e; --navy-600:#1857c4;
-  --navy-500:#2563eb; --navy-100:#e5edff; --navy-50:#f3f7ff;
+  /* 네이비 스케일을 망고 톤으로 리매핑 — 진한 네이비 → 밝은 망고(흰 글씨 대비 유지) */
+  --navy-900:#e85d00; --navy-800:#ff6b00; --navy-700:#ff7d1f; --navy-600:#ff8f38;
+  --navy-500:#ffa050; --navy-100:#ffe4c9; --navy-50:#fff4ea;
   --red:#e0322d; --red-dark:#c0392b; --red-50:#fdecec;
   --teal:#0f8a8a;
   --ink:#16213e; --slate-700:#33415c; --slate-600:#4b5878;
