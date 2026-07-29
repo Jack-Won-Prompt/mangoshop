@@ -283,7 +283,7 @@ main{min-height:60vh}
 /* =========================================================
    PAGE / SUB
    ========================================================= */
-.page-head{background:linear-gradient(120deg,var(--navy-900),var(--navy-700));color:#fff;padding:34px 0}
+.page-head{background:linear-gradient(120deg,#ffd9a6,#ffe9cf);color:#3d2a12;padding:34px 0;border-bottom:1px solid #f2e2cc}
 .page-head h1{font-size:27px;font-weight:800;letter-spacing:-.02em}
 .breadcrumb{display:flex;align-items:center;gap:7px;font-size:12.5px;color:rgba(255,255,255,.8);margin-top:8px}
 .breadcrumb .icon{width:14px;height:14px}
