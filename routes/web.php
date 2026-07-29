@@ -88,6 +88,17 @@ Route::middleware('auth')->group(function () {
     });
     Route::get('/mypage/wishlist', [WishlistController::class, 'index'])->name('mypage.wishlist');
 
+    // ===== 판매자(수입사) 콘솔 =====
+    Route::prefix('seller')->name('seller.center.')->controller(\App\Http\Controllers\SellerCenterController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/products', 'products')->name('products');
+        Route::put('/products/{product}', 'updateProduct')->name('products.update');
+        Route::get('/orders', 'orders')->name('orders');
+        Route::get('/settlements', 'settlements')->name('settlements');
+        Route::get('/store', 'store')->name('store');
+        Route::put('/store', 'storeUpdate')->name('store.update');
+    });
+
     // ===== 구매 대행자 콘솔 =====
     Route::prefix('agent')->name('agent.')->controller(\App\Http\Controllers\AgentController::class)->group(function () {
         Route::get('/', 'index')->name('index');
