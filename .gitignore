@@ -24,3 +24,7 @@ yarn-error.log
 
 # Playwright MCP 임시 산출물
 /.playwright-mcp
+
+# 디자인 산출물(대용량) — 저장소 제외
+/이미지
+*.zip

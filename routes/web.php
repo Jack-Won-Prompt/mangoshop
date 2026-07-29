@@ -40,6 +40,10 @@ Route::post('/product/{product}/review', [CatalogController::class, 'storeReview
 Route::get('/store', [\App\Http\Controllers\SellerStoreController::class, 'index'])->name('seller.index');
 Route::get('/store/{slug}', [\App\Http\Controllers\SellerStoreController::class, 'show'])->name('seller.show');
 
+// 입점 초대 수락(공개)
+Route::get('/seller/invite/{token}', [\App\Http\Controllers\SellerInviteController::class, 'show'])->name('seller.invite.show');
+Route::post('/seller/invite/{token}', [\App\Http\Controllers\SellerInviteController::class, 'accept'])->name('seller.invite.accept');
+
 // ===== 재입고 알림 (로그인 필요) =====
 Route::post('/restock/{product}', [\App\Http\Controllers\RestockController::class, 'toggle'])
     ->middleware('auth')->name('restock.toggle');
@@ -147,6 +151,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
     // 로그인 이력
     Route::get('/login-history', [\App\Http\Controllers\Admin\LoginHistoryController::class, 'index'])->name('login-history.index');
+
+    // 입점 초대
+    Route::get('/seller-invites', [\App\Http\Controllers\Admin\SellerInviteController::class, 'index'])->name('seller-invites.index');
+    Route::post('/seller-invites', [\App\Http\Controllers\Admin\SellerInviteController::class, 'store'])->name('seller-invites.store');
+    Route::post('/seller-invites/{invite}/resend', [\App\Http\Controllers\Admin\SellerInviteController::class, 'resend'])->name('seller-invites.resend');
+    Route::delete('/seller-invites/{invite}', [\App\Http\Controllers\Admin\SellerInviteController::class, 'revoke'])->name('seller-invites.revoke');
 
     // CSV 내보내기
     Route::get('/export/orders', [AdminExportController::class, 'orders'])->name('export.orders');

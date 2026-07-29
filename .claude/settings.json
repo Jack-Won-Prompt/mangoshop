@@ -75,7 +75,28 @@
       "Bash(curl -s -o /tmp/404.html -w \"HTTP %{http_code}\\\\n\" http://localhost/mangoshop/this-page-does-not-exist-xyz)",
       "Bash(grep -viE 'node_modules|\\\\.map$')",
       "Bash(grep -nE 'function queries|function naver|\\\\$this->dic|\\\\$this->sources|refererFor|dic\\\\[' app/Http/Controllers/Admin/ProductImageController.php)",
-      "Bash(sed -n '/function refererFor/,/^    }/p' app/Http/Controllers/Admin/ProductImageController.php)"
+      "Bash(sed -n '/function refererFor/,/^    }/p' app/Http/Controllers/Admin/ProductImageController.php)",
+      "Bash(php -r 'echo \"PHP \".PHP_VERSION.\"\\\\n\";')",
+      "Bash(php -d error_reporting=\"E_ALL & ~E_DEPRECATED\" artisan --version)",
+      "Bash(sed 's/\"name\"://; s/\"version\"://; s/[\",]//g')",
+      "Bash(composer --version)",
+      "Bash(composer audit *)",
+      "Bash(grep -viE 'Deprecated:|react/promise|^$')",
+      "Bash(awk '/^Package:/{print \"\\\\n\"$0; next}1')",
+      "Bash(grep -viE 'Deprecat|react/promise|curl_close|SSL/TLS|json-schema|^\\\\s*$')",
+      "Bash(php -d error_reporting=\"E_ALL & ~E_DEPRECATED\" artisan about --only=environment)",
+      "Bash(curl -s -o /dev/null -w \"login: %{http_code}\\\\n\" http://localhost/mangoshop/login)",
+      "Bash(sed -r 's/\\\\x1b\\\\[[0-9;]*m//g' /tmp/a2.txt)",
+      "Bash(sed -i \"s#site.css'\\) }}?v=19#site.css'\\) }}?v=20#\" resources/views/layouts/app.blade.php)",
+      "Bash(grep -rInE 'Mail::|Mailable|use Illuminate\\\\\\\\\\\\\\\\Mail|Notification::|->notify\\\\\\(|Mail\\\\\\\\|new .*Mail\\\\b' app)",
+      "Bash(/e/xampp/mysql/bin/mysql -uroot --default-character-set=utf8mb4 mangoshop -e \"SHOW COLUMNS FROM sellers;\")",
+      "Bash(awk '{print $1}')",
+      "Bash(grep -nE \"Route::get\\\\\\('/\\\\{resource\\\\}|login-history|admin.*group|^}\\\\\\);\" routes/web.php)",
+      "Bash(php -d error_reporting=\"E_ALL & ~E_DEPRECATED\" artisan tinker --execute=\"echo config\\('mail.default'\\).' | '.config\\('mail.mailers.smtp.host'\\).':'.config\\('mail.mailers.smtp.port'\\);\")",
+      "Bash(/e/xampp/mysql/bin/mysql -uroot mangoshop -sN -e \"SELECT COUNT\\(*\\) FROM seller_invites;\")"
+    ],
+    "additionalDirectories": [
+      "\\tmp"
     ]
   }
 }
