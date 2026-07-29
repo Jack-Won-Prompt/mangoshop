@@ -7,8 +7,9 @@
             <a href="{{ route('community.faq') }}">자주묻는질문</a>
             <a href="{{ route('mypage.orders') }}">배송조회</a>
             <a href="{{ route('community.qna') }}">회사소개</a>
-            <a href="{{ route('community.qna') }}">이용약관</a>
-            <a href="{{ route('community.qna') }}">개인정보처리방침</a>
+            <a href="{{ route('legal.terms') }}">이용약관</a>
+            <a href="{{ route('legal.privacy') }}">개인정보처리방침</a>
+            <a href="{{ route('legal.account-deletion') }}">계정·데이터 삭제</a>
         </div>
     </div>
     <div class="mg-foot-mid">

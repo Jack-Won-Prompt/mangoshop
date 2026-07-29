@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class MypageController extends Controller
 {
@@ -92,5 +95,59 @@ class MypageController extends Controller
         $user->save();
 
         return back()->with('ok', '회원정보가 수정되었습니다.');
+    }
+
+    /** 회원 탈퇴 확인 페이지 */
+    public function withdrawForm(Request $request)
+    {
+        return view('mypage.withdraw', ['user' => $request->user()]);
+    }
+
+    /**
+     * 회원 탈퇴 실행 — 개인정보 익명화 + 계정 비활성화.
+     * 주문 이력은 전자상거래법상 보관(주문에는 수령자 스냅샷이 남음).
+     */
+    public function withdraw(Request $request)
+    {
+        $user = $request->user();
+
+        $request->validate([
+            'password' => ['required'],
+            'agree'    => ['accepted'],
+        ], [], ['agree' => '동의']);
+
+        if ($user->is_admin) {
+            return back()->with('error', '관리자 계정은 탈퇴할 수 없습니다.');
+        }
+        if (! Hash::check($request->input('password'), $user->password)) {
+            return back()->withErrors(['password' => '비밀번호가 일치하지 않습니다.']);
+        }
+
+        DB::transaction(function () use ($user) {
+            // 개인화 데이터 삭제
+            $user->cartItems()->delete();
+            $user->wishlists()->delete();
+            $user->addresses()->delete();
+            $user->contractPrices()->delete();
+            DB::table('device_tokens')->where('user_id', $user->id)->delete();
+
+            // 개인정보 익명화 + 비활성화 (주문 이력은 보관)
+            $user->forceFill([
+                'name'           => '탈퇴회원',
+                'email'          => 'withdrawn_'.$user->id.'_'.Str::random(8).'@deleted.local',
+                'phone'          => null, 'postcode' => null, 'address1' => null, 'address2' => null,
+                'company_name'   => null, 'biz_no' => null, 'biz_type' => null, 'biz_ceo' => null,
+                'point'          => 0,
+                'password'       => Hash::make(Str::random(40)),
+                'remember_token' => null,
+                'withdrawn_at'   => now(),
+            ])->save();
+        });
+
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('home')->with('ok', '회원 탈퇴가 완료되었습니다. 그동안 이용해 주셔서 감사합니다.');
     }
 }

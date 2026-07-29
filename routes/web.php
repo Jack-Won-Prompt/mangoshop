@@ -83,6 +83,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/coupons', 'coupons')->name('coupons');
         Route::get('/profile', 'profile')->name('profile');
         Route::put('/profile', 'updateProfile')->name('profile.update');
+        Route::get('/withdraw', 'withdrawForm')->name('withdraw');
+        Route::delete('/withdraw', 'withdraw')->name('withdraw.submit');
     });
     Route::get('/mypage/wishlist', [WishlistController::class, 'index'])->name('mypage.wishlist');
 

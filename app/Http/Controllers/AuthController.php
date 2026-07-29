@@ -23,6 +23,15 @@ class AuthController extends Controller
         ]);
 
         if (Auth::attempt($cred, $request->boolean('remember'))) {
+            // 탈퇴(비활성) 회원 차단
+            if (Auth::user()->isWithdrawn()) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return back()->withInput($request->only('email'))
+                    ->withErrors(['email' => '탈퇴 처리된 계정입니다.']);
+            }
             $request->session()->regenerate();
             \App\Models\LoginHistory::record(Auth::user(), $cred['email'], 'success', $request);
             $to = Auth::user()->is_admin ? route('admin.dashboard') : route('home');

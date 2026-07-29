@@ -16,7 +16,7 @@ class User extends Authenticatable
         'name', 'email', 'password',
         'member_type', 'phone', 'postcode', 'address1', 'address2',
         'company_name', 'biz_no', 'biz_type', 'biz_status', 'grade',
-        'point', 'is_admin', 'is_agent', 'cashback_rate',
+        'point', 'is_admin', 'is_agent', 'cashback_rate', 'withdrawn_at',
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -29,7 +29,14 @@ class User extends Authenticatable
             'is_admin'          => 'boolean',
             'is_agent'          => 'boolean',
             'cashback_rate'     => 'decimal:2',
+            'withdrawn_at'      => 'datetime',
         ];
+    }
+
+    /** 탈퇴(비활성) 회원 여부 */
+    public function isWithdrawn(): bool
+    {
+        return $this->withdrawn_at !== null;
     }
 
     /** 구매 대행자 여부 */

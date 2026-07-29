@@ -36,6 +36,10 @@
 
                 <button class="btn btn-primary btn-lg">저장하기</button>
             </form>
+
+            <div style="text-align:right;margin-top:20px;padding-top:16px;border-top:1px solid var(--line)">
+                <a href="{{ route('mypage.withdraw') }}" style="font-size:13px;color:var(--slate-500);text-decoration:underline">회원 탈퇴</a>
+            </div>
         </div>
     </div>
 </div>
