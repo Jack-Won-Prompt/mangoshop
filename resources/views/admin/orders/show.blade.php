@@ -87,6 +87,35 @@
     </div>
 
     <div class="adm-card">
+        <div class="h">거래명세서</div>
+        <div style="padding:20px">
+            @php($stmts = $order->statements()->with('issuer')->get())
+            <div style="display:flex;gap:8px;margin-bottom:12px">
+                <a href="{{ route('admin.orders.statement.preview', $order) }}" target="_blank" class="abtn abtn-ghost abtn-sm" style="flex:1;justify-content:center"><x-icon name="doc" :size="15"/> 미리보기</a>
+                <a href="{{ route('admin.orders.statement.download', $order) }}" class="abtn abtn-pri abtn-sm" style="flex:1;justify-content:center"><x-icon name="arrow-right" :size="15"/> PDF 다운로드</a>
+            </div>
+            <form method="POST" action="{{ route('admin.orders.statement.send', $order) }}" onsubmit="return confirm('입력한 주소로 거래명세서를 보냅니다. 진행할까요?')" style="display:flex;gap:6px">
+                @csrf
+                <input type="email" name="email" class="ainput" style="flex:1" value="{{ $order->user->email ?? '' }}" placeholder="받는 이메일">
+                <button class="abtn abtn-ghost abtn-sm" style="flex:none">보내기</button>
+            </form>
+            @if($stmts->isNotEmpty())
+                <div style="margin-top:14px;border-top:1px solid var(--a-line);padding-top:10px">
+                    <div style="font-size:12px;color:#8a93a8;margin-bottom:6px">발행 이력</div>
+                    @foreach($stmts as $st)
+                        <div style="font-size:12px;color:#6b7794;line-height:1.7;{{ $st->error_message ? 'color:#e0322d' : '' }}">
+                            {{ $st->created_at->format('m.d H:i') }} · {{ $st->actionLabel() }}{{ $st->seq>1 ? ' ('.$st->seq.'회차)' : '' }}
+                            @if($st->sent_to) → {{ $st->sent_to }}@endif
+                            @if($st->issuer) · {{ $st->issuer->name }}@endif
+                            @if($st->error_message) · 실패@endif
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
+    </div>
+
+    <div class="adm-card">
         <div class="h">전자세금계산서</div>
         <div style="padding:20px">
             @php($business = $order->user && $order->user->member_type==='business' && $order->user->biz_no)

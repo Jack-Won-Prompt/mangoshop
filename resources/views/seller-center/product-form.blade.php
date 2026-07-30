@@ -65,7 +65,10 @@
         </div>
 
         <div class="afield" style="margin-top:12px"><label>요약</label><input type="text" name="summary" class="ainput" value="{{ old('summary', $product->summary) }}" placeholder="원산지·등급·규격 한 줄 요약"></div>
-        <div class="afield" style="margin-top:12px"><label>상세설명</label><textarea name="description" class="atextarea" rows="4">{{ old('description', $product->description) }}</textarea></div>
+        <div class="afield" style="margin-top:12px"><label>상세설명</label>
+            <div class="aeditor-wrap"><div class="aeditor" id="ed_description">{!! old('description', $product->description) !!}</div></div>
+            <input type="hidden" name="description" id="ed_val_description" value="{{ old('description', $product->description) }}">
+        </div>
 
         <label style="display:inline-flex;align-items:center;gap:8px;font-weight:600;margin:14px 0 4px;cursor:pointer">
             <input type="checkbox" name="is_active" value="1" {{ old('is_active', $product->exists ? $product->is_active : true) ? 'checked' : '' }} style="width:16px;height:16px"> 판매 활성화(노출)
@@ -77,4 +80,74 @@
         </div>
     </form>
 </div>
+
+{{-- Quill 리치에디터 (상세설명) --}}
+<link rel="stylesheet" href="{{ asset('vendor/quill/quill.snow.css') }}">
+<style>
+    .aeditor-wrap{border:1px solid var(--a-line,#e3e8f1);border-radius:8px;overflow:hidden;background:#fff}
+    .aeditor-wrap:focus-within{border-color:var(--a-navy,#ff6b00);box-shadow:0 0 0 3px rgba(255,107,0,.12)}
+    .aeditor-wrap .ql-toolbar{border:0;border-bottom:1px solid var(--a-line,#e3e8f1);background:#fbfcfe}
+    .aeditor-wrap .ql-container{border:0;font-size:14px;font-family:inherit}
+    .aeditor-wrap .ql-editor{min-height:260px;line-height:1.7}
+    .aeditor-wrap .ql-editor img{max-width:100%;height:auto}
+    .aeditor-wrap .ql-editor.ql-blank::before{color:#9aa5bd;font-style:normal}
+</style>
+<script src="{{ asset('vendor/quill/quill.min.js') }}"></script>
+<script>
+(function () {
+    var host = document.getElementById('ed_description');
+    var val  = document.getElementById('ed_val_description');
+    if (!host || !val || !window.Quill) return;
+    var csrf = document.querySelector('meta[name="csrf-token"]').content;
+    var uploadUrl = @json(route('seller.center.editor.upload'));
+
+    var q = new Quill(host, {
+        theme: 'snow',
+        placeholder: '상품 상세 설명을 입력하세요. 이미지는 붙여넣거나 툴바에서 올릴 수 있습니다.',
+        modules: { toolbar: [
+            [{ header: [2, 3, false] }],
+            ['bold', 'italic', 'underline', 'strike'],
+            [{ color: [] }, { background: [] }],
+            [{ list: 'ordered' }, { list: 'bullet' }],
+            [{ align: [] }],
+            ['link', 'image'],
+            ['clean'],
+        ] },
+    });
+
+    function uploadImage(file) {
+        var fd = new FormData(); fd.append('file', file);
+        fetch(uploadUrl, { method: 'POST', headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' }, body: fd })
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                if (!d.url) return;
+                var range = q.getSelection(true) || { index: q.getLength() };
+                q.insertEmbed(range.index, 'image', d.url, 'user');
+                q.setSelection(range.index + 1);
+            })
+            .catch(function () { alert('이미지 업로드에 실패했습니다.'); });
+    }
+    // 툴바 이미지 버튼 → 파일선택 업로드
+    q.getModule('toolbar').addHandler('image', function () {
+        var input = document.createElement('input');
+        input.type = 'file'; input.accept = 'image/*';
+        input.onchange = function () { if (input.files[0]) uploadImage(input.files[0]); };
+        input.click();
+    });
+    // 붙여넣기 이미지 업로드
+    q.root.addEventListener('paste', function (e) {
+        var items = (e.clipboardData || {}).items || [];
+        for (var i = 0; i < items.length; i++) {
+            if (items[i].type && items[i].type.indexOf('image') === 0) {
+                e.preventDefault(); uploadImage(items[i].getAsFile());
+            }
+        }
+    });
+
+    // 제출 시 내용 동기화 (빈 문서는 빈 문자열)
+    host.closest('form').addEventListener('submit', function () {
+        val.value = (q.getText().trim() === '' && !q.root.querySelector('img')) ? '' : q.root.innerHTML;
+    });
+})();
+</script>
 @endsection

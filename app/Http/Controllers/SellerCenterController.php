@@ -103,6 +103,23 @@ class SellerCenterController extends Controller
         return redirect()->route('seller.center.products')->with('ok', '상품이 수정되었습니다.');
     }
 
+    /** 리치에디터 이미지 업로드 → URL 반환 */
+    public function editorUpload(Request $request)
+    {
+        $this->seller($request);
+        $request->validate(['file' => ['required', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:4096']]);
+
+        $file = $request->file('file');
+        $dir = public_path('product/uploads');
+        if (! is_dir($dir)) {
+            @mkdir($dir, 0775, true);
+        }
+        $filename = 'ed'.now()->format('YmdHis').Str::lower(Str::random(5)).'.'.$file->getClientOriginalExtension();
+        $file->move($dir, $filename);
+
+        return response()->json(['url' => asset('product/uploads/'.$filename)]);
+    }
+
     public function destroyProduct(Request $request, Product $product)
     {
         $seller = $this->seller($request);
@@ -181,7 +198,7 @@ class SellerCenterController extends Controller
             'stock'           => ['required', 'integer', 'min:0'],
             'sale_status'     => ['required', 'in:on_sale,soldout,closed,inbound'],
             'summary'         => ['nullable', 'string', 'max:200'],
-            'description'     => ['nullable', 'string', 'max:4000'],
+            'description'     => ['nullable', 'string', 'max:65000'],
             'image'           => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
         ]);
 

@@ -12,6 +12,36 @@ class TaxInvoiceController extends Controller
 {
     public function __construct(private TaxInvoiceIssueService $service) {}
 
+    /** 발행 이력 목록 */
+    public function index(Request $request)
+    {
+        $q = TaxInvoice::with(['order', 'user'])->latest();
+
+        if ($request->filled('status')) {
+            $q->where('status', $request->string('status'));
+        }
+        if ($request->filled('q')) {
+            $kw = trim((string) $request->string('q'));
+            $q->where(function ($w) use ($kw) {
+                $w->where('receiver_corp_name', 'like', "%{$kw}%")
+                    ->orWhere('receiver_corp_num', 'like', "%{$kw}%")
+                    ->orWhere('mgt_key', 'like', "%{$kw}%")
+                    ->orWhere('nts_confirm_num', 'like', "%{$kw}%")
+                    ->orWhereHas('order', fn ($o) => $o->where('order_no', 'like', "%{$kw}%"));
+            });
+        }
+
+        $invoices = $q->paginate(20)->withQueryString();
+        $stats = [
+            'issued'    => TaxInvoice::whereIn('status', ['issued', 'simulated'])->count(),
+            'cancelled' => TaxInvoice::where('status', 'cancelled')->count(),
+            'failed'    => TaxInvoice::where('status', 'failed')->count(),
+            'amount'    => (int) TaxInvoice::whereIn('status', ['issued', 'simulated'])->sum('total_amount'),
+        ];
+
+        return view('admin.tax-invoices.index', compact('invoices', 'stats'));
+    }
+
     /** 주문에 대한 세금계산서 발행 */
     public function issue(Request $request, Order $order)
     {

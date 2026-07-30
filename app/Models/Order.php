@@ -73,6 +73,12 @@ class Order extends Model
         return $this->hasMany(TaxInvoice::class)->latest();
     }
 
+    /** 거래명세서 발행 이력 */
+    public function statements()
+    {
+        return $this->hasMany(OrderStatement::class)->latest();
+    }
+
     public function statusLabel(): string
     {
         return self::STATUSES[$this->status] ?? $this->status;

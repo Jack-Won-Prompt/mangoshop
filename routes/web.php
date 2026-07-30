@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\InquiryController as AdminInquiryController;
 use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\Admin\OrderStatementController as AdminOrderStatementController;
 use App\Http\Controllers\Admin\ResourceController as AdminResourceController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\SettingController as AdminSettingController;
@@ -97,6 +98,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/products/{product}/edit', 'editProduct')->name('products.edit');
         Route::put('/products/{product}', 'updateProduct')->name('products.update');
         Route::delete('/products/{product}', 'destroyProduct')->name('products.destroy');
+        Route::post('/editor/upload', 'editorUpload')->name('editor.upload');
         Route::get('/orders', 'orders')->name('orders');
         Route::get('/settlements', 'settlements')->name('settlements');
         Route::get('/store', 'store')->name('store');
@@ -147,8 +149,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
     Route::put('/orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.status');
     Route::put('/orders/{order}/shipping', [AdminOrderController::class, 'updateShipping'])->name('orders.shipping');
+    // 거래명세서 (주문 기반 PDF)
+    Route::get('/orders/{order}/statement/preview', [AdminOrderStatementController::class, 'preview'])->name('orders.statement.preview');
+    Route::get('/orders/{order}/statement/download', [AdminOrderStatementController::class, 'download'])->name('orders.statement.download');
+    Route::post('/orders/{order}/statement/send', [AdminOrderStatementController::class, 'send'])->name('orders.statement.send');
+
     // 전자세금계산서
     Route::post('/orders/{order}/tax-invoice', [AdminTaxInvoiceController::class, 'issue'])->name('orders.taxinvoice');
+    Route::get('/tax-invoices', [AdminTaxInvoiceController::class, 'index'])->name('taxinvoice.index');
     Route::delete('/tax-invoices/{taxInvoice}', [AdminTaxInvoiceController::class, 'cancel'])->name('taxinvoice.cancel');
     Route::get('/tax-invoices/{taxInvoice}/popup', [AdminTaxInvoiceController::class, 'popup'])->name('taxinvoice.popup');
 

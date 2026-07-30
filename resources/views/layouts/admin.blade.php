@@ -30,6 +30,7 @@
                 <div class="grp">주문/회원</div>
                 <a href="{{ route('admin.orders.index') }}" class="{{ request()->routeIs('admin.orders.*') ? 'on' : '' }}"><x-icon name="cart"/> 주문관리</a>
                 <a href="{{ route('admin.bank.index') }}" class="{{ request()->routeIs('admin.bank.*') ? 'on' : '' }}"><x-icon name="coin"/> 입금확인</a>
+                <a href="{{ route('admin.taxinvoice.index') }}" class="{{ request()->routeIs('admin.taxinvoice.*') ? 'on' : '' }}"><x-icon name="doc"/> 세금계산서</a>
                 <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'on' : '' }}"><x-icon name="user"/> 회원관리</a>
                 <a href="{{ route('admin.login-history.index') }}" class="{{ request()->routeIs('admin.login-history.*') ? 'on' : '' }}"><x-icon name="shield"/> 로그인 이력</a>
                 <a href="{{ route('admin.seller-invites.index') }}" class="{{ request()->routeIs('admin.seller-invites.*') ? 'on' : '' }}"><x-icon name="mail"/> 입점 초대</a>
