@@ -174,8 +174,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/users/{user}/prices/export', [AdminUserController::class, 'exportPrices'])->name('users.prices.export');
     Route::post('/users/{user}/prices/import', [AdminUserController::class, 'importPrices'])->name('users.prices.import');
 
-    // 로그인 이력
-    Route::get('/login-history', [\App\Http\Controllers\Admin\LoginHistoryController::class, 'index'])->name('login-history.index');
+    // 방문이력 (웹/앱 방문·상품검색·상품조회·로그인 통합)
+    Route::get('/visit-history', [\App\Http\Controllers\Admin\VisitHistoryController::class, 'index'])->name('visit-history.index');
 
     // 입점 초대
     Route::get('/seller-invites', [\App\Http\Controllers\Admin\SellerInviteController::class, 'index'])->name('seller-invites.index');

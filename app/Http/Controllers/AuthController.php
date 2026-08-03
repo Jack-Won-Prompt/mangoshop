@@ -33,13 +33,13 @@ class AuthController extends Controller
                     ->withErrors(['email' => '탈퇴 처리된 계정입니다.']);
             }
             $request->session()->regenerate();
-            \App\Models\LoginHistory::record(Auth::user(), $cred['email'], 'success', $request);
+            \App\Services\ActivityLogger::login($request, Auth::user(), $cred['email'], 'success');
             $to = Auth::user()->is_admin ? route('admin.dashboard') : route('home');
 
             return redirect()->intended($to)->with('ok', '로그인되었습니다.');
         }
 
-        \App\Models\LoginHistory::record(null, $cred['email'], 'fail', $request);
+        \App\Services\ActivityLogger::login($request, null, $cred['email'], 'fail');
 
         return back()->withInput($request->only('email'))
             ->withErrors(['email' => '이메일 또는 비밀번호가 올바르지 않습니다.']);

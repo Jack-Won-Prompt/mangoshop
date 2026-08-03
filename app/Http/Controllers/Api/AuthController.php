@@ -61,10 +61,13 @@ class AuthController extends Controller
         $user = User::where('email', $data['email'])->first();
 
         if (! $user || ! Hash::check($data['password'], $user->password)) {
+            \App\Services\ActivityLogger::login($request, null, $data['email'], 'fail');
             throw ValidationException::withMessages([
                 'email' => ['이메일 또는 비밀번호가 올바르지 않습니다.'],
             ]);
         }
+
+        \App\Services\ActivityLogger::login($request, $user, $data['email'], 'success');
 
         return $this->tokenResponse($user, '로그인되었습니다.', $data['device'] ?? 'mobile');
     }

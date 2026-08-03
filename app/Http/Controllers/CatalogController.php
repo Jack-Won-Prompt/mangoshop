@@ -38,6 +38,8 @@ class CatalogController extends Controller
             });
         }
 
+        \App\Services\ActivityLogger::search($request, $q, (clone $base)->count());
+
         return $this->renderList($request, $base, "'{$q}' 검색 결과", null, ['keyword' => $q]);
     }
 
@@ -86,6 +88,8 @@ class CatalogController extends Controller
         $product = Product::active()->with(['brand', 'category', 'reviews' => fn ($q) => $q->visible()->latest()])
             ->where('slug', $slug)->firstOrFail();
         $product->increment('view_count');
+
+        \App\Services\ActivityLogger::productView($request, $product);
 
         // 최근 본 상품 (세션, 최대 12개)
         $rv = array_values(array_diff(session('recently_viewed', []), [$product->id]));

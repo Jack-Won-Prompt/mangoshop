@@ -19,6 +19,13 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->api(prepend: [
             \App\Http\Middleware\ResolveSanctumUser::class,
         ]);
+        // 방문(페이지 접속) 이력 — 웹/앱 공용
+        $middleware->web(append: [
+            \App\Http\Middleware\TrackVisit::class,
+        ]);
+        $middleware->api(append: [
+            \App\Http\Middleware\TrackVisit::class,
+        ]);
         // 토스 웹훅은 외부 서버가 호출 → CSRF 제외
         $middleware->validateCsrfTokens(except: [
             'payment/toss/webhook',
