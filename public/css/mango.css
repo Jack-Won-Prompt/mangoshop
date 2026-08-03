@@ -251,6 +251,44 @@ body .site-footer { display: none !important; }
 .mg-promo-card.join .mg-promo-btn { background: var(--mg-accent); box-shadow: 0 8px 20px rgba(22,163,74,.24); }
 .mg-promo-card.join .mg-promo-btn:hover { background: var(--mg-accent-d); transform: translateY(-2px); }
 
+/* ============================ 실사진 피처 밴드 ============================ */
+.mg-feature { padding: 8px 0 46px; }
+.mg-feature .mg-wrap { display: flex; flex-direction: column; gap: 22px; }
+.mg-feat-row {
+    display: grid; grid-template-columns: 1.05fr 1fr; gap: 0;
+    border-radius: 20px; overflow: hidden; background: #fff;
+    border: 1px solid var(--mg-line); box-shadow: var(--mg-shadow); min-height: 340px;
+}
+.mg-feat-row.rev { grid-template-columns: 1fr 1.05fr; }
+.mg-feat-row.rev .mg-feat-photo { order: 2; }
+.mg-feat-row.rev .mg-feat-txt { order: 1; }
+.mg-feat-photo {
+    background-color: var(--mg-soft);
+    background-size: cover; background-position: center; min-height: 260px;
+}
+.mg-feat-row.a .mg-feat-photo { background-image: linear-gradient(120deg, rgba(255,183,71,.12), rgba(255,107,0,.05)), url('/images/main/cashback-points.jpg'); }
+.mg-feat-row.b .mg-feat-photo { background-image: linear-gradient(120deg, rgba(22,163,74,.10), rgba(22,163,74,.04)), url('/images/main/import-distribution.jpg'); }
+.mg-feat-txt { padding: 44px 48px; display: flex; flex-direction: column; justify-content: center; }
+.mg-feat-txt .ki { font-size: 12px; font-weight: 800; letter-spacing: 1.6px; color: var(--mg-primary); margin-bottom: 10px; }
+.mg-feat-row.b .mg-feat-txt .ki { color: var(--mg-accent); }
+.mg-feat-txt h3 { font-size: 30px; font-weight: 900; letter-spacing: -1.2px; line-height: 1.25; color: var(--mg-ink); margin: 0 0 14px; }
+.mg-feat-txt h3 b { color: var(--mg-primary-d); }
+.mg-feat-row.b .mg-feat-txt h3 b { color: var(--mg-accent-d); }
+.mg-feat-txt p { font-size: 14.5px; line-height: 1.7; color: var(--mg-sub); margin: 0 0 22px; }
+.mg-feat-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; }
+.mg-feat-chips span { font-size: 12.5px; font-weight: 700; color: var(--mg-ink); background: var(--mg-primary-l); border-radius: 20px; padding: 6px 13px; }
+.mg-feat-row.b .mg-feat-chips span { background: #eef7f0; }
+.mg-feat-txt .mg-btn { align-self: flex-start; }
+
+@media (max-width: 860px) {
+    .mg-feat-row, .mg-feat-row.rev { grid-template-columns: 1fr; }
+    .mg-feat-row.rev .mg-feat-photo { order: 0; }
+    .mg-feat-row.rev .mg-feat-txt { order: 0; }
+    .mg-feat-photo { min-height: 220px; }
+    .mg-feat-txt { padding: 30px 26px; }
+    .mg-feat-txt h3 { font-size: 24px; }
+}
+
 /* ============================ 인스타그램 피드 ============================ */
 .mg-insta { padding: 8px 0 56px; text-align: center; }
 .mg-insta-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; margin-top: 26px; }
