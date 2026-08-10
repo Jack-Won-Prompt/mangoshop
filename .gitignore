@@ -31,3 +31,4 @@ yarn-error.log
 
 # 판매자 상품 업로드(런타임)
 /public/product/uploads
+/네이버

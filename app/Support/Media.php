@@ -40,4 +40,21 @@ class Media
 
         return $value;
     }
+
+    /**
+     * 저장된 리치 HTML(상세설명 등) 안의 <img src> 를 현재 호스트 기준으로 정규화.
+     * - 셀러 에디터가 박제한 절대 URL, 시드된 상대경로 모두 배포 호스트에 맞게 재구성.
+     */
+    public static function html(?string $html): ?string
+    {
+        if (! $html) {
+            return $html;
+        }
+
+        return preg_replace_callback(
+            '#(<img\b[^>]*?\bsrc=)(["\'])(.*?)\2#is',
+            fn ($m) => $m[1].$m[2].(self::url($m[3]) ?? $m[3]).$m[2],
+            $html
+        );
+    }
 }

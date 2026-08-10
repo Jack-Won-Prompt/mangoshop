@@ -133,7 +133,7 @@
     </div>
 
     <div id="desc" class="prose" style="margin-bottom:40px">
-        {!! $product->description ?: '<p>등록된 상세설명이 없습니다.</p>' !!}
+        {!! \App\Support\Media::html($product->description) ?: '<p>등록된 상세설명이 없습니다.</p>' !!}
         @if($product->spec)
             <h3 style="margin:24px 0 12px;font-size:18px;font-weight:700;color:var(--ink)">규격 / 사양</h3>
             <pre style="white-space:pre-wrap;font-family:inherit;background:var(--slate-50);border:1px solid var(--line);border-radius:10px;padding:16px">{{ $product->spec }}</pre>
