@@ -145,6 +145,8 @@ function msApplyCoupon(code){var i=document.querySelector('input[name=code][form
             </div>
 
             <div class="sum-row"><span>상품금액</span><span>{{ number_format($summary['subtotal']) }}원</span></div>
+            <div class="sum-row"><span>배송기간</span><span>당일 발송 · 1~2일 소요</span></div>
+            <p class="muted" style="font-size:12px;margin:2px 0 0;text-align:right">결제 완료 시 당일 발송되며, 지역에 따라 도착까지 1~2일 소요됩니다</p>
             <div class="sum-row"><span>배송비</span><span>별도</span></div>
             <p class="muted" style="font-size:12px;margin:2px 0 0;text-align:right">콜드체인·지역별 배송비는 주문 후 별도 안내됩니다</p>
             @if($couponDiscount ?? 0)
