@@ -20,15 +20,18 @@ class PaymentController extends Controller
             return redirect()->route('order.complete', $order);
         }
 
-        $order->load('items');
-        $first = $order->items->first();
+        // 결제는 묶음(그룹) 전체 기준 — 금액·상품명은 형제 주문을 합산
+        $groupItems = $order->groupOrders()->with('items')->get()->flatMap->items;
+        $first = $groupItems->first();
         $orderName = $first
-            ? $first->product_name.($order->items->count() > 1 ? ' 외 '.($order->items->count() - 1).'건' : '')
+            ? $first->product_name.($groupItems->count() > 1 ? ' 외 '.($groupItems->count() - 1).'건' : '')
             : '망고샵 주문';
+        $payAmount = $order->groupTotal();
 
         return view('order.pay', [
             'order'       => $order,
             'orderName'   => $orderName,
+            'payAmount'   => $payAmount,
             'clientKey'   => config('services.toss.client_key'),
             'customerKey' => 'cust_'.substr(sha1($order->user_id.config('app.key')), 0, 24),
             'portone'     => config('portone'),
@@ -41,9 +44,8 @@ class PaymentController extends Controller
         abort_unless($order->user_id === $request->user()->id, 403);
         abort_unless(config('portone.simulate'), 400);
 
-        $order->fill(['pay_provider' => 'portone', 'pay_status' => 'DONE', 'pay_method' => '카드(시뮬레이트)']);
-        $order->save();
-        $order->markPaid();
+        $order->groupOrders()->update(['pay_provider' => 'portone', 'pay_status' => 'DONE', 'pay_method' => '카드(시뮬레이트)']);
+        $order->markPaidGroup();
 
         return redirect()->route('order.complete', $order)->with('ok', '결제가 완료되었습니다. (포트원 시뮬레이트)');
     }
@@ -58,12 +60,12 @@ class PaymentController extends Controller
         $order = Order::where('order_no', $data['merchant_uid'])->firstOrFail();
         abort_unless($order->user_id === $request->user()->id, 403);
 
-        $res = $portone->verify($data['imp_uid'], (int) $order->total);
+        $res = $portone->verify($data['imp_uid'], $order->groupTotal());
         if (! $res['ok']) {
             return redirect()->route('order.pay', $order)->with('error', '결제 검증 실패: '.($res['message'] ?? ''));
         }
 
-        $order->fill([
+        $order->groupOrders()->update([
             'pay_provider' => 'portone',
             'payment_key'  => $data['imp_uid'],
             'pay_status'   => $res['status'],
@@ -71,17 +73,14 @@ class PaymentController extends Controller
         ]);
 
         if ($res['status'] === 'paid') {
-            $order->save();
-            $order->markPaid();
+            $order->markPaidGroup();
         } elseif ($res['status'] === 'ready' && $res['vbank']) {
             $va = $res['vbank'];
-            $order->fill([
+            $order->groupOrders()->update([
                 'status' => 'pending',
                 'va_bank' => $va['bank'], 'va_account' => $va['account'],
                 'va_holder' => $va['holder'], 'va_due_at' => $va['due'],
-            ])->save();
-        } else {
-            $order->save();
+            ]);
         }
 
         return redirect()->route('order.complete', $order)->with('ok', '결제가 정상 처리되었습니다.');
@@ -97,10 +96,10 @@ class PaymentController extends Controller
         }
         $order = Order::where('order_no', $merchantUid)->first();
         if ($order) {
-            $res = $portone->verify($impUid, (int) $order->total);
+            $res = $portone->verify($impUid, $order->groupTotal());
             if (($res['status'] ?? null) === 'paid') {
-                $order->update(['pay_status' => 'DONE', 'payment_key' => $impUid]);
-                $order->markPaid();
+                $order->groupOrders()->update(['pay_status' => 'DONE', 'payment_key' => $impUid]);
+                $order->markPaidGroup();
             }
         }
         Log::info('portone.webhook', ['imp_uid' => $impUid, 'merchant_uid' => $merchantUid]);
@@ -120,8 +119,8 @@ class PaymentController extends Controller
         $order = Order::where('order_no', $data['orderId'])->firstOrFail();
         abort_unless($order->user_id === $request->user()->id, 403);
 
-        // 금액 위변조 방지
-        if ((int) $data['amount'] !== (int) $order->total) {
+        // 금액 위변조 방지 — 묶음(그룹) 합계 기준
+        if ((int) $data['amount'] !== $order->groupTotal()) {
             return redirect()->route('order.pay', $order)->with('error', '결제 금액이 일치하지 않습니다.');
         }
 
@@ -131,7 +130,7 @@ class PaymentController extends Controller
             return redirect()->route('order.pay', $order)->with('error', '결제 승인 실패: '.$res['message']);
         }
 
-        $order->fill([
+        $order->groupOrders()->update([
             'pay_provider' => 'toss',
             'payment_key'  => $data['paymentKey'],
             'pay_status'   => $res['status'] ?? null,
@@ -139,22 +138,18 @@ class PaymentController extends Controller
         ]);
 
         if (($res['status'] ?? '') === 'DONE') {
-            // 카드/계좌이체 등 즉시 결제완료
-            $order->save();
-            $order->markPaid();
+            // 카드/계좌이체 등 즉시 결제완료 → 그룹 전체
+            $order->markPaidGroup();
         } elseif (($res['status'] ?? '') === 'WAITING_FOR_DEPOSIT' && ! empty($res['virtualAccount'])) {
-            // 가상계좌 발급 → 입금대기
+            // 가상계좌 발급 → 입금대기 (그룹 공통)
             $va = $res['virtualAccount'];
-            $order->fill([
+            $order->groupOrders()->update([
                 'status'     => 'pending',
                 'va_bank'    => $va['bankCode'] ?? ($va['bank'] ?? null),
                 'va_account' => $va['accountNumber'] ?? null,
                 'va_holder'  => $va['customerName'] ?? null,
                 'va_due_at'  => $va['dueDate'] ?? null,
             ]);
-            $order->save();
-        } else {
-            $order->save();
         }
 
         return redirect()->route('order.complete', $order)->with('ok', '결제가 정상 처리되었습니다.');
@@ -190,12 +185,12 @@ class PaymentController extends Controller
                 if (! empty($data['paymentKey'])) {
                     $verify = $toss->get($data['paymentKey']);
                     if (($verify['status'] ?? null) === 'DONE') {
-                        $order->update(['pay_status' => 'DONE']);
-                        $order->markPaid();
+                        $order->groupOrders()->update(['pay_status' => 'DONE']);
+                        $order->markPaidGroup();
                     }
                 } else {
-                    $order->update(['pay_status' => 'DONE']);
-                    $order->markPaid();
+                    $order->groupOrders()->update(['pay_status' => 'DONE']);
+                    $order->markPaidGroup();
                 }
             }
         }

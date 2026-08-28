@@ -24,6 +24,15 @@ return [
         'account_num' => env('POPBILL_BANK_ACCOUNT', ''),            // 조회 계좌번호(하이픈 제외)
     ],
 
+    // 문자(SMS/LMS) — 주문 알림(판매자·구매자). SendXMS 로 길이에 따라 SMS/LMS 자동.
+    'sms' => [
+        'simulate'    => env('POPBILL_SMS_SIMULATE', true),          // 기본 시뮬레이트(실발송 차단, 로그만)
+        'corp_num'    => env('POPBILL_TEST_CORP_NUM', ''),           // 팝빌 회원 사업자번호(숫자만)
+        'user_id'     => env('POPBILL_TEST_USER_ID', ''),
+        'sender'      => env('POPBILL_SMS_SENDER', env('COMPANY_TEL', '')), // 팝빌에 사전등록된 발신번호
+        'sender_name' => env('POPBILL_SMS_SENDER_NAME', env('COMPANY_CORP_NAME', '망고샵')),
+    ],
+
     // 공급자(발행자 = 망고샵 / 현재는 .env 값). 팝빌에 등록된 사업자여야 실발행 가능.
     'supplier' => [
         'corp_num'  => env('POPBILL_TEST_CORP_NUM', ''),                 // 사업자등록번호(숫자만)

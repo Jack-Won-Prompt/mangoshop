@@ -127,26 +127,33 @@ class BankDepositService
         $deposits = BankDeposit::whereNull('matched_order_id')->get();
         $matched = 0;
 
-        foreach ($deposits as $d) {
-            $order = Order::where('status', 'pending')
-                ->where('payment_method', 'bank')
-                ->where('total', $d->amount)
-                ->get()
-                ->first(fn ($o) => BankDeposit::normalize($o->depositor) === BankDeposit::normalize($d->depositor));
+        // 대기중 무통장 주문을 결제묶음(그룹)별로 집계 — 입금액은 그룹 합계와 매칭
+        $pending = Order::where('status', 'pending')
+            ->where('payment_method', 'bank')
+            ->get()
+            ->groupBy(fn ($o) => $o->order_group_no ?: 'solo-'.$o->id);
 
-            if ($order) {
-                $this->confirm($d, $order);
-                $matched++;
+        foreach ($deposits as $d) {
+            foreach ($pending as $groupNo => $orders) {
+                $primary = $orders->sortBy('id')->first();
+                $groupTotal = (int) $orders->sum('total');
+                if ($groupTotal === (int) $d->amount
+                    && BankDeposit::normalize($primary->depositor) === BankDeposit::normalize($d->depositor)) {
+                    $this->confirm($d, $primary);
+                    $pending->forget($groupNo); // 동일 입금건 중복매칭 방지
+                    $matched++;
+                    break;
+                }
             }
         }
 
         return $matched;
     }
 
-    /** 입금건 ↔ 주문 확정 (결제완료 처리) */
+    /** 입금건 ↔ 주문 확정 (결제완료 처리) — 묶음 전체 확정 */
     public function confirm(BankDeposit $deposit, Order $order): void
     {
         $deposit->update(['matched_order_id' => $order->id, 'confirmed_at' => now()]);
-        $order->markPaid();
+        $order->markPaidGroup();
     }
 }

@@ -62,10 +62,32 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
-    /** 같은 결제 묶음(여러 수입사) 형제 주문 */
+    /** 같은 결제 묶음(여러 수입사) 형제 주문. 그룹번호가 없으면(레거시) 자기 자신만. */
     public function groupOrders()
     {
+        if (! $this->order_group_no) {
+            return static::whereKey($this->id);
+        }
+
         return static::where('order_group_no', $this->order_group_no);
+    }
+
+    /** 셀러 정산건 */
+    public function settlements()
+    {
+        return $this->hasMany(SellerSettlement::class);
+    }
+
+    /** 결제 묶음 합계(형제 주문 total 합) */
+    public function groupTotal(): int
+    {
+        return (int) $this->groupOrders()->sum('total');
+    }
+
+    /** 결제 묶음 전체 결제완료 처리(팬아웃) */
+    public function markPaidGroup(): void
+    {
+        $this->groupOrders()->get()->each->markPaid();
     }
 
     public function taxInvoices()
@@ -155,5 +177,33 @@ class Order extends Model
                 $this->user->adjustPoint($point, "구매 적립 ({$this->order_no})", $this->id);
             }
         }
+
+        $this->createSettlement();
+
+        // 판매자에게 주문서 이메일 + SMS (결제완료 1회). 실패해도 결제 흐름 유지.
+        app(\App\Services\OrderNotifier::class)->onPaid($this);
+    }
+
+    /** 셀러 정산건 생성 — 입점 수입사 주문에 한함, 1회만(본사 직접판매는 정산 없음) */
+    protected function createSettlement(): void
+    {
+        if (! $this->seller_id) {
+            return;
+        }
+        if (SellerSettlement::where('order_id', $this->id)->exists()) {
+            return;
+        }
+        $rate = (float) ($this->seller?->commission_rate ?? 0);
+        $gross = (int) $this->total;
+        $commission = (int) round($gross * $rate / 100);
+
+        SellerSettlement::create([
+            'seller_id'         => $this->seller_id,
+            'order_id'          => $this->id,
+            'gross_amount'      => $gross,
+            'commission_amount' => $commission,
+            'net_amount'        => $gross - $commission,
+            'status'            => 'pending',
+        ]);
     }
 }

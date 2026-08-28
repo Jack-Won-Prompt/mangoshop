@@ -45,6 +45,12 @@ Route::get('/store/{slug}', [\App\Http\Controllers\SellerStoreController::class,
 Route::get('/seller/invite/{token}', [\App\Http\Controllers\SellerInviteController::class, 'show'])->name('seller.invite.show');
 Route::post('/seller/invite/{token}', [\App\Http\Controllers\SellerInviteController::class, 'accept'])->name('seller.invite.accept');
 
+// 판매자 주문 확인·배송처리 (결제완료 알림 이메일의 서명 링크 · 로그인 불필요)
+Route::get('/seller/order/{order}/manage', [\App\Http\Controllers\SellerOrderController::class, 'manage'])
+    ->middleware('signed')->name('seller.order.manage');
+Route::post('/seller/order/{order}/ship', [\App\Http\Controllers\SellerOrderController::class, 'ship'])
+    ->middleware('signed')->name('seller.order.ship');
+
 // ===== 재입고 알림 (로그인 필요) =====
 Route::post('/restock/{product}', [\App\Http\Controllers\RestockController::class, 'toggle'])
     ->middleware('auth')->name('restock.toggle');

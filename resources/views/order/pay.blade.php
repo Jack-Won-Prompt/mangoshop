@@ -21,7 +21,7 @@
             <span class="muted">결제수단</span><span>{{ $provider === 'portone' ? '포트원(아임포트)' : '토스페이먼츠' }}</span>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);margin-top:10px;padding-top:12px">
-            <span>결제금액</span><b class="text-red" style="font-size:22px">{{ number_format($order->total) }}원</b>
+            <span>결제금액</span><b class="text-red" style="font-size:22px">{{ number_format($payAmount) }}원</b>
         </div>
     </div>
 
@@ -31,11 +31,11 @@
             @if($portone['simulate'])
                 <form method="POST" action="{{ route('payment.portone.simulate', $order) }}">
                     @csrf
-                    <button class="btn btn-red btn-lg btn-block">{{ number_format($order->total) }}원 결제하기</button>
+                    <button class="btn btn-red btn-lg btn-block">{{ number_format($payAmount) }}원 결제하기</button>
                 </form>
                 <p class="muted" style="font-size:12px;margin-top:10px;text-align:center">포트원 시뮬레이트 모드 — 실제 결제창 없이 완료 처리됩니다.</p>
             @else
-                <button id="pay-btn" class="btn btn-red btn-lg btn-block">{{ number_format($order->total) }}원 결제하기</button>
+                <button id="pay-btn" class="btn btn-red btn-lg btn-block">{{ number_format($payAmount) }}원 결제하기</button>
                 <form id="poVerify" method="POST" action="{{ route('payment.portone.verify') }}" style="display:none">
                     @csrf
                     <input type="hidden" name="imp_uid">
@@ -50,7 +50,7 @@
             <div id="payment-method"></div>
             <div id="agreement"></div>
             <button id="pay-btn" class="btn btn-red btn-lg btn-block" style="margin-top:16px" disabled>
-                {{ number_format($order->total) }}원 결제하기
+                {{ number_format($payAmount) }}원 결제하기
             </button>
             <p class="muted" style="font-size:12px;margin-top:10px;text-align:center">테스트 모드입니다. 실제 청구되지 않습니다.</p>
         </div>
@@ -72,7 +72,7 @@
             pay_method: @json($portone['pay_method']),
             merchant_uid: @json($order->order_no),
             name: @json($orderName),
-            amount: {{ (int) $order->total }},
+            amount: {{ (int) $payAmount }},
             buyer_name: @json($order->receiver_name),
             buyer_tel: @json($order->receiver_phone)
         }, function (rsp) {
@@ -92,7 +92,7 @@
 (function () {
     var clientKey   = @json($clientKey);
     var customerKey = @json($customerKey);
-    var amount      = {{ (int) $order->total }};
+    var amount      = {{ (int) $payAmount }};
     var payload = {
         orderId:      @json($order->order_no),
         orderName:    @json($orderName),
