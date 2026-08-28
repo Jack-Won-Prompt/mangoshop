@@ -55,14 +55,14 @@
 
             {{-- ===== 옵션 ===== --}}
             <div class="adm-card"><div class="h">상품 옵션</div><div style="padding:20px">
-                <div class="ahint" style="margin-bottom:10px">단일레벨 옵션(옵션구분이 같으면 하나의 선택박스로 묶입니다). 추가금액은 ± 입력 가능.</div>
+                <div class="ahint" style="margin-bottom:10px">단일레벨 옵션(옵션구분이 같으면 하나의 선택박스로 묶입니다). <b>옵션 가격은 그 옵션의 판매가(절대금액)</b>입니다. 예: 8과 58900, 9과 65000</div>
                 <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
                     <button type="button" class="abtn abtn-ghost abtn-sm" onclick="fillPreset('규격','5kg,10kg')">규격 5/10kg</button>
                     <button type="button" class="abtn abtn-ghost abtn-sm" onclick="fillPreset('과수','8과,9과,10과')">과수 8/9/10</button>
                     <button type="button" class="abtn abtn-ghost abtn-sm" onclick="fillPreset('포장','일반,선물박스,보자기')">포장</button>
                 </div>
                 <table class="atable" id="optTable" style="font-size:13px">
-                    <thead><tr><th style="width:130px">옵션구분</th><th>선택지</th><th style="width:110px">추가금액</th><th style="width:80px">재고</th><th style="width:50px">사용</th><th style="width:40px"></th></tr></thead>
+                    <thead><tr><th style="width:130px">옵션구분</th><th>선택지</th><th style="width:120px">옵션 판매가(원)</th><th style="width:80px">재고</th><th style="width:50px">사용</th><th style="width:40px"></th></tr></thead>
                     <tbody id="optBody">
                         @foreach(old('options', $product->options->map(fn($o)=>$o->only(['id','group_name','name','extra_price','stock','is_active'])) ?? []) as $i=>$o)
                         <tr>

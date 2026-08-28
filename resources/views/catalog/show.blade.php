@@ -9,9 +9,10 @@
     $rate = $special ? $product->discountRateFor($sell) : 0;
     $inquiry = $product->is_quote || $sell <= 0;           // 가격문의 토글 또는 판매가 미설정
     $soldout = $product->stock <= 0;
-    // 옵션 상품: 기본 선택 옵션(재고 있는 첫 옵션) 기준으로 가격 표시
+    // 옵션 상품: 옵션 판매가(절대)가 곧 판매가. 기본 선택은 재고 있는 첫 옵션.
+    $hasOptions = $product->activeOptions->count() > 0;
     $defaultOpt = $product->activeOptions->first(fn ($o) => $o->stock > 0) ?? $product->activeOptions->first();
-    $initSell = $sell + (int) ($defaultOpt->extra_price ?? 0);
+    $initSell = $hasOptions ? (int) ($defaultOpt->extra_price ?? $sell) : $sell;
 @endphp
 
 @section('content')
@@ -108,7 +109,7 @@
                                 @foreach($product->activeOptions->groupBy('group_name') as $gname => $opts)
                                     @if($gname)<optgroup label="{{ $gname }}">@endif
                                     @foreach($opts as $o)
-                                        <option value="{{ $o->id }}" data-extra="{{ (int) $o->extra_price }}" {{ $o->stock<=0 ? 'disabled' : '' }} {{ ($defaultOpt && $defaultOpt->id === $o->id) ? 'selected' : '' }}>{{ $o->label }}{{ $o->stock<=0 ? ' (품절)' : '' }}</option>
+                                        <option value="{{ $o->id }}" data-price="{{ (int) $o->extra_price }}" {{ $o->stock<=0 ? 'disabled' : '' }} {{ ($defaultOpt && $defaultOpt->id === $o->id) ? 'selected' : '' }}>{{ $o->label }}{{ $o->stock<=0 ? ' (품절)' : '' }}</option>
                                     @endforeach
                                     @if($gname)</optgroup>@endif
                                 @endforeach
@@ -132,11 +133,11 @@
                 <script>
                 (function(){
                     var sel=document.getElementById('optSelect'), num=document.getElementById('sellNum');
-                    if(!sel||!num)return; var base=parseInt(num.getAttribute('data-base'),10)||0;
+                    if(!sel||!num)return;
                     function sync(){
                         var o=sel.options[sel.selectedIndex]||null;
-                        var extra=o?parseInt(o.getAttribute('data-extra')||'0',10):0;
-                        num.textContent=(base+(isNaN(extra)?0:extra)).toLocaleString('ko-KR');
+                        var p=o?parseInt(o.getAttribute('data-price')||'0',10):0;
+                        num.textContent=(isNaN(p)?0:p).toLocaleString('ko-KR');
                     }
                     sel.addEventListener('change',sync);
                     sel.addEventListener('input',sync);

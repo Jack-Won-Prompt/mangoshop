@@ -20,22 +20,15 @@ class ProductOption extends Model
         return $this->belongsTo(Product::class);
     }
 
-    /** 옵션 적용가 = max(0, 상품 판매가 + 추가금액) */
-    public function priceFor(Product $product): int
+    /** 옵션 판매가(절대값) — 이 옵션 선택 시의 판매가 */
+    public function priceFor(?Product $product = null): int
     {
-        return max(0, (int) $product->price + (int) $this->extra_price);
+        return max(0, (int) $this->extra_price);
     }
 
-    /** 표시 라벨: "5kg 박스 (+3,000원)" */
+    /** 표시 라벨: "8과 - 58,900원" */
     public function getLabelAttribute(): string
     {
-        $label = $this->name;
-        if ($this->extra_price > 0) {
-            $label .= ' (+'.number_format($this->extra_price).'원)';
-        } elseif ($this->extra_price < 0) {
-            $label .= ' ('.number_format($this->extra_price).'원)';
-        }
-
-        return $label;
+        return $this->name.' · '.number_format(max(0, (int) $this->extra_price)).'원';
     }
 }

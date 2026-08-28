@@ -75,8 +75,7 @@ class CartController extends Controller
     {
         $subtotal = 0;
         foreach ($items as $i) {
-            $unit = $i->product->priceFor($user) + (int) ($i->option?->extra_price ?? 0);
-            $subtotal += max(0, $unit) * $i->quantity;
+            $subtotal += $i->unitPrice($user) * $i->quantity;
         }
         // 배송비 별도 — 콜드체인·수입사/지역별로 상이하여 주문 후 별도 정산(결제금액 미포함)
         $shipping = 0;

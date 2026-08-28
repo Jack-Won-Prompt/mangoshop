@@ -23,9 +23,13 @@ class CartItem extends Model
         return $this->belongsTo(ProductOption::class, 'option_id');
     }
 
-    /** 옵션 추가금액 포함 단가(회원가 반영) */
+    /** 단가 — 옵션 선택 시 옵션 판매가(절대), 아니면 회원가 */
     public function unitPrice(?User $user): int
     {
-        return max(0, $this->product->priceFor($user) + (int) ($this->option?->extra_price ?? 0));
+        if ($this->option) {
+            return max(0, (int) $this->option->extra_price);
+        }
+
+        return $this->product->priceFor($user);
     }
 }

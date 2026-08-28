@@ -3,9 +3,13 @@
     $user = auth()->user();
     $canSee = $product->priceVisibleFor($user);      // 가격 노출 여부
     $sell = $product->priceFor($user);
+    // 옵션 상품: 옵션 판매가(절대)의 최저가를 대표가로 표시
+    $optMin = $product->activeOptions->min('extra_price');
+    $hasOpt = $optMin !== null;
+    if ($hasOpt) { $sell = (int) $optMin; }
     $isWholesale = $user && $user->isWholesale();
-    $special = $canSee && $isWholesale && $sell < $product->price;   // 도매가/전용가 적용
-    $rate = ($canSee && $product->price > 0 && $sell < $product->price)
+    $special = ! $hasOpt && $canSee && $isWholesale && $sell < $product->price;   // 도매가/전용가 적용
+    $rate = (! $hasOpt && $canSee && $product->price > 0 && $sell < $product->price)
         ? (int) round(($product->price - $sell) / $product->price * 100) : 0;
     $status = $product->sale_status;
     $soldout = $status === 'soldout' || ($status === 'on_sale' && $product->stock <= 0);
@@ -60,7 +64,7 @@
                 @if($rate > 0)<span class="mg-oprice">{{ number_format($product->price) }}원</span>@endif
                 <div style="display:flex;align-items:baseline;gap:6px;flex-wrap:wrap">
                     @if($rate > 0)<span class="mg-rate">{{ $rate }}%</span>@endif
-                    <span class="mg-price">{{ number_format($sell) }}<span class="won">원</span></span>
+                    <span class="mg-price">{{ number_format($sell) }}<span class="won">원{{ $hasOpt ? '~' : '' }}</span></span>
                 </div>
                 @if($special)<div class="mg-wprice">도매 전용가 적용중</div>
                 @elseif(! $isWholesale && $product->wholesale_price)<div class="mg-wprice">도매회원 전용가 별도</div>@endif
