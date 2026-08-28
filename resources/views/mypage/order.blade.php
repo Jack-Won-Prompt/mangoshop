@@ -16,7 +16,7 @@
                     <thead><tr><th>상품</th><th style="width:90px">수량</th><th style="width:120px;text-align:right">금액</th></tr></thead>
                     <tbody>
                     @foreach($order->items as $it)
-                        <tr><td>{{ $it->product_name }}</td><td>{{ $it->quantity }}{{ $it->unit }}</td><td style="text-align:right"><b>{{ number_format($it->subtotal) }}원</b></td></tr>
+                        <tr><td>{{ $it->display_name }}</td><td>{{ $it->quantity }}{{ $it->unit }}</td><td style="text-align:right"><b>{{ number_format($it->subtotal) }}원</b></td></tr>
                     @endforeach
                     </tbody>
                 </table>

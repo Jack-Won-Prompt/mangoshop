@@ -24,7 +24,7 @@
             <tbody>
             @foreach($order->items as $it)
                 <tr>
-                    <td style="padding:8px 10px;border-bottom:1px solid #f2eadd">{{ $it->product_name }}</td>
+                    <td style="padding:8px 10px;border-bottom:1px solid #f2eadd">{{ $it->display_name }}</td>
                     <td align="center" style="padding:8px 10px;border-bottom:1px solid #f2eadd">{{ $it->quantity }}</td>
                     <td align="right" style="padding:8px 10px;border-bottom:1px solid #f2eadd">{{ number_format($it->subtotal) }}원</td>
                 </tr>

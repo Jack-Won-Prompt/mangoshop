@@ -96,7 +96,7 @@ class OrderController extends Controller
 
         $isPg = $data['payment_method'] !== 'bank';
 
-        $items = $user->cartItems()->with('product')->get()
+        $items = $user->cartItems()->with(['product', 'option'])->get()
             ->filter(fn ($i) => $i->product !== null);
 
         if ($items->isEmpty()) {

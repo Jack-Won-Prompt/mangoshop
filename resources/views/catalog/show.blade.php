@@ -72,7 +72,7 @@
                 @endif
                 <div class="row" style="align-items:flex-end">
                     <span class="lbl">{{ $special ? '도매 전용가' : '판매가' }}</span>
-                    <span class="big-price">{{ number_format($sell) }}<span class="won">원</span></span>
+                    <span class="big-price"><span id="sellNum" data-base="{{ (int) $sell }}">{{ number_format($sell) }}</span><span class="won">원</span></span>
                 </div>
                 @if($special)
                     <div style="text-align:right;margin-top:6px"><span class="mtag"><x-icon name="check" :size="14"/> {{ $user->company_name ?? '도매' }} 전용가 적용중 ({{ $rate }}%↓)</span></div>
@@ -98,6 +98,21 @@
                 @else
                 <form method="POST" action="{{ route('cart.add', $product) }}">
                     @csrf
+                    @if($product->activeOptions->count())
+                        <div style="margin-bottom:14px">
+                            <label style="font-weight:600;font-size:14px;display:block;margin-bottom:6px">옵션 선택 <span style="color:#e0322d">*</span></label>
+                            <select name="option_id" id="optSelect" required style="width:100%;padding:11px 12px;border:1px solid var(--slate-200,#e3e8f1);border-radius:9px;font-size:14px;background:#fff">
+                                <option value="">- 옵션을 선택하세요 -</option>
+                                @foreach($product->activeOptions->groupBy('group_name') as $gname => $opts)
+                                    @if($gname)<optgroup label="{{ $gname }}">@endif
+                                    @foreach($opts as $o)
+                                        <option value="{{ $o->id }}" data-extra="{{ (int) $o->extra_price }}" {{ $o->stock<=0 ? 'disabled' : '' }}>{{ $o->label }}{{ $o->stock<=0 ? ' (품절)' : '' }}</option>
+                                    @endforeach
+                                    @if($gname)</optgroup>@endif
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
                     <div style="display:flex;align-items:center;gap:14px">
                         <span style="font-weight:600;font-size:14px">수량</span>
                         <div class="qty">
@@ -111,6 +126,18 @@
                         <button type="submit" name="buy_now" value="1" class="btn btn-red btn-lg">바로 구매</button>
                     </div>
                 </form>
+                @if($product->activeOptions->count())
+                <script>
+                (function(){
+                    var sel=document.getElementById('optSelect'), num=document.getElementById('sellNum');
+                    if(!sel||!num)return; var base=parseInt(num.dataset.base,10)||0;
+                    sel.addEventListener('change',function(){
+                        var o=sel.options[sel.selectedIndex]; var extra=o?parseInt(o.dataset.extra||'0',10):0;
+                        num.textContent=(base+(extra||0)).toLocaleString('ko-KR');
+                    });
+                })();
+                </script>
+                @endif
                 @php($inWish = in_array($product->id, $wishlistIds ?? []))
                 <form method="POST" action="{{ route('wishlist.toggle', $product) }}" style="margin-top:10px">
                     @csrf

@@ -12,7 +12,7 @@
                 <thead><tr><th>상품정보</th><th style="width:120px">판매가</th><th style="width:130px">수량</th><th style="width:120px">합계</th><th style="width:60px"></th></tr></thead>
                 <tbody>
                 @foreach($items as $it)
-                    @php($unit = $it->product->priceFor(auth()->user()))
+                    @php($unit = $it->unitPrice(auth()->user()))
                     <tr>
                         <td>
                             <div class="pname">
@@ -22,6 +22,7 @@
                                 <div>
                                     <div class="muted" style="font-size:12px">{{ $it->product->maker }}</div>
                                     <a href="{{ route('catalog.show', $it->product->slug) }}" style="font-weight:600">{{ $it->product->name }}</a>
+                                    @if($it->option)<div style="font-size:12px;color:#c9640a;font-weight:600">옵션: {{ $it->option->label }}</div>@endif
                                     <div class="muted" style="font-size:12px">단위 {{ $it->product->unit }}</div>
                                 </div>
                             </div>

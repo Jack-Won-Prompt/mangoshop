@@ -49,7 +49,7 @@
         <table class="dtable" style="border:0">
             <tbody>
             @foreach($order->items as $it)
-                <tr><td>{{ $it->product_name }} <span class="muted">× {{ $it->quantity }}</span></td><td style="text-align:right"><b>{{ number_format($it->subtotal) }}원</b></td></tr>
+                <tr><td>{{ $it->display_name }} <span class="muted">× {{ $it->quantity }}</span></td><td style="text-align:right"><b>{{ number_format($it->subtotal) }}원</b></td></tr>
             @endforeach
             </tbody>
         </table>

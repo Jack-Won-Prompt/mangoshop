@@ -25,7 +25,7 @@ class OrderPlacement
 
         // 셀러별 그룹핑 (product.seller_id, null → 0=본사)
         $groups = $items->groupBy(fn ($i) => $i->product->seller_id ?? 0);
-        $subtotals = $groups->map(fn ($g) => (int) $g->sum(fn ($i) => $i->product->priceFor($user) * $i->quantity));
+        $subtotals = $groups->map(fn ($g) => (int) $g->sum(fn ($i) => $i->unitPrice($user) * $i->quantity));
         $grand = (int) $subtotals->sum();
         $keys = $subtotals->keys()->values();
 
@@ -78,11 +78,15 @@ class OrderPlacement
                 $primary ??= $order;
 
                 foreach ($groups[$key] as $i) {
-                    $price = $i->product->priceFor($user);
+                    $price = $i->unitPrice($user);
+                    $opt = $i->option;
                     $order->items()->create([
                         'seller_id'    => $sellerId,
                         'product_id'   => $i->product_id,
                         'product_name' => $i->product->name,
+                        'option_id'    => $opt?->id,
+                        'option_name'  => $opt?->name,
+                        'option_extra' => (int) ($opt?->extra_price ?? 0),
                         'unit'         => $i->product->unit,
                         'price'        => $price,
                         'quantity'     => $i->quantity,

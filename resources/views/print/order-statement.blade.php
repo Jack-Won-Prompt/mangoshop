@@ -95,7 +95,7 @@
         @foreach($items as $i => $it)
             <tr>
                 <td class="ctr">{{ $i + 1 }}</td>
-                <td>{{ $it->product_name }}</td>
+                <td>{{ $it->display_name }}</td>
                 <td class="ctr">{{ $it->unit ?: '-' }}</td>
                 <td class="num">{{ number_format((int) $it->price) }}</td>
                 <td class="ctr">{{ number_format((int) $it->quantity) }}</td>
