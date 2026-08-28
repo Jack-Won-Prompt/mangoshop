@@ -16,7 +16,7 @@ class Product extends Model
     protected $fillable = [
         'seller_id', 'category_id', 'brand_id', 'name', 'slug', 'code', 'unit', 'maker',
         'summary', 'description', 'spec', 'price', 'cost', 'member_price', 'wholesale_price', 'wholesale_only',
-        'tax_type', 'stock', 'thumbnail', 'images', 'is_active', 'is_featured', 'is_best', 'is_new',
+        'tax_type', 'stock', 'thumbnail', 'images', 'is_active', 'is_featured', 'is_best', 'is_new', 'is_quote',
         'badge', 'view_count', 'sort_order',
         // 신선식품/멀티벤더 속성
         'origin', 'variety', 'grade', 'box_spec', 'weight_kg',
@@ -31,6 +31,7 @@ class Product extends Model
         'is_featured' => 'boolean',
         'is_best'     => 'boolean',
         'is_new'      => 'boolean',
+        'is_quote'    => 'boolean',
         'inbound_date'          => 'date',
         'expiry_date'           => 'date',
         'expected_inbound_date' => 'date',

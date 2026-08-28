@@ -193,6 +193,7 @@ class ProductController extends Controller
         $product->is_featured = $request->boolean('is_featured');
         $product->is_best     = $request->boolean('is_best');
         $product->is_new      = $request->boolean('is_new');
+        $product->is_quote    = $request->boolean('is_quote');
         $product->moq         = (int) ($data['moq'] ?? 1) ?: 1;
 
         // 슬러그: 비어있을 때만 생성(수정 시 재생성 안 함)

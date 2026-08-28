@@ -25,6 +25,11 @@ class CartController extends Controller
         $qty = max(1, (int) $request->input('quantity', 1));
         $user = $request->user();
 
+        // 가격문의 상품은 장바구니 담기 불가(견적문의로 안내)
+        if ($product->is_quote) {
+            return back()->with('error', '가격문의 상품입니다. 견적문의로 문의해 주세요.');
+        }
+
         // 옵션 처리 — 옵션이 있는 상품은 반드시 선택
         $optionId = (int) $request->input('option_id', 0) ?: null;
         if ($product->activeOptions()->exists()) {

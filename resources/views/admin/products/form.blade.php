@@ -105,11 +105,12 @@
             </div></div>
 
             <div class="adm-card"><div class="h">노출 설정</div><div style="padding:20px">
-                @foreach(['is_active'=>'판매중(노출)','is_featured'=>'추천상품','is_best'=>'베스트','is_new'=>'신상품'] as $k=>$lbl)
+                @foreach(['is_active'=>'판매중(노출)','is_featured'=>'추천상품','is_best'=>'베스트','is_new'=>'신상품','is_quote'=>'가격문의(가격 숨김)'] as $k=>$lbl)
                     <label style="display:inline-flex;align-items:center;gap:7px;font-weight:600;margin:0 14px 8px 0;cursor:pointer">
                         <input type="checkbox" name="{{ $k }}" value="1" {{ $val($k, $k==='is_active') ? 'checked' : '' }} style="width:16px;height:16px"> {{ $lbl }}
                     </label>
                 @endforeach
+                <div class="ahint" style="margin-top:2px">‘가격문의’ 체크 시 가격 대신 <b>가격문의</b>가 표시되고 담기 대신 견적문의로 안내됩니다.</div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px">
                     <div class="afield"><label>커스텀 뱃지</label><input type="text" name="badge" class="ainput" value="{{ $val('badge') }}" placeholder="예: 기획"></div>
                     <div class="afield"><label>정렬순서</label><input type="number" name="sort_order" class="ainput" value="{{ $val('sort_order') }}"></div>

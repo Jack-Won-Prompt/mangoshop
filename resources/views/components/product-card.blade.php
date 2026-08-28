@@ -54,7 +54,7 @@
                 <div class="mg-price-hide">
                     @guest 로그인 후 가격 확인 @else 회원 승인 후 가격 확인 @endguest
                 </div>
-            @elseif($sell <= 0)
+            @elseif($product->is_quote || $sell <= 0)
                 <div class="mg-price-hide"><a href="{{ route('community.inquiry', ['type' => 'quote', 'product' => $product->id]) }}">가격문의</a></div>
             @else
                 @if($rate > 0)<span class="mg-oprice">{{ number_format($product->price) }}원</span>@endif

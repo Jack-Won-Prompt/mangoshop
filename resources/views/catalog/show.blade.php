@@ -7,7 +7,7 @@
     $isHospital = $user && $user->isApprovedBusiness();
     $special = $isHospital && $sell < $product->price;     // 도매 전용가 적용
     $rate = $special ? $product->discountRateFor($sell) : 0;
-    $inquiry = $sell <= 0;                                 // 판매가 미설정 → 가격문의
+    $inquiry = $product->is_quote || $sell <= 0;           // 가격문의 토글 또는 판매가 미설정
     $soldout = $product->stock <= 0;
 @endphp
 
