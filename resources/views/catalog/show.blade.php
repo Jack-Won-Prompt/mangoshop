@@ -132,11 +132,15 @@
                 <script>
                 (function(){
                     var sel=document.getElementById('optSelect'), num=document.getElementById('sellNum');
-                    if(!sel||!num)return; var base=parseInt(num.dataset.base,10)||0;
-                    sel.addEventListener('change',function(){
-                        var o=sel.options[sel.selectedIndex]; var extra=o?parseInt(o.dataset.extra||'0',10):0;
-                        num.textContent=(base+(extra||0)).toLocaleString('ko-KR');
-                    });
+                    if(!sel||!num)return; var base=parseInt(num.getAttribute('data-base'),10)||0;
+                    function sync(){
+                        var o=sel.options[sel.selectedIndex]||null;
+                        var extra=o?parseInt(o.getAttribute('data-extra')||'0',10):0;
+                        num.textContent=(base+(isNaN(extra)?0:extra)).toLocaleString('ko-KR');
+                    }
+                    sel.addEventListener('change',sync);
+                    sel.addEventListener('input',sync);
+                    sync();
                 })();
                 </script>
                 @endif
