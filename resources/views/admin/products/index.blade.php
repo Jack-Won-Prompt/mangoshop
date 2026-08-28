@@ -39,7 +39,10 @@
                 </td>
                 <td><b>{{ $p->name }}</b><div style="color:#97a0b8;font-size:11.5px">{{ $p->code }} · {{ $p->maker }}</div></td>
                 <td style="font-size:12.5px">{{ $p->category?->name }}</td>
-                <td style="text-align:right">{{ number_format($p->price) }}원</td>
+                <td style="text-align:right">
+                    @if($p->is_quote)<span style="color:#c9640a;font-weight:700">가격문의</span>
+                    @else{{ number_format($p->price) }}원@endif
+                </td>
                 <td style="text-align:right">{{ number_format($p->stock) }}</td>
                 <td>
                     @php($st = $p->sale_status)
@@ -47,6 +50,9 @@
                     @else<span class="pill {{ $st==='on_sale'?'pill-y':($st==='soldout'||$st==='closed'?'pill-n':'pill-w') }}">{{ $statuses[$st] ?? $st }}</span>@endif
                 </td>
                 <td style="text-align:right;white-space:nowrap">
+                    <form method="POST" action="{{ route('admin.products.togglequote', $p) }}" style="display:inline" title="가격문의 전환">@csrf
+                        <button class="abtn abtn-ghost abtn-sm" type="submit" style="{{ $p->is_quote ? 'color:#c9640a;border-color:#f0b37e;font-weight:700' : '' }}">가격문의{{ $p->is_quote ? ' ✓' : '' }}</button>
+                    </form>
                     <a href="{{ route('admin.products.edit', $p) }}" class="abtn abtn-ghost abtn-sm">수정</a>
                     <form method="POST" action="{{ route('admin.products.destroy', $p) }}" style="display:inline" onsubmit="return confirm('삭제하시겠습니까?')">@csrf @method('DELETE')
                         <button class="abtn abtn-ghost abtn-sm" type="submit">삭제</button>

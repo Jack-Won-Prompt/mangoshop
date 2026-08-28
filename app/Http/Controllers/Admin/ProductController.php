@@ -97,6 +97,14 @@ class ProductController extends Controller
         return redirect()->route('admin.products.index')->with('ok', '상품이 삭제되었습니다.');
     }
 
+    /** 리스트에서 가격문의 on/off 빠른 토글 */
+    public function toggleQuote(Product $product)
+    {
+        $product->update(['is_quote' => ! $product->is_quote]);
+
+        return back()->with('ok', $product->name.' → 가격문의 '.($product->is_quote ? '설정' : '해제').'되었습니다.');
+    }
+
     /** 대표이미지 편집 화면(회전·밝기·대비·자르기) */
     public function editImage(Product $product)
     {
