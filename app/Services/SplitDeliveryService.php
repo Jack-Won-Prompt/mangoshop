@@ -13,7 +13,7 @@ class SplitDeliveryService
 {
     public const MAX_ROWS = 200;
 
-    public const HEADER = ['상품코드', '수량', '받는사람', '전화번호', '우편번호', '주소', '상세주소', '요청사항'];
+    public const HEADER = ['상품코드', '제품명', '수량', '받는사람', '전화번호', '우편번호', '주소', '상세주소', '요청사항'];
 
     /** CSV 원문(문자열) → 검증 결과 */
     public function parse(string $content, ?User $user): array
@@ -40,15 +40,21 @@ class SplitDeliveryService
                 break;
             }
             $c = array_map(fn ($v) => trim((string) $v), str_getcsv($line));
-            [$code, $qty, $name, $phone, $postcode, $addr1, $addr2, $memo] = array_pad($c, 8, '');
+            [$code, $pname, $qty, $name, $phone, $postcode, $addr1, $addr2, $memo] = array_pad($c, 9, '');
 
-            if ($code === '' && $name === '' && $addr1 === '') {
+            if ($code === '' && $pname === '' && $name === '' && $addr1 === '') {
                 continue; // 완전 빈 행
             }
             $rowErr = [];
-            $product = $code !== '' ? Product::active()->where('code', $code)->first() : null;
+            // 상품 매칭: 상품코드 우선, 코드가 비면 제품명으로 보조 매칭
+            $product = null;
+            if ($code !== '') {
+                $product = Product::active()->where('code', $code)->first();
+            } elseif ($pname !== '') {
+                $product = Product::active()->where('name', $pname)->first();
+            }
             if (! $product) {
-                $rowErr[] = "상품코드 '{$code}' 없음";
+                $rowErr[] = $code !== '' ? "상품코드 '{$code}' 없음" : "제품명 '{$pname}' 매칭 실패";
             }
             $q = (int) preg_replace('/[^0-9]/', '', (string) $qty);
             if ($q < 1) {
@@ -143,7 +149,7 @@ class SplitDeliveryService
     /** 엑셀(CSV) 양식 문자열 — UTF-8 BOM */
     public function template(): string
     {
-        $sample = ['GSP001', '2', '홍길동', '010-1234-5678', '07789', '서울 강서구 마곡중앙로 161-8', 'C동 502호', '부재 시 경비실'];
+        $sample = ['GSP001', '프리미엄 애플망고 선물세트', '2', '홍길동', '010-1234-5678', '07789', '서울 강서구 마곡중앙로 161-8', 'C동 502호', '부재 시 경비실'];
 
         return "\xEF\xBB\xBF".$this->csvLine(self::HEADER)."\n".$this->csvLine($sample)."\n";
     }
