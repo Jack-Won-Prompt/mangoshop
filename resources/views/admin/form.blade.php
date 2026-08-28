@@ -36,7 +36,7 @@
                     @elseif($type === 'datetime')
                         <input type="datetime-local" name="{{ $name }}" class="ainput" value="{{ $value ? \Illuminate\Support\Carbon::parse($value)->format('Y-m-d\TH:i') : '' }}">
                     @elseif($type === 'image')
-                        <div style="margin-bottom:8px"><img src="{{ $value }}" alt="" id="thumbPreview_{{ $name }}" style="max-height:120px;max-width:200px;border:1px solid var(--a-line);border-radius:8px;object-fit:contain;background:#fff;{{ $value ? '' : 'display:none' }}"></div>
+                        <div style="margin-bottom:8px"><img src="{{ \App\Support\Media::url($value) }}" alt="" id="thumbPreview_{{ $name }}" style="max-height:120px;max-width:200px;border:1px solid var(--a-line);border-radius:8px;object-fit:contain;background:#fff;{{ $value ? '' : 'display:none' }}"></div>
                         <input type="file" name="{{ $name }}" accept="image/*" class="ainput" style="padding:8px">
                         @if($value)
                             <label class="acheck" style="margin-top:6px"><input type="checkbox" name="{{ $name }}_clear" value="1"> 기존 이미지 삭제</label>
