@@ -19,8 +19,7 @@
                 상호 : {{ $site['company'] ?? '망고샵' }} &nbsp;|&nbsp; 대표 : {{ $site['ceo'] ?? '' }}<br>
                 사업자등록번호 : {{ $site['biz_no'] ?? '' }} &nbsp;|&nbsp; 통신판매업 신고 : {{ $site['mailorder'] ?? '' }}<br>
                 주소 : {{ $site['address'] ?? '' }}<br>
-                이메일 : {{ $site['email'] ?? '' }}<br>
-                <span style="color:#aaa">여러 수입사가 입점하는 오픈마켓으로, 각 상품의 판매·배송·정산 책임은 해당 수입사에 있습니다.</span>
+                이메일 : {{ $site['email'] ?? '' }}
                 <div style="color:#bbb;font-size:11.5px;margin-top:12px">© {{ date('Y') }} MANGOSHOP. All rights reserved.</div>
             </div>
             <div class="mg-foot-cs">
