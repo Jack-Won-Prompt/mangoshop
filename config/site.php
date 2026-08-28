@@ -11,7 +11,8 @@ return [
     'name'        => '망고샵',
     'name_en'     => 'MANGOSHOP',
     'tagline'     => '수입 과일 도매·소매 오픈마켓',
-    'company'     => '망고샵',
+    // 사업자(법인) 정보 — 실제 사업자등록증 기준(토스페이먼츠 심사용). 메디셀과 동일 법인.
+    'company'     => '메디셀',
     'ceo'         => '최연아',
     'biz_no'      => '833-27-01712',
     'mailorder'   => '제2024-서울강서-1841호',      // 통신판매업 신고번호
@@ -19,7 +20,7 @@ return [
 
     'cs_tel'      => '1600-0000',
     'cs_hours'    => '평일 09:00 ~ 18:00 (점심 12:00~13:00) / 주말·공휴일 휴무',
-    'email'       => 'help@mangoshop.co.kr',
+    'email'       => 'help@medisell.co.kr',
 
     // 무통장 입금계좌
     'banks' => [
