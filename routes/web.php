@@ -67,6 +67,8 @@ Route::middleware('auth')->group(function () {
     // ===== 주문/결제 =====
     Route::get('/checkout', [OrderController::class, 'checkout'])->name('order.checkout');
     Route::post('/checkout', [OrderController::class, 'store'])->name('order.store');
+    Route::get('/checkout/split/template', [OrderController::class, 'splitTemplate'])->name('order.split.template');
+    Route::post('/checkout/split/preview', [OrderController::class, 'splitPreview'])->name('order.split.preview');
     Route::post('/checkout/coupon', [OrderController::class, 'applyCoupon'])->name('order.coupon.apply');
     Route::delete('/checkout/coupon', [OrderController::class, 'removeCoupon'])->name('order.coupon.remove');
     Route::get('/order/complete/{order}', [OrderController::class, 'complete'])->name('order.complete');

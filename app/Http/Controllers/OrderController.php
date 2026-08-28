@@ -18,11 +18,15 @@ class OrderController extends Controller
         $items = $user->cartItems()->with('product.brand')->get()
             ->filter(fn ($i) => $i->product !== null);
 
-        if ($items->isEmpty()) {
+        // 분할배송(엑셀=주문서)은 장바구니 없이도 진입 가능
+        $splitEntry = $request->query('mode') === 'split';
+        if ($items->isEmpty() && ! $splitEntry) {
             return redirect()->route('cart.index')->with('error', '장바구니가 비어 있습니다.');
         }
 
-        $summary = CartController::summarize($items, $user);
+        $summary = $items->isEmpty()
+            ? ['subtotal' => 0, 'shipping' => 0, 'total' => 0, 'count' => 0]
+            : CartController::summarize($items, $user);
         [$coupon, $couponDiscount, $couponError] = $this->resolveCoupon($user, $summary['subtotal']);
 
         // 보유(발행받은) 쿠폰 — 이미 적용된 것 제외
@@ -34,6 +38,7 @@ class OrderController extends Controller
             'coupon' => $coupon, 'couponDiscount' => $couponDiscount, 'couponError' => $couponError,
             'availableCoupons' => $availableCoupons,
             'agentBuyers' => $user->isAgent() ? $user->buyers()->get() : collect(),
+            'splitEntry' => $splitEntry,
         ]);
     }
 
@@ -69,9 +74,38 @@ class OrderController extends Controller
         return back()->with('ok', '쿠폰이 해제되었습니다.');
     }
 
+    /** 분할배송 엑셀(CSV) 양식 다운로드 */
+    public function splitTemplate(\App\Services\SplitDeliveryService $svc)
+    {
+        return response($svc->template(), 200, [
+            'Content-Type'        => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="분할배송_양식.csv"',
+        ]);
+    }
+
+    /** 분할배송 엑셀 업로드 → 파싱·검증 후 미리보기(JSON). 정상 시 세션 저장 */
+    public function splitPreview(Request $request, \App\Services\SplitDeliveryService $svc)
+    {
+        $request->validate(['file' => ['required', 'file', 'mimes:csv,txt', 'max:2048']]);
+        $result = $svc->parse(file_get_contents($request->file('file')->getRealPath()), $request->user());
+
+        if ($result['ok']) {
+            $request->session()->put('split_shipments', $result['shipments']);
+        } else {
+            $request->session()->forget('split_shipments');
+        }
+
+        return response()->json($result);
+    }
+
     public function store(Request $request)
     {
         $user = $request->user();
+
+        // 분할배송(엑셀=주문서)
+        if ($request->input('delivery_mode') === 'split') {
+            return $this->storeSplit($request, $user);
+        }
 
         $rules = [
             'receiver_name'  => ['required', 'string', 'max:50'],
@@ -143,6 +177,34 @@ class OrderController extends Controller
         }
 
         return [$coupon, $coupon->discountFor($subtotal), null];
+    }
+
+    /** 분할배송 주문 처리 (엑셀=주문서, 세션의 검증된 수령처 사용) */
+    private function storeSplit(Request $request, $user)
+    {
+        $request->validate([
+            'payment_method' => ['required', 'in:bank,toss,portone'],
+            'depositor'      => ['required_if:payment_method,bank', 'nullable', 'string', 'max:50'],
+            'bank'           => ['required_if:payment_method,bank', 'nullable', 'string', 'max:50'],
+        ]);
+
+        $shipments = $request->session()->get('split_shipments');
+        if (empty($shipments)) {
+            return redirect()->route('order.checkout')->with('error', '분할배송 엑셀을 먼저 업로드해 주세요.');
+        }
+
+        $isPg = $request->input('payment_method') !== 'bank';
+        $data = $request->only(['payment_method', 'bank', 'depositor']);
+
+        $order = app(\App\Services\OrderPlacement::class)->placeSplit($user, $shipments, $data, $isPg);
+
+        $request->session()->forget('split_shipments');
+
+        if ($isPg) {
+            return redirect()->route('order.pay', $order);
+        }
+
+        return redirect()->route('order.complete', $order)->with('ok', '분할배송 주문이 접수되었습니다.');
     }
 
     public function complete(Request $request, Order $order)

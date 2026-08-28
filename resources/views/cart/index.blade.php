@@ -57,6 +57,7 @@
             <div class="sum-row total"><span>결제예정금액</span><b>{{ number_format($summary['total']) }}원</b></div>
             <p class="muted" style="font-size:12.5px;margin:10px 0">콜드체인·지역별 배송비는 주문 후 별도 안내됩니다</p>
             <a href="{{ route('order.checkout') }}" class="btn btn-red btn-lg btn-block" style="margin-top:14px">주문하기</a>
+            <a href="{{ route('order.checkout', ['mode'=>'split']) }}" class="btn btn-ghost btn-block" style="margin-top:8px">📦 여러 주소 분할 배송(엑셀)</a>
         </div>
     </div>
 @else

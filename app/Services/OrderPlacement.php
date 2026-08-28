@@ -6,6 +6,7 @@ use App\Models\AgentBuyer;
 use App\Models\AgentCashback;
 use App\Models\Coupon;
 use App\Models\Order;
+use App\Models\Product;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -137,6 +138,78 @@ class OrderPlacement
             }
 
             $user->cartItems()->delete();
+
+            return $primary;
+        });
+    }
+
+    /**
+     * 분할배송(엑셀=주문서) — 수령처별 하위주문 생성. 대표(첫) 주문 반환.
+     * 결제 1건 = order_group_no 하나, 각 하위주문 receiver = 수령인, user_id = 원 주문자.
+     * 배송비는 수령처마다 부과(수령처의 첫 하위주문에 계상).
+     */
+    public function placeSplit(User $user, array $shipments, array $data, bool $isPg): Order
+    {
+        return DB::transaction(function () use ($user, $shipments, $data, $isPg) {
+            $groupNo = 'MSG'.now()->format('ymd').strtoupper(substr(uniqid(), -6));
+            $primary = null;
+            $idx = 0;
+
+            foreach ($shipments as $ship) {
+                $rc = $ship['receiver'];
+                // 수령처 내 셀러별 분할
+                $bySeller = [];
+                foreach ($ship['items'] as $it) {
+                    $bySeller[$it['seller_id'] ?? 0][] = $it;
+                }
+                $firstOfRecipient = true;
+
+                foreach ($bySeller as $sellerKey => $items) {
+                    $idx++;
+                    $sellerId = ((int) $sellerKey) === 0 ? null : (int) $sellerKey;
+                    $sub = array_sum(array_column($items, 'subtotal'));
+                    $ship_fee = $firstOfRecipient ? (int) $ship['shipping'] : 0; // 배송비는 수령처당 1회
+                    $total = $sub + $ship_fee;
+
+                    $order = Order::create([
+                        'order_no'       => 'MS'.now()->format('ymd').strtoupper(substr(uniqid(), -5)).'-'.$idx,
+                        'order_group_no' => $groupNo,
+                        'seller_id'      => $sellerId,
+                        'user_id'        => $user->id,
+                        'status'         => 'pending',
+                        'payment_method' => $data['payment_method'],
+                        'pay_provider'   => $isPg ? $data['payment_method'] : null,
+                        'receiver_name'  => $rc['name'],
+                        'receiver_phone' => $rc['phone'],
+                        'postcode'       => $rc['postcode'] ?: null,
+                        'address1'       => $rc['address1'],
+                        'address2'       => $rc['address2'] ?: null,
+                        'memo'           => $rc['memo'] ?: null,
+                        'subtotal'       => $sub,
+                        'shipping_fee'   => $ship_fee,
+                        'discount'       => 0,
+                        'point_used'     => 0,
+                        'total'          => $total,
+                        'bank'           => $isPg ? null : ($data['bank'] ?? null),
+                        'depositor'      => $isPg ? null : ($data['depositor'] ?? null),
+                    ]);
+                    $primary ??= $order;
+                    $firstOfRecipient = false;
+
+                    foreach ($items as $it) {
+                        $order->items()->create([
+                            'seller_id'    => $sellerId,
+                            'product_id'   => $it['product_id'],
+                            'product_name' => $it['name'],
+                            'unit'         => $it['unit_label'],
+                            'price'        => $it['unit'],
+                            'quantity'     => $it['qty'],
+                            'subtotal'     => $it['subtotal'],
+                        ]);
+                        Product::where('id', $it['product_id'])->decrement('stock', min($it['qty'], (int) Product::where('id', $it['product_id'])->value('stock')));
+                    }
+                }
+            }
 
             return $primary;
         });

@@ -66,19 +66,37 @@ function msApplyCoupon(code){var i=document.querySelector('input[name=code][form
             {{-- 배송지 --}}
             <div class="form-card">
                 <h3><x-icon name="pin"/> 배송지 정보</h3>
-                <div class="row2">
-                    <div class="field"><label>받는분 <span class="req">*</span></label><input type="text" name="receiver_name" class="input" value="{{ old('receiver_name', $user->name) }}" required></div>
-                    <div class="field"><label>연락처 <span class="req">*</span></label><input type="text" name="receiver_phone" class="input" value="{{ old('receiver_phone', $user->phone) }}" required></div>
+                <input type="hidden" name="delivery_mode" id="deliveryMode" value="single">
+                <div style="display:flex;gap:8px;margin-bottom:14px">
+                    <button type="button" class="btn btn-ghost dm-tab on" data-mode="single" style="flex:1">단일 배송</button>
+                    <button type="button" class="btn btn-ghost dm-tab" data-mode="split" style="flex:1">여러 주소 분할 배송</button>
                 </div>
-                <div class="field" style="max-width:360px"><label>우편번호</label>
-                    <div style="display:flex;gap:8px">
-                        <input type="text" name="postcode" id="postcode" class="input" value="{{ old('postcode', $user->postcode) }}" readonly placeholder="주소 찾기 클릭">
-                        <button type="button" class="btn btn-ghost" onclick="findAddr()" style="flex:none;white-space:nowrap">주소 찾기</button>
+
+                <div id="singleAddr">
+                    <div class="row2">
+                        <div class="field"><label>받는분 <span class="req">*</span></label><input type="text" name="receiver_name" class="input single-req" value="{{ old('receiver_name', $user->name) }}" required></div>
+                        <div class="field"><label>연락처 <span class="req">*</span></label><input type="text" name="receiver_phone" class="input single-req" value="{{ old('receiver_phone', $user->phone) }}" required></div>
                     </div>
+                    <div class="field" style="max-width:360px"><label>우편번호</label>
+                        <div style="display:flex;gap:8px">
+                            <input type="text" name="postcode" id="postcode" class="input" value="{{ old('postcode', $user->postcode) }}" readonly placeholder="주소 찾기 클릭">
+                            <button type="button" class="btn btn-ghost" onclick="findAddr()" style="flex:none;white-space:nowrap">주소 찾기</button>
+                        </div>
+                    </div>
+                    <div class="field"><label>주소 <span class="req">*</span></label><input type="text" name="address1" id="address1" class="input single-req" value="{{ old('address1', $user->address1) }}" placeholder="주소 찾기로 입력" required readonly></div>
+                    <div class="field"><label>상세주소</label><input type="text" name="address2" id="address2" class="input" value="{{ old('address2', $user->address2) }}" placeholder="상세 주소 (동/호수 등)"></div>
+                    <div class="field"><label>배송 메모</label><input type="text" name="memo" class="input" value="{{ old('memo') }}" placeholder="예) 부재 시 문 앞에 놓아주세요"></div>
                 </div>
-                <div class="field"><label>주소 <span class="req">*</span></label><input type="text" name="address1" id="address1" class="input" value="{{ old('address1', $user->address1) }}" placeholder="주소 찾기로 입력" required readonly></div>
-                <div class="field"><label>상세주소</label><input type="text" name="address2" id="address2" class="input" value="{{ old('address2', $user->address2) }}" placeholder="상세 주소 (동/호수 등)"></div>
-                <div class="field"><label>배송 메모</label><input type="text" name="memo" class="input" value="{{ old('memo') }}" placeholder="예) 부재 시 문 앞에 놓아주세요"></div>
+
+                <div id="splitAddr" style="display:none">
+                    <p class="muted" style="font-size:13px;margin:0 0 10px;line-height:1.7">여러 수령인에게 각각 배송합니다. 양식을 내려받아 작성 후 업로드하면 주문서가 자동으로 채워집니다.<br><b>배송비는 수령처마다 부과</b>됩니다 · 기본 3,000원(제주 5,000원) · 3박스 단위 +2,000원.</p>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+                        <a href="{{ route('order.split.template') }}" class="btn btn-ghost">📄 엑셀 양식 다운로드</a>
+                        <label class="btn btn-ghost" style="cursor:pointer;margin:0">📤 엑셀 업로드<input type="file" id="splitFile" accept=".csv,text/csv" hidden></label>
+                        <span id="splitStatus" class="muted" style="align-self:center;font-size:13px"></span>
+                    </div>
+                    <div id="splitPreview"></div>
+                </div>
             </div>
 
             {{-- 결제수단 --}}
@@ -144,11 +162,11 @@ function msApplyCoupon(code){var i=document.querySelector('input[name=code][form
                 @endif
             </div>
 
-            <div class="sum-row"><span>상품금액</span><span>{{ number_format($summary['subtotal']) }}원</span></div>
+            <div class="sum-row"><span>상품금액</span><span id="sumSubtotal" data-base="{{ (int) $summary['subtotal'] }}">{{ number_format($summary['subtotal']) }}원</span></div>
             <div class="sum-row"><span>배송기간</span><span>당일 발송 · 1~2일 소요</span></div>
             <p class="muted" style="font-size:12px;margin:2px 0 0;text-align:right">결제 완료 시 당일 발송되며, 지역에 따라 도착까지 1~2일 소요됩니다</p>
-            <div class="sum-row"><span>배송비</span><span>별도</span></div>
-            <p class="muted" style="font-size:12px;margin:2px 0 0;text-align:right">콜드체인·지역별 배송비는 주문 후 별도 안내됩니다</p>
+            <div class="sum-row"><span>배송비</span><span id="sumShipping" data-base="별도">별도</span></div>
+            <p class="muted" id="shipNote" style="font-size:12px;margin:2px 0 0;text-align:right">콜드체인·지역별 배송비는 주문 후 별도 안내됩니다</p>
             @if($couponDiscount ?? 0)
                 <div class="sum-row" style="color:var(--red)"><span>쿠폰 할인</span><span>-{{ number_format($couponDiscount) }}원</span></div>
             @endif
@@ -159,8 +177,8 @@ function msApplyCoupon(code){var i=document.querySelector('input[name=code][form
                 </div>
                 <div class="muted" style="font-size:12px;text-align:right">보유 {{ number_format($user->point) }}원</div>
             @endif
-            <div class="sum-row total"><span>최종 결제금액</span><b>{{ number_format($finalTotal) }}원</b></div>
-            <button type="submit" class="btn btn-red btn-lg btn-block" style="margin-top:14px">{{ number_format($finalTotal) }}원 결제하기</button>
+            <div class="sum-row total"><span>최종 결제금액</span><b id="sumTotal" data-base="{{ (int) $finalTotal }}">{{ number_format($finalTotal) }}원</b></div>
+            <button type="submit" id="payBtn" class="btn btn-red btn-lg btn-block" style="margin-top:14px">{{ number_format($finalTotal) }}원 결제하기</button>
             <p class="muted" style="font-size:12px;margin-top:10px">결제수단에 따라 결제창 또는 입금안내로 이동합니다.</p>
         </div>
     </div>
@@ -195,5 +213,77 @@ function pickBuyer(sel) {
     document.getElementById('buyer_biz_no').value = o.dataset.biz || '';
     document.getElementById('buyer_phone').value = o.dataset.phone || '';
 }
+
+/* ===== 분할배송 ===== */
+(function(){
+    var mode=document.getElementById('deliveryMode');
+    if(!mode) return;
+    var single=document.getElementById('singleAddr'), split=document.getElementById('splitAddr');
+    var reqs=document.querySelectorAll('.single-req');
+    var subEl=document.getElementById('sumSubtotal'), shipEl=document.getElementById('sumShipping'),
+        totEl=document.getElementById('sumTotal'), payBtn=document.getElementById('payBtn'),
+        shipNote=document.getElementById('shipNote');
+    var token=document.querySelector('#deliveryMode').closest('form').querySelector('input[name=_token]').value;
+    var splitOK=false;
+    function won(n){ return Number(n).toLocaleString('ko-KR')+'원'; }
+
+    function setMode(m){
+        mode.value=m;
+        document.querySelectorAll('.dm-tab').forEach(function(b){ b.classList.toggle('on', b.dataset.mode===m); });
+        var isSplit=m==='split';
+        single.style.display=isSplit?'none':''; split.style.display=isSplit?'':'none';
+        reqs.forEach(function(el){ if(isSplit){el.removeAttribute('required');} else {el.setAttribute('required','required');} });
+        if(!isSplit){ // 단일: 원래(장바구니) 값 복원
+            subEl.textContent=won(subEl.dataset.base); shipEl.textContent=shipEl.dataset.base;
+            totEl.textContent=won(totEl.dataset.base); payBtn.textContent=won(totEl.dataset.base)+' 결제하기';
+            shipNote.style.display=''; payBtn.disabled=false;
+        } else { // 분할: 업로드 전까지 결제 비활성
+            if(!splitOK){ payBtn.disabled=true; totEl.textContent='엑셀 업로드 필요'; payBtn.textContent='엑셀 업로드 후 결제'; }
+            shipNote.style.display='none';
+        }
+    }
+    document.querySelectorAll('.dm-tab').forEach(function(b){ b.addEventListener('click',function(){ setMode(b.dataset.mode); }); });
+    @if($splitEntry ?? false) setMode('split'); @endif
+
+    var fileInput=document.getElementById('splitFile');
+    fileInput && fileInput.addEventListener('change',function(){
+        var f=fileInput.files[0]; if(!f) return;
+        var st=document.getElementById('splitStatus'); st.textContent='업로드·검증 중...';
+        var fd=new FormData(); fd.append('file',f); fd.append('_token',token);
+        fetch(@json(route('order.split.preview')),{method:'POST',headers:{'X-CSRF-TOKEN':token,'Accept':'application/json'},body:fd})
+        .then(function(r){return r.json();}).then(function(d){ renderPreview(d); })
+        .catch(function(){ st.textContent='업로드 실패'; });
+    });
+
+    function renderPreview(d){
+        var box=document.getElementById('splitPreview'), st=document.getElementById('splitStatus');
+        var s=d.summary||{};
+        var html='';
+        if(d.errors && d.errors.length){
+            html+='<div style="background:#fff3f2;border:1px solid #ffd0cc;border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:13px;color:#c0392b">⚠ 오류 '+d.errors.length+'건<br>'+d.errors.map(function(e){return '· '+e;}).join('<br>')+'</div>';
+        }
+        html+='<div style="border:1px solid var(--slate-200,#e3e8f1);border-radius:8px;overflow:hidden">';
+        html+='<table style="width:100%;border-collapse:collapse;font-size:12.5px"><thead><tr style="background:#f6f8fc">'+
+              '<th style="padding:7px;text-align:left">받는사람</th><th style="padding:7px;text-align:left">상품</th><th style="padding:7px;text-align:right">금액</th><th style="padding:7px;text-align:right">배송비</th></tr></thead><tbody>';
+        (d.shipments||[]).forEach(function(sp){
+            var items=sp.items.map(function(i){return i.name+' × '+i.qty;}).join('<br>');
+            html+='<tr style="border-top:1px solid #eef1f6"><td style="padding:7px;vertical-align:top">'+sp.receiver.name+'<div style="color:#8a93a8">'+sp.receiver.phone+'<br>'+sp.receiver.address1+' '+(sp.receiver.address2||'')+'</div></td>'+
+                  '<td style="padding:7px;vertical-align:top">'+items+'</td><td style="padding:7px;text-align:right;vertical-align:top">'+won(sp.subtotal)+'</td>'+
+                  '<td style="padding:7px;text-align:right;vertical-align:top">'+won(sp.shipping)+'</td></tr>';
+        });
+        html+='</tbody></table></div>';
+        box.innerHTML=html;
+
+        if(d.ok){
+            splitOK=true;
+            st.textContent='✓ 수령처 '+s.recipients+'건 · 총 '+s.qty+'개';
+            subEl.textContent=won(s.subtotal); shipEl.textContent=won(s.shipping);
+            totEl.textContent=won(s.total); payBtn.textContent=won(s.total)+' 결제하기'; payBtn.disabled=false;
+        } else {
+            splitOK=false; st.textContent='오류를 수정 후 다시 업로드하세요';
+            payBtn.disabled=true; totEl.textContent='업로드 필요'; payBtn.textContent='엑셀 업로드 후 결제';
+        }
+    }
+})();
 </script>
 @endpush
