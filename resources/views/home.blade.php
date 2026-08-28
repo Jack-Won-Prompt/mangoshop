@@ -53,8 +53,8 @@
     <div class="mg-wrap">
         <div class="mg-sec-head">
             <div class="ki">NEW ARRIVAL</div>
-            <h3>새로 들어온 과일</h3>
-            <p>이번 주 새롭게 입고된 신상품</p>
+            <h3>{{ $site['home_new_title'] ?? '새로 들어온 과일' }}</h3>
+            <p>{{ $site['home_new_sub'] ?? '이번 주 새롭게 입고된 신상품' }}</p>
         </div>
         <div class="mg-grid g5">
             @foreach($newProducts->take(5) as $p)<x-product-card :product="$p"/>@endforeach

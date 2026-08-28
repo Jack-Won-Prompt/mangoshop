@@ -93,6 +93,22 @@
         </div>
     </div>
 
+    {{-- 메인화면 문구 --}}
+    <div class="adm-card">
+        <div class="h">메인화면 문구</div>
+        <div style="padding:20px">
+            <div class="afield">
+                <label>‘새로 들어온 과일’ 섹션 제목</label>
+                <input type="text" name="home_new_title" class="ainput" value="{{ old('home_new_title', $site['home_new_title'] ?? '새로 들어온 과일') }}" placeholder="예: 2026년 추석 명절 선물세트">
+            </div>
+            <div class="afield">
+                <label>‘새로 들어온 과일’ 섹션 부제</label>
+                <input type="text" name="home_new_sub" class="ainput" value="{{ old('home_new_sub', $site['home_new_sub'] ?? '') }}" placeholder="예: 명절 선물로 좋은 프리미엄 수입과일">
+            </div>
+            <div class="ahint">메인화면 상단 ‘새로 들어온 과일’ 영역의 제목·부제를 변경합니다.</div>
+        </div>
+    </div>
+
     {{-- 인기검색어 --}}
     <div class="adm-card">
         <div class="h">인기 검색어</div>

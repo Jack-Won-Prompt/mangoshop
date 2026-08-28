@@ -39,6 +39,8 @@ class SettingController extends Controller
             'banks.*.account'    => ['nullable', 'string', 'max:60'],
             'banks.*.holder'     => ['nullable', 'string', 'max:50'],
             'popular_keywords'   => ['nullable', 'string', 'max:500'],
+            'home_new_title'     => ['nullable', 'string', 'max:60'],
+            'home_new_sub'       => ['nullable', 'string', 'max:120'],
         ]);
 
         // 빈 계좌행 제거
