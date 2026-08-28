@@ -9,6 +9,9 @@
     $rate = $special ? $product->discountRateFor($sell) : 0;
     $inquiry = $product->is_quote || $sell <= 0;           // 가격문의 토글 또는 판매가 미설정
     $soldout = $product->stock <= 0;
+    // 옵션 상품: 기본 선택 옵션(재고 있는 첫 옵션) 기준으로 가격 표시
+    $defaultOpt = $product->activeOptions->first(fn ($o) => $o->stock > 0) ?? $product->activeOptions->first();
+    $initSell = $sell + (int) ($defaultOpt->extra_price ?? 0);
 @endphp
 
 @section('content')
@@ -72,7 +75,7 @@
                 @endif
                 <div class="row" style="align-items:flex-end">
                     <span class="lbl">{{ $special ? '도매 전용가' : '판매가' }}</span>
-                    <span class="big-price"><span id="sellNum" data-base="{{ (int) $sell }}">{{ number_format($sell) }}</span><span class="won">원</span></span>
+                    <span class="big-price"><span id="sellNum" data-base="{{ (int) $sell }}">{{ number_format($initSell) }}</span><span class="won">원</span></span>
                 </div>
                 @if($special)
                     <div style="text-align:right;margin-top:6px"><span class="mtag"><x-icon name="check" :size="14"/> {{ $user->company_name ?? '도매' }} 전용가 적용중 ({{ $rate }}%↓)</span></div>
@@ -102,11 +105,10 @@
                         <div style="margin-bottom:14px">
                             <label style="font-weight:600;font-size:14px;display:block;margin-bottom:6px">옵션 선택 <span style="color:#e0322d">*</span></label>
                             <select name="option_id" id="optSelect" required style="width:100%;padding:11px 12px;border:1px solid var(--slate-200,#e3e8f1);border-radius:9px;font-size:14px;background:#fff">
-                                <option value="">- 옵션을 선택하세요 -</option>
                                 @foreach($product->activeOptions->groupBy('group_name') as $gname => $opts)
                                     @if($gname)<optgroup label="{{ $gname }}">@endif
                                     @foreach($opts as $o)
-                                        <option value="{{ $o->id }}" data-extra="{{ (int) $o->extra_price }}" {{ $o->stock<=0 ? 'disabled' : '' }}>{{ $o->label }}{{ $o->stock<=0 ? ' (품절)' : '' }}</option>
+                                        <option value="{{ $o->id }}" data-extra="{{ (int) $o->extra_price }}" {{ $o->stock<=0 ? 'disabled' : '' }} {{ ($defaultOpt && $defaultOpt->id === $o->id) ? 'selected' : '' }}>{{ $o->label }}{{ $o->stock<=0 ? ' (품절)' : '' }}</option>
                                     @endforeach
                                     @if($gname)</optgroup>@endif
                                 @endforeach
