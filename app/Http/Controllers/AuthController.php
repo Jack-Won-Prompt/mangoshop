@@ -62,8 +62,15 @@ class AuthController extends Controller
             'company_name' => ['required_if:member_type,business', 'nullable', 'string', 'max:100'],
             'biz_no'       => ['required_if:member_type,business', 'nullable', 'string', 'max:20'],
             'biz_type'     => ['nullable', 'string', 'max:50'],
-            'agree'        => ['accepted'],
+            'agree_terms'     => ['accepted'],
+            'agree_privacy'   => ['accepted'],
+            'agree_marketing' => ['nullable', 'boolean'],
+        ], [
+            'agree_terms.accepted'   => '이용약관에 동의해 주세요.',
+            'agree_privacy.accepted' => '개인정보 수집·이용에 동의해 주세요.',
         ]);
+
+        $marketing = $request->boolean('agree_marketing');
 
         $isBusiness = $data['member_type'] === 'business';
         $signupPoint = config('site.signup_point', 0);
@@ -79,6 +86,8 @@ class AuthController extends Controller
             'biz_type'     => $isBusiness ? ($data['biz_type'] ?? null) : null,
             'biz_status'   => $isBusiness ? 'pending' : 'none',
             'point'        => $signupPoint,
+            'marketing_agree'     => $marketing,
+            'marketing_agreed_at' => $marketing ? now() : null,
         ]);
 
         // 가입 적립금 로그

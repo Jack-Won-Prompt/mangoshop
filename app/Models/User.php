@@ -17,6 +17,7 @@ class User extends Authenticatable
         'member_type', 'phone', 'postcode', 'address1', 'address2',
         'company_name', 'biz_no', 'biz_type', 'biz_status', 'grade',
         'point', 'is_admin', 'is_agent', 'cashback_rate', 'withdrawn_at',
+        'marketing_agree', 'marketing_agreed_at',
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -30,6 +31,8 @@ class User extends Authenticatable
             'is_agent'          => 'boolean',
             'cashback_rate'     => 'decimal:2',
             'withdrawn_at'      => 'datetime',
+            'marketing_agree'   => 'boolean',
+            'marketing_agreed_at' => 'datetime',
         ];
     }
 
