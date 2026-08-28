@@ -90,7 +90,7 @@
             <p>도매회원 승인 후 도매 전용가와 수량구간 대량할인으로 만나보세요</p>
         </div>
         <div class="mg-grid g5">
-            @foreach($featuredProducts->take(5) as $p)<x-product-card :product="$p"/>@endforeach
+            @foreach($dealProducts->take(5) as $p)<x-product-card :product="$p"/>@endforeach
         </div>
         <div class="mg-sec-more"><a href="{{ route('catalog.index', ['grade' => 'wholesale']) }}" class="mg-btn pri" style="padding:12px 28px">사업자 전용몰 <x-icon name="arrow-right" :size="15"/></a></div>
     </div>
