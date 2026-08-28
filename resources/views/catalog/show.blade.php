@@ -124,27 +124,38 @@
                             <button type="button" data-inc><x-icon name="plus" :size="16"/></button>
                         </div>
                     </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:12px;border-top:1px solid var(--slate-100,#eef1f6)">
+                        <span style="font-weight:700;font-size:15px">총 주문금액</span>
+                        <b id="orderTotal" style="font-size:22px;color:var(--red,#e0322d)">{{ number_format($initSell) }}원</b>
+                    </div>
                     <div class="buy-actions">
                         <button type="submit" class="btn btn-ghost btn-lg"><x-icon name="cart"/> 장바구니</button>
                         <button type="submit" name="buy_now" value="1" class="btn btn-red btn-lg">바로 구매</button>
                     </div>
                 </form>
-                @if($product->activeOptions->count())
                 <script>
                 (function(){
-                    var sel=document.getElementById('optSelect'), num=document.getElementById('sellNum');
-                    if(!sel||!num)return;
-                    function sync(){
-                        var o=sel.options[sel.selectedIndex]||null;
-                        var p=o?parseInt(o.getAttribute('data-price')||'0',10):0;
-                        num.textContent=(isNaN(p)?0:p).toLocaleString('ko-KR');
+                    var num=document.getElementById('sellNum');          // 단위 판매가
+                    var totalEl=document.getElementById('orderTotal');    // 총 주문금액
+                    var qtyEl=document.querySelector('input[name=quantity]');
+                    var sel=document.getElementById('optSelect');         // 옵션(있을 수도)
+                    var base={{ (int) $sell }};
+                    function unit(){
+                        if(sel){ var o=sel.options[sel.selectedIndex]; return o?(parseInt(o.getAttribute('data-price')||'0',10)||0):0; }
+                        return base;
                     }
-                    sel.addEventListener('change',sync);
-                    sel.addEventListener('input',sync);
-                    sync();
+                    function recalc(){
+                        var u=unit();
+                        if(num) num.textContent=u.toLocaleString('ko-KR');
+                        var q=Math.max(1, parseInt((qtyEl&&qtyEl.value)||'1',10)||1);
+                        if(totalEl) totalEl.textContent=(u*q).toLocaleString('ko-KR')+'원';
+                    }
+                    if(sel){ sel.addEventListener('change',recalc); sel.addEventListener('input',recalc); }
+                    if(qtyEl){ qtyEl.addEventListener('input',recalc); qtyEl.addEventListener('change',recalc); }
+                    document.querySelectorAll('.qty [data-inc], .qty [data-dec]').forEach(function(b){ b.addEventListener('click',function(){ setTimeout(recalc,0); }); });
+                    recalc();
                 })();
                 </script>
-                @endif
                 @php($inWish = in_array($product->id, $wishlistIds ?? []))
                 <form method="POST" action="{{ route('wishlist.toggle', $product) }}" style="margin-top:10px">
                     @csrf
