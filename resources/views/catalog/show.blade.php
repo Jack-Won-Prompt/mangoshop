@@ -87,7 +87,7 @@
                 @endif
                 @endif
                 <div class="row"><span class="lbl">배송비</span><span>{{ $sell >= $site['free_ship_over'] ? '무료배송' : number_format($site['shipping_fee']).'원 (5만원 이상 무료)' }}</span></div>
-                <div class="row"><span class="lbl">재고</span><span>{{ $soldout ? '품절' : number_format($product->stock).$product->unit }}</span></div>
+                @if($soldout)<div class="row"><span class="lbl">재고</span><span style="color:var(--red)">품절</span></div>@endif
             </div>
 
             @if($inquiry)
