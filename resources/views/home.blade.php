@@ -47,7 +47,23 @@
     </div>
 </div>
 
-{{-- ===== 3. 이달의 베스트 ===== --}}
+{{-- ===== 3. 새로 들어온 과일 (베스트 위로 이동) ===== --}}
+@if($newProducts->count())
+<section class="mg-section">
+    <div class="mg-wrap">
+        <div class="mg-sec-head">
+            <div class="ki">NEW ARRIVAL</div>
+            <h3>새로 들어온 과일</h3>
+            <p>이번 주 새롭게 입고된 신상품</p>
+        </div>
+        <div class="mg-grid g5">
+            @foreach($newProducts->take(5) as $p)<x-product-card :product="$p"/>@endforeach
+        </div>
+    </div>
+</section>
+@endif
+
+{{-- ===== 4. 이달의 베스트 ===== --}}
 @if($bestProducts->count())
 <section class="mg-section">
     <div class="mg-wrap">
@@ -112,22 +128,6 @@
         </div>
     </div>
 </section>
-
-{{-- ===== 5. 신상품 ===== --}}
-@if($newProducts->count())
-<section class="mg-section">
-    <div class="mg-wrap">
-        <div class="mg-sec-head">
-            <div class="ki">NEW ARRIVAL</div>
-            <h3>새로 들어온 과일</h3>
-            <p>이번 주 새롭게 입고된 신상품</p>
-        </div>
-        <div class="mg-grid g5">
-            @foreach($newProducts->take(5) as $p)<x-product-card :product="$p"/>@endforeach
-        </div>
-    </div>
-</section>
-@endif
 
 {{-- ===== 6. 입점 수입사 섹션은 요청에 따라 숨김 ===== --}}
 
