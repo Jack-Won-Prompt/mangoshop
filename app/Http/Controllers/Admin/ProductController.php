@@ -97,6 +97,38 @@ class ProductController extends Controller
         return redirect()->route('admin.products.index')->with('ok', '상품이 삭제되었습니다.');
     }
 
+    /** 대표이미지 편집 화면(회전·밝기·대비·자르기) */
+    public function editImage(Product $product)
+    {
+        abort_unless($product->thumbnail, 404, '대표 이미지가 없습니다.');
+
+        return view('admin.products.image-editor', ['product' => $product]);
+    }
+
+    /** 편집본(base64 dataURL) 저장 → 대표이미지 갱신 */
+    public function saveImage(Request $request, Product $product)
+    {
+        $data = (string) $request->input('image', '');
+        if (! preg_match('/^data:image\/(png|jpeg|jpg|webp);base64,/', $data, $m)) {
+            return back()->withErrors(['image' => '이미지 데이터가 올바르지 않습니다.']);
+        }
+        $ext = $m[1] === 'jpeg' ? 'jpg' : $m[1];
+        $bin = base64_decode(substr($data, strpos($data, ',') + 1), true);
+        if ($bin === false || strlen($bin) < 100) {
+            return back()->withErrors(['image' => '이미지 저장에 실패했습니다.']);
+        }
+        $dir = public_path('product/uploads');
+        if (! is_dir($dir)) {
+            @mkdir($dir, 0775, true);
+        }
+        $name = 'edit_'.now()->format('Ymd_His').'_'.Str::lower(Str::random(5)).'.'.$ext;
+        file_put_contents($dir.'/'.$name, $bin);
+
+        $product->update(['thumbnail' => 'product/uploads/'.$name]);
+
+        return redirect()->route('admin.products.edit', $product)->with('ok', '대표 이미지가 편집·저장되었습니다.');
+    }
+
     /** 리치에디터 이미지 업로드(AJAX) → {url} */
     public function editorUpload(Request $request)
     {

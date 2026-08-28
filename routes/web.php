@@ -150,6 +150,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/products/create', [\App\Http\Controllers\Admin\ProductController::class, 'create'])->name('products.create');
     Route::post('/products', [\App\Http\Controllers\Admin\ProductController::class, 'store'])->name('products.store');
     Route::post('/products/editor-upload', [\App\Http\Controllers\Admin\ProductController::class, 'editorUpload'])->name('products.editor.upload');
+    Route::get('/products/{product}/image', [\App\Http\Controllers\Admin\ProductController::class, 'editImage'])->name('products.image');
+    Route::post('/products/{product}/image', [\App\Http\Controllers\Admin\ProductController::class, 'saveImage'])->name('products.image.save');
     Route::get('/products/{product}/edit', [\App\Http\Controllers\Admin\ProductController::class, 'edit'])->name('products.edit');
     Route::put('/products/{product}', [\App\Http\Controllers\Admin\ProductController::class, 'update'])->name('products.update');
     Route::delete('/products/{product}', [\App\Http\Controllers\Admin\ProductController::class, 'destroy'])->name('products.destroy');

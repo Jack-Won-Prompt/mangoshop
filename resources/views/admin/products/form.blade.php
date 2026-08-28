@@ -124,6 +124,9 @@
                     </div>
                     <input type="file" name="thumbnail" accept="image/*" class="ainput" style="padding:8px" onchange="prev(this,'mainPrev','mainPh')">
                 </div>
+                @if($product->exists && $product->thumbnail)
+                    <a href="{{ route('admin.products.image', $product) }}" class="abtn abtn-ghost abtn-sm" style="margin-top:10px">✂ 이미지 편집(회전·자르기·밝기)</a>
+                @endif
             </div></div>
 
             <div class="adm-card"><div class="h">갤러리 이미지</div><div style="padding:20px">
