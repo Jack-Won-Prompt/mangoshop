@@ -145,6 +145,15 @@ Route::view('/account-deletion', 'legal.account-deletion')->name('legal.account-
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
+    // 상품 관리 (전용 — 리치에디터·갤러리/상세이미지·옵션·메인이미지 에디터) ※ 제네릭 CRUD보다 먼저
+    Route::get('/products', [\App\Http\Controllers\Admin\ProductController::class, 'index'])->name('products.index');
+    Route::get('/products/create', [\App\Http\Controllers\Admin\ProductController::class, 'create'])->name('products.create');
+    Route::post('/products', [\App\Http\Controllers\Admin\ProductController::class, 'store'])->name('products.store');
+    Route::post('/products/editor-upload', [\App\Http\Controllers\Admin\ProductController::class, 'editorUpload'])->name('products.editor.upload');
+    Route::get('/products/{product}/edit', [\App\Http\Controllers\Admin\ProductController::class, 'edit'])->name('products.edit');
+    Route::put('/products/{product}', [\App\Http\Controllers\Admin\ProductController::class, 'update'])->name('products.update');
+    Route::delete('/products/{product}', [\App\Http\Controllers\Admin\ProductController::class, 'destroy'])->name('products.destroy');
+
     // 상품 이미지 자동검색(수입과일몰+네이버) + 확인 후 다운로드
     Route::get('/products/{product}/image-search', [\App\Http\Controllers\Admin\ProductImageController::class, 'search'])->name('products.imagesearch');
     Route::post('/products/{product}/image-fetch', [\App\Http\Controllers\Admin\ProductImageController::class, 'fetch'])->name('products.imagefetch');

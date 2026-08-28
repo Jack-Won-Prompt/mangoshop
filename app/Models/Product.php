@@ -51,6 +51,33 @@ class Product extends Model
         return $this->belongsTo(Brand::class);
     }
 
+    /** 상품 이미지(갤러리+상세) */
+    public function productImages()
+    {
+        return $this->hasMany(ProductImage::class)->orderBy('sort')->orderBy('id');
+    }
+
+    public function galleryImages()
+    {
+        return $this->hasMany(ProductImage::class)->where('type', 'gallery')->orderBy('sort')->orderBy('id');
+    }
+
+    public function detailImages()
+    {
+        return $this->hasMany(ProductImage::class)->where('type', 'detail')->orderBy('sort')->orderBy('id');
+    }
+
+    /** 상품 옵션(단일레벨) */
+    public function options()
+    {
+        return $this->hasMany(ProductOption::class)->orderBy('sort')->orderBy('id');
+    }
+
+    public function activeOptions()
+    {
+        return $this->options()->where('is_active', true);
+    }
+
     public function restockAlerts()
     {
         return $this->hasMany(RestockAlert::class);
