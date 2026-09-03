@@ -27,13 +27,6 @@
             <span>·</span>
             <a href="{{ route('community.qna') }}">고객센터 문의</a>
         </div>
-
-        <div style="margin-top:20px;padding:14px;background:var(--slate-50);border-radius:10px;font-size:12.5px;color:var(--slate-500);line-height:1.8">
-            <b>체험 계정</b><br>
-            소매회원 user@test.com / test1234<br>
-            도매(승인) buyer@test.com / test1234<br>
-            관리자 admin@mangoshop.co.kr / mango!2026
-        </div>
     </div>
 </div>
 @endsection
