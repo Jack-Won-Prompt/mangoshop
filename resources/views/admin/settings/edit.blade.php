@@ -109,6 +109,20 @@
         </div>
     </div>
 
+    {{-- 고객 문의 알림 이메일 --}}
+    <div class="adm-card">
+        <div class="h">고객 문의 알림 이메일</div>
+        <div style="padding:20px">
+            <div class="ahint" style="margin-bottom:10px">고객이 <b>문의하기</b>를 등록하면 아래 이메일로 문의 내용이 전송됩니다. (최대 3개)</div>
+            @php($iemails = old('inquiry_emails', $site['inquiry_emails'] ?? []))
+            @for($i = 0; $i < 3; $i++)
+                <div class="afield"><label>알림 이메일 {{ $i + 1 }}</label>
+                    <input type="email" name="inquiry_emails[]" class="ainput" value="{{ $iemails[$i] ?? '' }}" placeholder="예: cs@mangoshop.co.kr">
+                </div>
+            @endfor
+        </div>
+    </div>
+
     {{-- 인기검색어 --}}
     <div class="adm-card">
         <div class="h">인기 검색어</div>

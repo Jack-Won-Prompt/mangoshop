@@ -64,11 +64,21 @@ class CommunityController extends Controller
             'is_secret' => ['nullable', 'boolean'],
         ]);
 
-        Inquiry::create($data + [
+        $inquiry = Inquiry::create($data + [
             'user_id'   => $request->user()?->id,
             'is_secret' => $request->boolean('is_secret'),
             'status'    => 'pending',
         ]);
+
+        // 관리자 알림 이메일 발송(설정된 수신자에게). 실패해도 접수는 유지.
+        $emails = array_values(array_filter((array) config('site.inquiry_emails', [])));
+        if ($emails) {
+            try {
+                \Illuminate\Support\Facades\Mail::to($emails)->send(new \App\Mail\InquiryNotifyMail($inquiry));
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
 
         return redirect()->route('community.qna')->with('ok', '문의가 접수되었습니다. 빠르게 답변드리겠습니다.');
     }

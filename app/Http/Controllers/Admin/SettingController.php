@@ -41,6 +41,8 @@ class SettingController extends Controller
             'popular_keywords'   => ['nullable', 'string', 'max:500'],
             'home_new_title'     => ['nullable', 'string', 'max:60'],
             'home_new_sub'       => ['nullable', 'string', 'max:120'],
+            'inquiry_emails'     => ['nullable', 'array'],
+            'inquiry_emails.*'   => ['nullable', 'email', 'max:100'],
         ]);
 
         // 빈 계좌행 제거
@@ -56,9 +58,14 @@ class SettingController extends Controller
         $keywords = collect(explode(',', (string) $request->input('popular_keywords', '')))
             ->map(fn ($k) => trim($k))->filter()->values()->all();
 
-        $site = array_merge(config('site'), array_diff_key($data, array_flip(['banks', 'popular_keywords'])), [
+        // 문의 알림 이메일 — 빈 값 제거·중복 제거(최대 3)
+        $inquiryEmails = collect($request->input('inquiry_emails', []))
+            ->map(fn ($e) => trim((string) $e))->filter()->unique()->take(3)->values()->all();
+
+        $site = array_merge(config('site'), array_diff_key($data, array_flip(['banks', 'popular_keywords', 'inquiry_emails'])), [
             'banks'            => $banks,
             'popular_keywords' => $keywords,
+            'inquiry_emails'   => $inquiryEmails,
         ]);
 
         Setting::put('site', $site);
