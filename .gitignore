@@ -33,3 +33,5 @@ yarn-error.log
 /public/product/uploads
 /네이버
 /선물용 상품 이미지
+/mangoshop-24fb8-firebase-adminsdk-fbsvc-a719e5f372.json
+storage/app/fcm-service-account.json
