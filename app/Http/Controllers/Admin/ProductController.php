@@ -56,6 +56,7 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
+        $this->extractInlineImages($request); // 붙여넣기 base64 → 파일화(검증 전)
         $data = $this->validated($request);
         $product = new Product();
         $this->fill($product, $data, $request);
@@ -76,6 +77,7 @@ class ProductController extends Controller
 
     public function update(Request $request, Product $product)
     {
+        $this->extractInlineImages($request); // 붙여넣기 base64 → 파일화(검증 전)
         $data = $this->validated($request);
         $this->fill($product, $data, $request);
         $product->save();
@@ -285,6 +287,45 @@ class ProductController extends Controller
         $file->move($dir, $name);
 
         return '/product/uploads'.($sub ? '/'.$sub : '').'/'.$name;
+    }
+
+    /**
+     * 상세설명에 인라인으로 붙여넣은 base64 이미지(data:image/...)를 파일로 저장하고
+     * src 를 정적 URL 로 치환한다. 검증(max:500000자) 이전에 실행하여 본문 크기 폭증을 막는다.
+     * 클라이언트 붙여넣기 핸들러가 놓친 경우(브라우저/출처별 차이)까지 서버에서 처리.
+     */
+    private function extractInlineImages(Request $request): void
+    {
+        $html = (string) $request->input('description', '');
+        if (stripos($html, 'data:image/') === false) {
+            return;
+        }
+
+        $ext = ['png' => 'png', 'jpeg' => 'jpg', 'jpg' => 'jpg', 'gif' => 'gif', 'webp' => 'webp'];
+        $dir = public_path('product/uploads/editor');
+        if (! is_dir($dir)) {
+            @mkdir($dir, 0775, true);
+        }
+
+        $html = preg_replace_callback(
+            '#data:image/(png|jpe?g|gif|webp);base64,([A-Za-z0-9+/=\s]+)#i',
+            function ($m) use ($ext, $dir) {
+                $type = strtolower($m[1]);
+                $bin = base64_decode(preg_replace('/\s+/', '', $m[2]), true);
+                if ($bin === false || $bin === '') {
+                    return $m[0]; // 디코드 실패 시 원본 유지
+                }
+                $name = now()->format('Ymd_His').'_'.Str::lower(Str::random(8)).'.'.($ext[$type] ?? 'png');
+                if (@file_put_contents($dir.'/'.$name, $bin) === false) {
+                    return $m[0]; // 저장 실패 시 원본 유지
+                }
+
+                return asset('product/uploads/editor/'.$name);
+            },
+            $html
+        );
+
+        $request->merge(['description' => $html]);
     }
 
     private function uniqueSlug(string $base, ?int $ignoreId = null): string
