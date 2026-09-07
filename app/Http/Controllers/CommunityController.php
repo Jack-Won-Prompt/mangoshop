@@ -80,6 +80,21 @@ class CommunityController extends Controller
             }
         }
 
+        // 관리자 앱 FCM 푸시 알림(미설정/토큰없음 시 자동 무시)
+        try {
+            $adminIds = \App\Models\User::where('is_admin', true)->pluck('id');
+            if ($adminIds->isNotEmpty()) {
+                app(\App\Services\FcmService::class)->sendToUsers(
+                    $adminIds,
+                    '새 고객문의',
+                    (\App\Models\Inquiry::TYPES[$inquiry->type] ?? $inquiry->type).' · '.$inquiry->subject,
+                    ['type' => 'inquiry', 'inquiry_id' => $inquiry->id],
+                );
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
         return redirect()->route('community.qna')->with('ok', '문의가 접수되었습니다. 빠르게 답변드리겠습니다.');
     }
 }
