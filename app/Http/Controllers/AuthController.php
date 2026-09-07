@@ -97,6 +97,13 @@ class AuthController extends Controller
             ]);
         }
 
+        // 관리자 앱 FCM 알림
+        \App\Support\AdminPush::toAdmins(
+            '🙋 새 회원가입',
+            $user->name.' · '.($isBusiness ? '사업자'.($user->company_name ? '('.$user->company_name.')' : '') : '일반').' · '.$user->email,
+            ['type' => 'member_join', 'user_id' => (string) $user->id],
+        );
+
         Auth::login($user);
 
         $msg = $isBusiness
