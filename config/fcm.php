@@ -11,4 +11,18 @@ return [
 
     // 발송 비활성화(키 미설정 시 자동 skip). true 로 강제 비활성 가능.
     'disabled' => env('FCM_DISABLED', false),
+
+    // 웹 푸시(브라우저) — Firebase 콘솔 → Cloud Messaging → 웹 구성 → 웹 푸시 인증서 '키 쌍'
+    'vapid_key' => env('FCM_VAPID_KEY'),
+
+    // 웹 푸시 클라이언트 초기화용 Firebase 웹 앱 구성
+    // Firebase 콘솔 → 프로젝트 설정 → 일반 → 내 앱(웹) → SDK 설정 및 구성
+    'web' => [
+        'apiKey'            => env('FCM_WEB_API_KEY'),
+        'authDomain'        => env('FCM_WEB_AUTH_DOMAIN'),
+        'projectId'         => env('FCM_PROJECT_ID'),
+        'storageBucket'     => env('FCM_WEB_STORAGE_BUCKET'),
+        'messagingSenderId' => env('FCM_WEB_SENDER_ID'),
+        'appId'             => env('FCM_WEB_APP_ID'),
+    ],
 ];
