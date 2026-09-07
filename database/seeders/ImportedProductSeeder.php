@@ -140,7 +140,7 @@ class ImportedProductSeeder extends Seeder
   · <b>선물가방 또는 보자기 포장</b> 선택 시 <b>2,500원</b>이 추가됩니다.<br>
   · 생물 특성상 개체별 크기·무게 및 포장 개수는 다소 달라질 수 있습니다.
 </div>
-  <img src="images/giftset/orchard/detail-packaging.jpg" alt="마음을 전하는 신선한 망고 선물 · 포장 안내" style="width:100%;height:auto;display:block;border-radius:10px;margin:10px 0">
+  <img src="images/giftset/orchard/brochure-goldmango.jpg" alt="프리미엄 골드망고 선물세트 상세 안내" style="width:100%;height:auto;display:block;border-radius:10px;margin:10px 0">
 </div>',
     'origin' => '수입산',
     'variety' => '골드망고',
