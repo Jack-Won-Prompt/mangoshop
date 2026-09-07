@@ -38,6 +38,35 @@ class OrderNotifier
         }
     }
 
+    /**
+     * 결제완료 시 관리자 앱으로 FCM 푸시 — 결제(묶음) 1건당 1회.
+     * 대표(첫) 하위주문에서만 호출되며, 금액/건수는 그룹 전체 기준.
+     */
+    public function pushPaidToAdmins(Order $order): void
+    {
+        try {
+            $adminIds = \App\Models\User::where('is_admin', true)->pluck('id');
+            if ($adminIds->isEmpty()) {
+                return;
+            }
+
+            $items  = $order->groupOrders()->with('items')->get()->flatMap->items;
+            $first  = $items->first();
+            $label  = ($first?->product_name ?? '상품');
+            $label  = Str::limit($label, 20).($items->count() > 1 ? ' 외 '.($items->count() - 1).'건' : '');
+            $amount = (int) $order->groupTotal();
+
+            app(\App\Services\FcmService::class)->sendToUsers(
+                $adminIds,
+                '🛒 새 결제 완료',
+                $label.' · '.number_format($amount).'원 · '.$order->order_no,
+                ['type' => 'order_paid', 'order_no' => (string) $order->order_no, 'order_id' => (string) $order->id],
+            );
+        } catch (\Throwable $e) {
+            report($e);
+        }
+    }
+
     /** 발송(송장 등록) 시 구매자에게 SMS. */
     public function onShipped(Order $order): void
     {

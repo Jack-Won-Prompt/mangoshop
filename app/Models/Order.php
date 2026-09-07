@@ -182,6 +182,11 @@ class Order extends Model
 
         // 판매자에게 주문서 이메일 + SMS (결제완료 1회). 실패해도 결제 흐름 유지.
         app(\App\Services\OrderNotifier::class)->onPaid($this);
+
+        // 관리자 앱 FCM — 결제(묶음) 1건당 1회(대표 하위주문에서만; 하위주문 order_no 는 '-N' 접미사)
+        if (! str_contains((string) $this->order_no, '-')) {
+            app(\App\Services\OrderNotifier::class)->pushPaidToAdmins($this);
+        }
     }
 
     /** 셀러 정산건 생성 — 입점 수입사 주문에 한함, 1회만(본사 직접판매는 정산 없음) */
