@@ -77,8 +77,9 @@ class CartController extends Controller
         foreach ($items as $i) {
             $subtotal += $i->unitPrice($user) * $i->quantity;
         }
-        // 배송비 별도 — 콜드체인·수입사/지역별로 상이하여 주문 후 별도 정산(결제금액 미포함)
-        $shipping = 0;
+        // 배송비: 배송 건당 고정 3,000원(제주 5,000원). 장바구니 단계엔 주소가 없어 기본요금으로 표시,
+        // 제주 등 실제 요금은 주문 시 배송지 기준으로 확정된다.
+        $shipping = $items->isEmpty() ? 0 : (int) config('site.shipping_fee', 3000);
 
         return [
             'subtotal' => $subtotal,

@@ -32,10 +32,8 @@ return [
 
     // 배송비 정책 (플랫폼 기본값 — 수입사별 정책이 우선)
     'free_ship_over' => 50000,
-    'shipping_fee'      => 3000,   // 기본 배송비
-    'shipping_fee_jeju' => 5000,   // 제주(우편번호 63xxx)
-    'shipping_box_unit'  => 3,     // N박스 단위마다
-    'shipping_box_extra' => 2000,  // 추가 배송비
+    'shipping_fee'      => 3000,   // 배송 건당 기본 배송비
+    'shipping_fee_jeju' => 5000,   // 제주(우편번호 63xxx) 배송 건당
 
     // 가입 적립금 / 구매 적립률(%)
     'signup_point'   => 3000,

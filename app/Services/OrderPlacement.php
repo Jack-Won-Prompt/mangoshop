@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 /**
  * 체크아웃 → 셀러별 하위주문 분할 생성(①: 결제묶음 + 셀러별 하위주문).
  *  - 같은 결제 1건을 order_group_no 로 묶고, 판매자별 Order 를 생성.
- *  - 배송비는 0(주문 후 별도 정산)이라 금액 배분은 상품합계 비례로 단순.
+ *  - 배송비는 배송 1건(한 주소)당 고정 3,000원(제주 5,000원)을 대표 하위주문에 계상.
  *  - 쿠폰할인/적립금 사용은 그룹 단위 → 하위주문에 비례 배분(잔여는 대표주문).
  *  - 대표(첫) 주문을 반환 → 결제/완료 라우트의 앵커로 사용.
  */
@@ -33,7 +33,10 @@ class OrderPlacement
         $discAlloc = $this->allocate($couponDiscount, $subtotals, $grand, $keys);
         $pointAlloc = $this->allocate($pointUsed, $subtotals, $grand, $keys);
 
-        return DB::transaction(function () use ($user, $groups, $data, $isPg, $coupon, $couponDiscount, $pointUsed, $isAgent, $subtotals, $discAlloc, $pointAlloc, $keys) {
+        // 배송비: 배송 1건(한 주소)당 고정 3,000원(제주 5,000원) — 대표 하위주문에 1회 계상
+        $shipping = \App\Support\Shipping::fee(1, $data['postcode'] ?? null, $data['address1'] ?? null);
+
+        return DB::transaction(function () use ($user, $groups, $data, $isPg, $coupon, $couponDiscount, $pointUsed, $isAgent, $subtotals, $discAlloc, $pointAlloc, $keys, $shipping) {
             $groupNo = 'MSG'.now()->format('ymd').strtoupper(substr(uniqid(), -6));
             $primary = null;
             $idx = 0;
@@ -46,6 +49,10 @@ class OrderPlacement
                 $point = (int) $pointAlloc[$key];
                 $total = max(0, $sub - $disc - $point);
                 $cashback = $isAgent ? (int) round($total * ((float) $user->cashback_rate) / 100) : 0;
+
+                // 배송비는 대표(첫) 하위주문에만 1회 계상 (배송 건당 고정요금)
+                $shipFee = ($idx === 1) ? $shipping : 0;
+                $total += $shipFee;
 
                 $order = Order::create([
                     'order_no'        => 'MS'.now()->format('ymd').strtoupper(substr(uniqid(), -5)).($idx > 1 ? '-'.$idx : ''),
@@ -67,7 +74,7 @@ class OrderPlacement
                     'address2'        => $data['address2'] ?? null,
                     'memo'            => $data['memo'] ?? null,
                     'subtotal'        => $sub,
-                    'shipping_fee'    => 0,
+                    'shipping_fee'    => $shipFee,
                     'discount'        => $disc,
                     'coupon_id'       => $coupon?->id,
                     'coupon_code'     => $coupon?->code,

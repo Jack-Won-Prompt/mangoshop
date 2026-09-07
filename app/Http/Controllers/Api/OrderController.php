@@ -120,9 +120,11 @@ class OrderController extends Controller
 
         $pointCap  = max(0, $summary['subtotal'] - $couponDiscount);
         $pointUsed = min((int) ($data['point_used'] ?? 0), $user->point, $pointCap);
-        $total     = max(0, $summary['subtotal'] + $summary['shipping'] - $couponDiscount - $pointUsed);
+        // 배송비: 배송 건당 3,000원(제주 5,000원) — 배송지 기준 확정
+        $shipping  = \App\Support\Shipping::fee(1, $data['postcode'] ?? null, $data['address1'] ?? null);
+        $total     = max(0, $summary['subtotal'] + $shipping - $couponDiscount - $pointUsed);
 
-        $order = DB::transaction(function () use ($user, $items, $summary, $data, $pointUsed, $isPg, $coupon, $couponDiscount, $total) {
+        $order = DB::transaction(function () use ($user, $items, $summary, $data, $pointUsed, $isPg, $coupon, $couponDiscount, $total, $shipping) {
             $order = Order::create([
                 'order_no'       => 'MS'.now()->format('ymd').strtoupper(substr(uniqid(), -5)),
                 'user_id'        => $user->id,
@@ -136,7 +138,7 @@ class OrderController extends Controller
                 'address2'       => $data['address2'] ?? null,
                 'memo'           => $data['memo'] ?? null,
                 'subtotal'       => $summary['subtotal'],
-                'shipping_fee'   => $summary['shipping'],
+                'shipping_fee'   => $shipping,
                 'discount'       => $couponDiscount,
                 'coupon_id'      => $coupon?->id,
                 'coupon_code'    => $coupon?->code,

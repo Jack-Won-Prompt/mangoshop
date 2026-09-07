@@ -89,7 +89,7 @@ function msApplyCoupon(code){var i=document.querySelector('input[name=code][form
                 </div>
 
                 <div id="splitAddr" style="display:none">
-                    <p class="muted" style="font-size:13px;margin:0 0 10px;line-height:1.7">여러 수령인에게 각각 배송합니다. 양식을 내려받아 작성 후 업로드하면 주문서가 자동으로 채워집니다.<br><b>배송비는 수령처마다 부과</b>됩니다 · 기본 3,000원(제주 5,000원) · 3박스 단위 +2,000원.</p>
+                    <p class="muted" style="font-size:13px;margin:0 0 10px;line-height:1.7">여러 수령인에게 각각 배송합니다. 양식을 내려받아 작성 후 업로드하면 주문서가 자동으로 채워집니다.<br><b>배송비는 수령처마다 부과</b>됩니다 · 건당 3,000원(제주 5,000원).</p>
                     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
                         <a href="{{ route('order.split.template') }}" class="btn btn-ghost">📄 엑셀 양식 다운로드</a>
                         <label class="btn btn-ghost" style="cursor:pointer;margin:0">📤 엑셀 업로드<input type="file" id="splitFile" accept=".csv,text/csv" hidden></label>
@@ -165,8 +165,8 @@ function msApplyCoupon(code){var i=document.querySelector('input[name=code][form
             <div class="sum-row"><span>상품금액</span><span id="sumSubtotal" data-base="{{ (int) $summary['subtotal'] }}">{{ number_format($summary['subtotal']) }}원</span></div>
             <div class="sum-row"><span>배송기간</span><span>당일 발송 · 1~2일 소요</span></div>
             <p class="muted" style="font-size:12px;margin:2px 0 0;text-align:right">결제 완료 시 당일 발송되며, 지역에 따라 도착까지 1~2일 소요됩니다</p>
-            <div class="sum-row"><span>배송비</span><span id="sumShipping" data-base="별도">별도</span></div>
-            <p class="muted" id="shipNote" style="font-size:12px;margin:2px 0 0;text-align:right">콜드체인·지역별 배송비는 주문 후 별도 안내됩니다</p>
+            <div class="sum-row"><span>배송비</span><span id="sumShipping" data-base="{{ (int) $summary['shipping'] }}">{{ number_format($summary['shipping']) }}원</span></div>
+            <p class="muted" id="shipNote" style="font-size:12px;margin:2px 0 0;text-align:right">배송 건당 3,000원 · 제주 5,000원 (실제 배송비는 배송지 기준으로 확정)</p>
             @if($couponDiscount ?? 0)
                 <div class="sum-row" style="color:var(--red)"><span>쿠폰 할인</span><span>-{{ number_format($couponDiscount) }}원</span></div>
             @endif
@@ -234,7 +234,7 @@ function pickBuyer(sel) {
         single.style.display=isSplit?'none':''; split.style.display=isSplit?'':'none';
         reqs.forEach(function(el){ if(isSplit){el.removeAttribute('required');} else {el.setAttribute('required','required');} });
         if(!isSplit){ // 단일: 원래(장바구니) 값 복원
-            subEl.textContent=won(subEl.dataset.base); shipEl.textContent=shipEl.dataset.base;
+            subEl.textContent=won(subEl.dataset.base); shipEl.textContent=won(shipEl.dataset.base);
             totEl.textContent=won(totEl.dataset.base); payBtn.textContent=won(totEl.dataset.base)+' 결제하기';
             shipNote.style.display=''; payBtn.disabled=false;
         } else { // 분할: 업로드 전까지 결제 비활성

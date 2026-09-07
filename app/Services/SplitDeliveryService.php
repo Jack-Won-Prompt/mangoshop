@@ -118,7 +118,7 @@ class SplitDeliveryService
         foreach ($groups as $g) {
             $sub = array_sum(array_column($g['items'], 'subtotal'));
             $qty = array_sum(array_column($g['items'], 'qty'));
-            // 수령처마다 배송비: 기본 3,000(제주 5,000) + 3박스 단위 +2,000
+            // 수령처(배송 건)마다 배송비: 건당 3,000원(제주 5,000원) 고정
             $ship = \App\Support\Shipping::fee($qty, $g['receiver']['postcode'] ?? null, $g['receiver']['address1'] ?? null);
             $shipments[] = [
                 'receiver' => $g['receiver'],

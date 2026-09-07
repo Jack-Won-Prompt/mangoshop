@@ -53,9 +53,9 @@
         <div class="sum-card">
             <h3>결제 예상금액</h3>
             <div class="sum-row"><span>상품금액</span><span>{{ number_format($summary['subtotal']) }}원</span></div>
-            <div class="sum-row"><span>배송비</span><span>별도</span></div>
+            <div class="sum-row"><span>배송비</span><span>{{ number_format($summary['shipping']) }}원</span></div>
             <div class="sum-row total"><span>결제예정금액</span><b>{{ number_format($summary['total']) }}원</b></div>
-            <p class="muted" style="font-size:12.5px;margin:10px 0">콜드체인·지역별 배송비는 주문 후 별도 안내됩니다</p>
+            <p class="muted" style="font-size:12.5px;margin:10px 0">배송 건당 3,000원 · 제주 5,000원 (실제 배송비는 배송지 기준으로 확정)</p>
             <a href="{{ route('order.checkout') }}" class="btn btn-red btn-lg btn-block" style="margin-top:14px">주문하기</a>
             <a href="{{ route('order.checkout', ['mode'=>'split']) }}" class="btn btn-ghost btn-block" style="margin-top:8px">📦 여러 주소 분할 배송(엑셀)</a>
         </div>
