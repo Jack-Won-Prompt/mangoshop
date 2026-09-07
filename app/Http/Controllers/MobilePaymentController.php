@@ -32,6 +32,7 @@ class MobilePaymentController extends Controller
             'orderName'   => $orderName,
             'clientKey'   => config('services.toss.client_key'),
             'customerKey' => 'cust_'.substr(sha1($order->user_id.config('app.key')), 0, 24),
+            'testMode'    => (bool) config('services.toss.test_mode'),
             'portone'     => config('portone'),
         ]);
     }

@@ -51,8 +51,11 @@
     <div class="card">
       <div id="payment-method"></div>
       <div id="agreement"></div>
+      <div id="pay-error" style="display:none;margin-top:14px;padding:12px 14px;border:1px solid #f3c2c2;background:#fff5f5;border-radius:10px;color:#c0392b;font-size:13px;line-height:1.6"></div>
       <button id="pay-btn" class="btn" style="margin-top:16px" disabled>{{ number_format($order->total) }}원 결제하기</button>
-      <p class="hint">테스트 모드입니다. 실제 청구되지 않습니다.</p>
+      @if(! empty($testMode))
+        <p class="hint">테스트 모드입니다. 실제 청구되지 않습니다.</p>
+      @endif
     </div>
   @endif
 </div>
@@ -88,20 +91,28 @@
     customerName: @json($order->receiver_name), windowTarget: 'self'
   };
   var btn = document.getElementById('pay-btn');
-  var toss = TossPayments(clientKey);
-  var widgets = toss.widgets({ customerKey: customerKey });
+  var errBox = document.getElementById('pay-error');
+  function showError(msg){ if(!errBox){ alert(msg); return; } errBox.textContent = msg; errBox.style.display = 'block'; }
   (async function () {
-    await widgets.setAmount({ currency: 'KRW', value: amount });
-    await Promise.all([
-      widgets.renderPaymentMethods({ selector: '#payment-method', variantKey: 'DEFAULT' }),
-      widgets.renderAgreement({ selector: '#agreement', variantKey: 'AGREEMENT' })
-    ]);
-    btn.disabled = false;
-    btn.addEventListener('click', async function () {
-      btn.disabled = true;
-      try { await widgets.requestPayment(payload); }
-      catch (e) { btn.disabled = false; }
-    });
+    try {
+      var toss = TossPayments(clientKey);
+      var widgets = toss.widgets({ customerKey: customerKey });
+      await widgets.setAmount({ currency: 'KRW', value: amount });
+      await Promise.all([
+        widgets.renderPaymentMethods({ selector: '#payment-method', variantKey: 'DEFAULT' }),
+        widgets.renderAgreement({ selector: '#agreement', variantKey: 'AGREEMENT' })
+      ]);
+      btn.disabled = false;
+      btn.addEventListener('click', async function () {
+        btn.disabled = true;
+        try { await widgets.requestPayment(payload); }
+        catch (e) { btn.disabled = false; console.error(e); showError('결제 요청 실패: ' + (e && (e.message || e.code) || e)); }
+      });
+    } catch (e) {
+      console.error('[Toss widget]', e);
+      var detail = e && (e.message || e.code) ? (e.message || e.code) : String(e);
+      showError('결제창을 불러오지 못했습니다. (' + detail + ') 결제수단 설정 또는 상점 도메인 등록을 확인해 주세요.');
+    }
   })();
 })();
 </script>
