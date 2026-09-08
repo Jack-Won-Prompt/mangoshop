@@ -26,8 +26,8 @@ class ActivityLogger
     public static function search(Request $request, string $keyword, ?int $resultCount = null): void
     {
         $keyword = trim($keyword);
-        if ($keyword === '') {
-            return; // 빈 검색은 기록하지 않음
+        if ($keyword === '' || static::looksLikeInjection($keyword)) {
+            return; // 빈 검색·인젝션 스캐너 키워드는 기록하지 않음
         }
         static::write($request, 'search', [
             'keyword'      => mb_substr($keyword, 0, 191),
@@ -57,8 +57,40 @@ class ActivityLogger
 
     /* ===== 내부 ===== */
 
+    /** 알려진 스캐너/크롤러 UA는 방문이력에서 제외(고객 통계 정확도) */
+    private static function isBot(Request $request): bool
+    {
+        $ua = (string) $request->userAgent();
+        if (trim($ua) === '') {
+            return true; // UA 없는 요청은 대부분 봇/스크립트
+        }
+
+        return (bool) preg_match(
+            '/(bot|crawl|spider|slurp|curl|wget|python-requests|python-urllib|scrapy|nikto|sqlmap|nmap|masscan|zgrab|semrush|ahrefs|mj12|dotbot|petalbot|bytespider|headlesschrome|phantomjs|go-http-client|libwww|httrack|censys|zmeu)/i',
+            $ua
+        );
+    }
+
+    /** SQL/스크립트 인젝션 스캐너가 검색창으로 넣는 패턴 */
+    private static function looksLikeInjection(string $s): bool
+    {
+        return (bool) preg_match(
+            '/(\bunion\b\s+select|select\s*\(|sleep\s*\(|benchmark\s*\(|waitfor\s+delay|\bxor\b|information_schema|concat\s*\(|0x[0-9a-f]{4}|--\s|\/\*|<script|onerror\s*=|\bor\b\s+\d+\s*=\s*\d+)/i',
+            $s
+        );
+    }
+
     private static function write(Request $request, string $type, array $extra, ?User $user = null): void
     {
+        // 봇/스캐너 트래픽은 기록하지 않음 (단, 로그인 실패 등은 이메일 기준으로 별도 판단)
+        if (static::isBot($request)) {
+            return;
+        }
+        // 스캐너 기본 이메일(로그인 등)은 제외
+        if (! empty($extra['email']) && str_starts_with(strtolower($extra['email']), 'testing@example.com')) {
+            return;
+        }
+
         try {
             $user = $user ?: $request->user();
             ActivityLog::create(array_merge([
