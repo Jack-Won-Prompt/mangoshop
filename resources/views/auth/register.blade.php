@@ -10,6 +10,10 @@
 
         <form method="POST" action="{{ route('register.attempt') }}">
             @csrf
+            {{-- 스팸 방지 허니팟(사람에겐 숨김) --}}
+            <div style="position:absolute;left:-9999px;top:-9999px" aria-hidden="true">
+                <label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+            </div>
             <div class="field" data-radio-cards>
                 <label>회원 구분</label>
                 <div class="radio-cards">

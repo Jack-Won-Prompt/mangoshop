@@ -6,6 +6,10 @@
 <div class="container" style="padding:26px 20px;max-width:760px">
     <form method="POST" action="{{ route('community.inquiry.store') }}" class="form-card">
         @csrf
+        {{-- 스팸 방지 허니팟(사람에겐 숨김) --}}
+        <div style="position:absolute;left:-9999px;top:-9999px" aria-hidden="true">
+            <label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+        </div>
         <div class="field">
             <label>문의 유형 <span class="req">*</span></label>
             <select name="type" class="select">

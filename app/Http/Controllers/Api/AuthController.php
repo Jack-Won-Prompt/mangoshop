@@ -13,6 +13,16 @@ class AuthController extends Controller
 {
     public function register(Request $request)
     {
+        // 스팸 방지: 허니팟(봇) + IP 레이트리밋(1시간 5건)
+        if (filled($request->input('website'))) {
+            return response()->json(['message' => '잘못된 요청입니다.'], 422);
+        }
+        $rlKey = 'register:'.$request->ip();
+        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($rlKey, 5)) {
+            return response()->json(['message' => '가입 시도가 너무 많습니다. 잠시 후 다시 시도해 주세요.'], 429);
+        }
+        \Illuminate\Support\Facades\RateLimiter::hit($rlKey, 3600);
+
         $data = $request->validate([
             'member_type'  => ['required', 'in:general,business'],
             'name'         => ['required', 'string', 'max:50'],
