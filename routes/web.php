@@ -133,6 +133,16 @@ Route::prefix('community')->name('community.')->controller(CommunityController::
     Route::post('/inquiry', 'inquiryStore')->name('inquiry.store');
 });
 
+// ===== 레시피 커뮤니티 (공개 · SEO) =====
+Route::prefix('community')->name('community.')->group(function () {
+    Route::get('/recipes', [\App\Http\Controllers\RecipeController::class, 'index'])->name('recipes');
+    Route::get('/recipes/{category:slug}', [\App\Http\Controllers\RecipeController::class, 'category'])->name('recipe.category');
+    Route::get('/recipes/{category:slug}/{recipe}', [\App\Http\Controllers\RecipeController::class, 'show'])->name('recipe.show');
+});
+
+// 사이트맵(SEO)
+Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
+
 // ===== 안내 페이지 (메인 탭바 연결) =====
 Route::view('/event/signup', 'guide.event')->name('guide.event');       // 신규회원 이벤트
 Route::view('/guide/delivery', 'guide.delivery')->name('guide.delivery'); // 당일출고 안내
@@ -158,6 +168,17 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::put('/products/{product}', [\App\Http\Controllers\Admin\ProductController::class, 'update'])->name('products.update');
     Route::delete('/products/{product}', [\App\Http\Controllers\Admin\ProductController::class, 'destroy'])->name('products.destroy');
     Route::post('/products/{product}/toggle-quote', [\App\Http\Controllers\Admin\ProductController::class, 'toggleQuote'])->name('products.togglequote');
+
+    // 레시피 글(공식) 전용 CRUD — 제네릭 catch-all 보다 먼저
+    Route::get('/recipes', [\App\Http\Controllers\Admin\RecipeController::class, 'index'])->name('recipes.index');
+    Route::get('/recipes/create', [\App\Http\Controllers\Admin\RecipeController::class, 'create'])->name('recipes.create');
+    Route::post('/recipes', [\App\Http\Controllers\Admin\RecipeController::class, 'store'])->name('recipes.store');
+    Route::post('/recipes/editor-upload', [\App\Http\Controllers\Admin\RecipeController::class, 'editorUpload'])->name('recipes.editor.upload');
+    Route::get('/recipes/{recipe}/edit', [\App\Http\Controllers\Admin\RecipeController::class, 'edit'])->name('recipes.edit');
+    Route::put('/recipes/{recipe}', [\App\Http\Controllers\Admin\RecipeController::class, 'update'])->name('recipes.update');
+    Route::delete('/recipes/{recipe}', [\App\Http\Controllers\Admin\RecipeController::class, 'destroy'])->name('recipes.destroy');
+    Route::post('/recipes/{recipe}/toggle-pin', [\App\Http\Controllers\Admin\RecipeController::class, 'togglePin'])->name('recipes.togglepin');
+    Route::post('/recipes/{recipe}/toggle-status', [\App\Http\Controllers\Admin\RecipeController::class, 'toggleStatus'])->name('recipes.togglestatus');
 
     // 상품 이미지 자동검색(수입과일몰+네이버) + 확인 후 다운로드
     Route::get('/products/{product}/image-search', [\App\Http\Controllers\Admin\ProductImageController::class, 'search'])->name('products.imagesearch');

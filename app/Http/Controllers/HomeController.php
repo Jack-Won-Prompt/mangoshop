@@ -41,6 +41,8 @@ class HomeController extends Controller
             'notices'     => Notice::orderByDesc('is_pinned')->latest('published_at')->take(5)->get(),
             'brands'      => Brand::where('is_active', true)->orderBy('sort_order')->get(),
             'sellers'     => Seller::approved()->withCount('products')->orderBy('sort_order')->take(5)->get(),
+            'recipeItems' => \App\Models\Recipe::published()->with('category')
+                                ->orderByDesc('is_pinned')->latest('published_at')->take(4)->get(),
         ]);
     }
 }

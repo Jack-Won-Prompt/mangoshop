@@ -131,6 +131,40 @@
 
 {{-- ===== 6. 입점 수입사 섹션은 요청에 따라 숨김 ===== --}}
 
+{{-- ===== 6-1. 레시피 커뮤니티 ===== --}}
+@if(($recipeItems ?? collect())->count())
+<section class="mg-section">
+    <div class="mg-wrap">
+        <div class="mg-sec-head">
+            <div class="ki">RECIPE</div>
+            <h3>레시피 커뮤니티</h3>
+            <p>신선한 과일로 만드는 레시피와 회원들의 요리 이야기</p>
+        </div>
+        <div class="mg-recipe-grid">
+            @foreach($recipeItems as $r)
+                @php($thumb = $r->cover_url ?: ($r->youtube_id ? 'https://i.ytimg.com/vi/'.$r->youtube_id.'/hqdefault.jpg' : asset('images/fruit/mango-fruit-2.jpg')))
+                <a class="mg-recipe-card" href="{{ $r->url }}">
+                    <span class="th" style="background-image:url('{{ $thumb }}')">@if($r->youtube_id || $r->video_path)<i>▶</i>@endif</span>
+                    <span class="cat">{{ $r->category->name ?? '레시피' }}</span>
+                    <b>{{ \Illuminate\Support\Str::limit($r->title, 32) }}</b>
+                </a>
+            @endforeach
+        </div>
+        <div class="mg-sec-more"><a href="{{ route('community.recipes') }}" class="mg-btn gho" style="padding:12px 28px">레시피 더보기 <x-icon name="arrow-right" :size="15"/></a></div>
+    </div>
+</section>
+<style>
+.mg-recipe-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.mg-recipe-card{display:block;text-decoration:none;color:inherit;border:1px solid #ececE5;border-radius:12px;overflow:hidden;background:#fff;transition:.15s}
+.mg-recipe-card:hover{transform:translateY(-3px);box-shadow:0 8px 22px #153b2414}
+.mg-recipe-card .th{display:block;aspect-ratio:1.3;background:#f4f3ec center/cover no-repeat;position:relative}
+.mg-recipe-card .th i{position:absolute;right:8px;bottom:8px;background:#000a;color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:12px}
+.mg-recipe-card .cat{display:block;font-size:11px;color:#ed7254;font-weight:700;padding:11px 12px 0}
+.mg-recipe-card b{display:block;font-size:14px;padding:4px 12px 14px;line-height:1.4}
+@media(max-width:900px){.mg-recipe-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+@endif
+
 {{-- ===== 7. 인스타그램 피드 ===== --}}
 <section class="mg-insta">
     <div class="mg-wrap">

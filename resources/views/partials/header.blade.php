@@ -2,6 +2,7 @@
 <div class="mg-topbar">
     <div class="mg-wrap">
         <ul class="mg-tb-nav mg-tb-left">
+            <li><a href="{{ route('community.recipes') }}">레시피</a></li>
             <li><a href="{{ route('community.notices') }}">공지사항</a></li>
             <li><a href="{{ route('community.qna') }}">Q&amp;A</a></li>
             <li><a href="{{ route('community.reviews') }}">상품후기</a></li>
@@ -72,6 +73,7 @@
             @foreach($navCategories as $cat)
                 <li><a href="{{ route('catalog.category', $cat->slug) }}"><span class="ic"><x-icon :name="$__catIcons[$cat->slug] ?? 'grid'" :size="19"/></span>{{ $cat->name }}</a></li>
             @endforeach
+            <li><a href="{{ route('community.recipes') }}"><span class="ic"><x-icon name="doc" :size="19"/></span>레시피</a></li>
             <li><a href="{{ route('catalog.index', ['grade' => 'wholesale']) }}" class="biz"><span class="ic"><x-icon name="building" :size="19"/></span>사업자 전용몰</a></li>
         </ul>
     </div>

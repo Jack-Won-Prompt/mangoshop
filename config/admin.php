@@ -7,6 +7,8 @@ use App\Models\Coupon;
 use App\Models\Faq;
 use App\Models\Notice;
 use App\Models\Product;
+use App\Models\Recipe;
+use App\Models\RecipeCategory;
 
 /*
 |--------------------------------------------------------------------------
@@ -99,6 +101,34 @@ return [
             ['name' => 'is_active', 'label' => '노출', 'type' => 'checkbox'],
         ],
         'defaults' => ['is_active' => true, 'position' => 'main'],
+    ],
+
+    // 레시피 카테고리(제네릭 CRUD) — 레시피 글은 전용 컨트롤러(Admin\RecipeController)가 처리
+    'recipe_categories' => [
+        'label' => '레시피 카테고리', 'model' => RecipeCategory::class, 'icon' => 'grid', 'group' => '커뮤니티',
+        'order' => ['sort_order', 'asc'],
+        'columns' => ['name' => '이름', 'slug' => '슬러그', 'sort_order' => '순서', 'is_active' => '활성'],
+        'fields' => [
+            ['name' => 'name', 'label' => '카테고리명', 'type' => 'text', 'required' => true],
+            ['name' => 'slug', 'label' => '슬러그(URL)', 'type' => 'text', 'hint' => '비우면 이름 기준 자동 생성(한글 가능)'],
+            ['name' => 'tagline', 'label' => '한 줄 설명', 'type' => 'text'],
+            ['name' => 'cover', 'label' => '대표 이미지', 'type' => 'image'],
+            ['name' => 'description', 'label' => '카테고리 소개(SEO 본문)', 'type' => 'textarea', 'rows' => 4],
+            ['name' => 'meta_title', 'label' => 'SEO 제목', 'type' => 'text'],
+            ['name' => 'meta_description', 'label' => 'SEO 설명', 'type' => 'textarea', 'rows' => 2],
+            ['name' => 'sort_order', 'label' => '정렬 순서', 'type' => 'number'],
+            ['name' => 'is_active', 'label' => '노출', 'type' => 'checkbox'],
+        ],
+        'defaults' => ['is_active' => true],
+    ],
+
+    // 레시피 글 — 네비 노출용(실제 등록/수정은 전용 라우트 /admin/recipes 가 오버라이드)
+    'recipes' => [
+        'label' => '레시피 글', 'model' => Recipe::class, 'icon' => 'doc', 'group' => '커뮤니티',
+        'dedicated' => true,
+        'order' => ['id', 'desc'],
+        'columns' => ['title' => '제목', 'is_official' => '공식', 'is_pinned' => '고정', 'status' => '상태'],
+        'fields' => [],
     ],
 
     'coupons' => [
