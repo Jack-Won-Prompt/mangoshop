@@ -36,6 +36,17 @@
     </div>
     <div class="qbody">{{ $question->body }}</div>
 
+    @if($question->youtube_id)
+        <div style="position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000;margin:0 0 18px">
+            <iframe src="https://www.youtube.com/embed/{{ $question->youtube_id }}" title="{{ $question->title }}" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe>
+        </div>
+    @endif
+    @if($question->images->count())
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 22px">
+            @foreach($question->images as $img)<img src="{{ $img->url }}" alt="{{ $question->title }} 사진 {{ $loop->iteration }}" loading="lazy" style="width:100%;border-radius:8px">@endforeach
+        </div>
+    @endif
+
     <div class="acount">답변 {{ $question->answers->count() }}</div>
     @forelse($question->answers as $a)
         <div class="ans {{ $a->is_admin ? 'admin' : '' }}">

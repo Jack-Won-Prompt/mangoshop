@@ -253,6 +253,7 @@ class RecipeController extends Controller
             'summary'   => ['nullable', 'string', 'max:300'],
             'body'      => ['required', 'string', 'max:5000'],
             'video_url' => ['nullable', 'url', 'max:300'],
+            'video'     => ['nullable', 'file', 'mimetypes:video/mp4,video/webm,video/quicktime', 'max:102400'],
             'tags'      => ['nullable', 'string', 'max:200'],
             'photos.*'  => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:8192'],
         ]);
@@ -267,6 +268,16 @@ class RecipeController extends Controller
         $recipe->body = '<p>'.nl2br(e(trim($data['body']))).'</p>';
         $recipe->video_url = trim((string) ($data['video_url'] ?? '')) ?: null;
         $recipe->tags = Recipe::normalizeTags($data['tags'] ?? null);
+        if ($request->hasFile('video')) {
+            $dir = public_path('recipe/uploads');
+            if (! is_dir($dir)) {
+                @mkdir($dir, 0775, true);
+            }
+            $vf = $request->file('video');
+            $vname = now()->format('Ymd_His').'_'.\Illuminate\Support\Str::lower(\Illuminate\Support\Str::random(6)).'.'.strtolower($vf->getClientOriginalExtension());
+            $vf->move($dir, $vname);
+            $recipe->video_path = '/recipe/uploads/'.$vname;
+        }
         if (blank($recipe->slug)) {
             $recipe->slug = Recipe::uniqueSlug($data['title'], (int) $data['recipe_category_id'], $recipe->id);
         }

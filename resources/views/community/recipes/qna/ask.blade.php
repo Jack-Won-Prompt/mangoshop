@@ -13,7 +13,7 @@
     </style>
 
     <h1>레시피 질문하기</h1>
-    <form method="POST" action="{{ route('community.recipe.qna.store') }}">
+    <form method="POST" action="{{ route('community.recipe.qna.store') }}" enctype="multipart/form-data">
         @csrf
         <div style="position:absolute;left:-9999px" aria-hidden="true"><input type="text" name="website" tabindex="-1" autocomplete="off"></div>
 
@@ -31,6 +31,14 @@
         <div class="f">
             <label>내용 *</label>
             <textarea name="body" maxlength="3000" required placeholder="궁금한 점을 자세히 적어주세요.">{{ old('body') }}</textarea>
+        </div>
+        <div class="f">
+            <label>사진 첨부 (선택 · 여러 장)</label>
+            <input type="file" name="photos[]" accept="image/*" multiple>
+        </div>
+        <div class="f">
+            <label>유튜브 링크 (선택)</label>
+            <input type="text" name="video_url" value="{{ old('video_url') }}" placeholder="https://youtu.be/...">
         </div>
         <button class="sub">질문 등록</button>
         <a href="{{ route('community.recipe.qna') }}" style="margin-left:10px;color:#77786f;text-decoration:none">취소</a>

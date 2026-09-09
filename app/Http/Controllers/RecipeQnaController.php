@@ -44,9 +44,19 @@ class RecipeQnaController extends Controller
             'recipe_category_id' => ['nullable', 'exists:recipe_categories,id'],
             'title' => ['required', 'string', 'max:150'],
             'body'  => ['required', 'string', 'max:3000'],
+            'video_url' => ['nullable', 'url', 'max:300'],
+            'photos.*'  => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:8192'],
         ]);
 
-        $q = RecipeQuestion::create($data + ['user_id' => $request->user()->id, 'status' => 'published']);
+        $q = RecipeQuestion::create([
+            'user_id' => $request->user()->id,
+            'recipe_category_id' => $data['recipe_category_id'] ?? null,
+            'title' => $data['title'],
+            'body'  => $data['body'],
+            'video_url' => trim((string) ($data['video_url'] ?? '')) ?: null,
+            'status' => 'published',
+        ]);
+        $this->handlePhotos($q, $request);
 
         // 관리자 앱 알림
         AdminPush::toAdmins('🍳 새 레시피 질문', $request->user()->name.' · '.\Illuminate\Support\Str::limit($q->title, 40),
@@ -64,9 +74,27 @@ class RecipeQnaController extends Controller
             $question->increment('view_count');
             session()->put($key, true);
         }
-        $question->load('user', 'category', 'answers.user');
+        $question->load('user', 'category', 'answers.user', 'images');
 
         return view('community.recipes.qna.show', compact('question'));
+    }
+
+    /** 질문 첨부 사진 저장 */
+    private function handlePhotos(RecipeQuestion $question, Request $request): void
+    {
+        if (! $request->hasFile('photos')) {
+            return;
+        }
+        $dir = public_path('recipe/uploads');
+        if (! is_dir($dir)) {
+            @mkdir($dir, 0775, true);
+        }
+        $sort = 0;
+        foreach ($request->file('photos') as $file) {
+            $name = now()->format('Ymd_His').'_'.\Illuminate\Support\Str::lower(\Illuminate\Support\Str::random(6)).'.'.strtolower($file->getClientOriginalExtension());
+            $file->move($dir, $name);
+            $question->images()->create(['path' => '/recipe/uploads/'.$name, 'sort' => ++$sort]);
+        }
     }
 
     public function answer(Request $request, RecipeQuestion $question)

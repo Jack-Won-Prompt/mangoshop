@@ -69,6 +69,11 @@
             <input type="file" name="photos[]" accept="image/*" multiple>
             <div class="hint">첫 사진이 대표 이미지로 사용됩니다. (장당 최대 8MB)</div>
         </div>
+        <div class="f">
+            <label>영상 파일 (선택 · mp4/webm)</label>
+            <input type="file" name="video" accept="video/mp4,video/webm,video/quicktime">
+            <div class="hint">직접 촬영한 영상을 올리면 상세페이지에서 재생됩니다. (유튜브 링크가 있으면 유튜브 우선)</div>
+        </div>
 
         <button class="sub">{{ $recipe->exists ? '수정 저장' : '레시피 등록' }}</button>
         <a href="{{ $recipe->exists ? $recipe->url : route('community.recipes') }}" style="margin-left:10px;color:#77786f;text-decoration:none">취소</a>

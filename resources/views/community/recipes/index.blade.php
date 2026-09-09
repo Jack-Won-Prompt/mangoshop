@@ -33,8 +33,14 @@
             <p>신선한 수입 과일로 만드는 레시피와 회원들의 요리 이야기</p>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <a href="{{ route('community.recipe.qna') }}" style="background:#fff;border:1px solid #123b26;color:#123b26;text-decoration:none;padding:10px 18px;border-radius:22px;font-size:13.5px;font-weight:700;white-space:nowrap">💬 레시피 물어보기</a>
-            <a href="{{ route('community.recipe.create') }}" style="background:#123b26;color:#fff;text-decoration:none;padding:10px 18px;border-radius:22px;font-size:13.5px;font-weight:700;white-space:nowrap">✍️ 레시피 작성</a>
+            @auth
+                <button type="button" class="rcp-openbtn ghost" onclick="rcpOpen('askModal')">💬 레시피 물어보기</button>
+                <button type="button" class="rcp-openbtn" onclick="rcpOpen('writeModal')">✍️ 레시피 작성</button>
+            @else
+                <a href="{{ route('login') }}" class="rcp-openbtn ghost" style="text-decoration:none">💬 레시피 물어보기</a>
+                <a href="{{ route('login') }}" class="rcp-openbtn" style="text-decoration:none">✍️ 레시피 작성</a>
+            @endauth
+            <a href="{{ route('community.recipe.qna') }}" style="align-self:center;font-size:12.5px;color:#77786f;text-decoration:none">전체 Q&A →</a>
         </div>
     </div>
 
@@ -67,4 +73,67 @@
         <p style="color:#9a9b91;padding:30px 0">아직 등록된 레시피가 없습니다.</p>
     @endif
 </div>
+
+@auth
+{{-- ===== 레시피 작성 모달 ===== --}}
+<div class="rcp-modal" id="writeModal" aria-hidden="true">
+    <div class="rcp-dim" onclick="rcpClose('writeModal')"></div>
+    <div class="rcp-dialog" role="dialog" aria-label="레시피 작성">
+        <div class="rcp-mhead"><b>✍️ 레시피 작성</b><button type="button" class="x" onclick="rcpClose('writeModal')">×</button></div>
+        <form method="POST" action="{{ route('community.recipe.store') }}" enctype="multipart/form-data" class="rcp-form">
+            @csrf
+            <div style="position:absolute;left:-9999px" aria-hidden="true"><input type="text" name="website" tabindex="-1" autocomplete="off"></div>
+            <label>카테고리 *<select name="recipe_category_id" required><option value="">선택</option>@foreach($categories as $c)<option value="{{ $c->id }}">{{ $c->name }}</option>@endforeach</select></label>
+            <label>제목 *<input type="text" name="title" maxlength="200" required placeholder="예: 애플망고 치즈케이크"></label>
+            <label>요약(선택)<input type="text" name="summary" maxlength="300" placeholder="한 줄 소개"></label>
+            <label>내용 *<textarea name="body" maxlength="5000" required placeholder="재료와 만드는 방법을 적어주세요."></textarea></label>
+            <label>유튜브 링크(선택)<input type="text" name="video_url" placeholder="https://youtu.be/..."></label>
+            <label>태그(선택)<input type="text" name="tags" placeholder="쉼표 구분 · 예: 애플망고, 디저트"></label>
+            <label>사진(여러 장)<input type="file" name="photos[]" accept="image/*" multiple></label>
+            <label>영상 파일(선택·mp4/webm)<input type="file" name="video" accept="video/mp4,video/webm,video/quicktime"></label>
+            <button class="submit">레시피 등록</button>
+        </form>
+    </div>
+</div>
+
+{{-- ===== 레시피 물어보기 모달 ===== --}}
+<div class="rcp-modal" id="askModal" aria-hidden="true">
+    <div class="rcp-dim" onclick="rcpClose('askModal')"></div>
+    <div class="rcp-dialog" role="dialog" aria-label="레시피 물어보기">
+        <div class="rcp-mhead"><b>💬 레시피 물어보기</b><button type="button" class="x" onclick="rcpClose('askModal')">×</button></div>
+        <form method="POST" action="{{ route('community.recipe.qna.store') }}" enctype="multipart/form-data" class="rcp-form">
+            @csrf
+            <div style="position:absolute;left:-9999px" aria-hidden="true"><input type="text" name="website" tabindex="-1" autocomplete="off"></div>
+            <label>카테고리(선택)<select name="recipe_category_id"><option value="">일반</option>@foreach($categories as $c)<option value="{{ $c->id }}">{{ $c->name }}</option>@endforeach</select></label>
+            <label>제목 *<input type="text" name="title" maxlength="150" required placeholder="예: 애플망고 어떻게 보관하나요?"></label>
+            <label>내용 *<textarea name="body" maxlength="3000" required placeholder="궁금한 점을 자세히 적어주세요."></textarea></label>
+            <label>사진 첨부(선택·여러 장)<input type="file" name="photos[]" accept="image/*" multiple></label>
+            <label>유튜브 링크(선택)<input type="text" name="video_url" placeholder="https://youtu.be/..."></label>
+            <button class="submit">질문 등록</button>
+        </form>
+    </div>
+</div>
+@endauth
+
+<style>
+    .rcp-openbtn{border:0;background:#123b26;color:#fff;padding:10px 18px;border-radius:22px;font-size:13.5px;font-weight:700;white-space:nowrap;cursor:pointer}
+    .rcp-openbtn.ghost{background:#fff;border:1px solid #123b26;color:#123b26}
+    .rcp-modal{position:fixed;inset:0;z-index:1000;display:none}
+    .rcp-modal.on{display:block}
+    .rcp-dim{position:absolute;inset:0;background:rgba(20,30,20,.5)}
+    .rcp-dialog{position:relative;max-width:560px;margin:5vh auto;background:#fff;border-radius:14px;max-height:90vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+    .rcp-mhead{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid #eee;position:sticky;top:0;background:#fff}
+    .rcp-mhead b{font-size:16px}
+    .rcp-mhead .x{border:0;background:none;font-size:24px;cursor:pointer;color:#888;line-height:1}
+    .rcp-form{padding:18px 20px 24px;display:grid;gap:14px}
+    .rcp-form label{display:block;font-size:13px;font-weight:600;color:#33415c}
+    .rcp-form input,.rcp-form select,.rcp-form textarea{width:100%;border:1px solid #dcdcd4;border-radius:8px;padding:10px 12px;font-size:14px;font-family:inherit;margin-top:6px}
+    .rcp-form textarea{min-height:130px;line-height:1.6;resize:vertical}
+    .rcp-form .submit{background:#123b26;color:#fff;border:0;border-radius:22px;padding:12px;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px}
+</style>
+<script>
+    function rcpOpen(id){var m=document.getElementById(id);if(m){m.classList.add('on');document.body.style.overflow='hidden';}}
+    function rcpClose(id){var m=document.getElementById(id);if(m){m.classList.remove('on');document.body.style.overflow='';}}
+    document.addEventListener('keydown',function(e){if(e.key==='Escape'){document.querySelectorAll('.rcp-modal.on').forEach(function(m){m.classList.remove('on');});document.body.style.overflow='';}});
+</script>
 @endsection
