@@ -68,7 +68,9 @@
         </div>
     @endif
 
-    <h2 class="sec">회원 레시피 · 요리 이야기</h2>
+    <h2 class="sec">회원 레시피 · 요리 이야기
+        <a href="{{ route('community.recipe.create') }}" style="margin-left:auto;font-size:12.5px;background:#123b26;color:#fff;text-decoration:none;padding:7px 14px;border-radius:18px;font-weight:700">✍️ 레시피 작성</a>
+    </h2>
     <div class="toolbar">
         <a href="{{ route('community.recipe.category',[$category->slug]) }}" class="{{ $sort==='latest'?'on':'' }}">최신순</a>
         <a href="{{ route('community.recipe.category',[$category->slug,'sort'=>'popular']) }}" class="{{ $sort==='popular'?'on':'' }}">인기순</a>

@@ -32,7 +32,10 @@
             <h1>🍳 레시피 커뮤니티</h1>
             <p>신선한 수입 과일로 만드는 레시피와 회원들의 요리 이야기</p>
         </div>
-        <a href="{{ route('community.recipe.qna') }}" style="background:#fff;border:1px solid #123b26;color:#123b26;text-decoration:none;padding:10px 18px;border-radius:22px;font-size:13.5px;font-weight:700;white-space:nowrap">💬 레시피 물어보기</a>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <a href="{{ route('community.recipe.qna') }}" style="background:#fff;border:1px solid #123b26;color:#123b26;text-decoration:none;padding:10px 18px;border-radius:22px;font-size:13.5px;font-weight:700;white-space:nowrap">💬 레시피 물어보기</a>
+            <a href="{{ route('community.recipe.create') }}" style="background:#123b26;color:#fff;text-decoration:none;padding:10px 18px;border-radius:22px;font-size:13.5px;font-weight:700;white-space:nowrap">✍️ 레시피 작성</a>
+        </div>
     </div>
 
     @if($categories->count())

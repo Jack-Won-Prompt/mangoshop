@@ -144,6 +144,16 @@ Route::prefix('community')->name('community.')->group(function () {
     });
     Route::get('/recipe-qna/{question}', [\App\Http\Controllers\RecipeQnaController::class, 'show'])->name('recipe.qna.show');
 
+    // 회원 레시피 글쓰기(로그인 필수) — {category}/{recipe} 보다 먼저(전용 경로)
+    Route::middleware('auth')->group(function () {
+        Route::get('/recipe-write', [\App\Http\Controllers\RecipeController::class, 'create'])->name('recipe.create');
+        Route::post('/recipe-write', [\App\Http\Controllers\RecipeController::class, 'store'])->name('recipe.store');
+        Route::get('/recipe-write/{recipe}', [\App\Http\Controllers\RecipeController::class, 'editOwn'])->name('recipe.edit');
+        Route::put('/recipe-write/{recipe}', [\App\Http\Controllers\RecipeController::class, 'updateOwn'])->name('recipe.update');
+        Route::delete('/recipe-write/{recipe}', [\App\Http\Controllers\RecipeController::class, 'destroyOwn'])->name('recipe.destroy');
+        Route::post('/recipes/{recipe}/report', [\App\Http\Controllers\RecipeController::class, 'report'])->name('recipe.report');
+    });
+
     Route::get('/recipes', [\App\Http\Controllers\RecipeController::class, 'index'])->name('recipes');
     Route::get('/recipes/{category:slug}', [\App\Http\Controllers\RecipeController::class, 'category'])->name('recipe.category');
     Route::get('/recipes/{category:slug}/{recipe}', [\App\Http\Controllers\RecipeController::class, 'show'])->name('recipe.show');

@@ -83,6 +83,15 @@
         <span>조회 {{ number_format($recipe->view_count) }}</span>
         <span>{{ optional($recipe->published_at)->format('Y.m.d') }}</span>
         @if($recipe->cook_time)<span>⏱ {{ $recipe->cook_time }}</span>@endif
+        @auth
+            @if($recipe->user_id && (auth()->id() === $recipe->user_id || auth()->user()->is_admin))
+                <a href="{{ route('community.recipe.edit', $recipe) }}" style="color:#123b26;text-decoration:none;font-weight:700">수정</a>
+            @elseif($recipe->user_id)
+                <form method="POST" action="{{ route('community.recipe.report', $recipe) }}" style="display:inline" onsubmit="return confirm('이 레시피를 신고할까요?')">@csrf
+                    <button style="border:0;background:none;color:#c0392b;cursor:pointer;font-size:13px">🚨 신고</button>
+                </form>
+            @endif
+        @endauth
     </div>
 
     {{-- 영상: 유튜브 우선, 없으면 업로드 영상 --}}

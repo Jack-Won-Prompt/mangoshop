@@ -73,4 +73,141 @@ class RecipeController extends Controller
 
         return view('community.recipes.show', ['recipe' => $item, 'category' => $category, 'related' => $related]);
     }
+
+    /* ===== 회원 레시피 글쓰기(Phase 2) ===== */
+
+    public function create()
+    {
+        return view('community.recipes.write', [
+            'recipe' => new Recipe(),
+            'categories' => RecipeCategory::active()->orderBy('sort_order')->get(),
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        if (filled($request->input('website'))) {              // 허니팟
+            return redirect()->route('community.recipes');
+        }
+        $key = 'recipe_write:'.$request->ip();
+        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($key, 8)) {
+            return back()->withInput()->with('error', '글이 너무 자주 등록되었습니다. 잠시 후 다시 시도해 주세요.');
+        }
+        \Illuminate\Support\Facades\RateLimiter::hit($key, 3600);
+
+        $data = $this->validateWrite($request);
+        $recipe = new Recipe();
+        $recipe->user_id = $request->user()->id;
+        $recipe->is_official = false;
+        $recipe->is_pinned = false;
+        $recipe->status = 'published';                          // 즉시 게시
+        $recipe->published_at = now();
+        $this->fillWrite($recipe, $data, $request);
+        $recipe->save();
+        $this->handleGallery($recipe, $request);
+
+        // 관리자 알림(모더레이션 참고)
+        \App\Support\AdminPush::toAdmins('📝 새 회원 레시피', $request->user()->name.' · '.\Illuminate\Support\Str::limit($recipe->title, 40),
+            ['type' => 'recipe_post', 'recipe_id' => (string) $recipe->id]);
+
+        return redirect($recipe->url)->with('ok', '레시피가 등록되었습니다.');
+    }
+
+    public function editOwn(Request $request, Recipe $recipe)
+    {
+        $this->authorizeOwner($request, $recipe);
+
+        return view('community.recipes.write', [
+            'recipe' => $recipe->load('images'),
+            'categories' => RecipeCategory::active()->orderBy('sort_order')->get(),
+        ]);
+    }
+
+    public function updateOwn(Request $request, Recipe $recipe)
+    {
+        $this->authorizeOwner($request, $recipe);
+        $data = $this->validateWrite($request);
+        $this->fillWrite($recipe, $data, $request);
+        $recipe->save();
+
+        $removeIds = array_filter((array) $request->input('remove_images', []));
+        if ($removeIds) {
+            $recipe->images()->whereIn('id', $removeIds)->delete();
+        }
+        $this->handleGallery($recipe, $request);
+
+        return redirect($recipe->url)->with('ok', '레시피가 수정되었습니다.');
+    }
+
+    public function destroyOwn(Request $request, Recipe $recipe)
+    {
+        $this->authorizeOwner($request, $recipe);
+        $cat = $recipe->category->slug ?? null;
+        $recipe->delete();
+
+        return redirect($cat ? route('community.recipe.category', $cat) : route('community.recipes'))
+            ->with('ok', '레시피가 삭제되었습니다.');
+    }
+
+    /** 신고 — 관리자 알림(즉시게시 + 신고/숨김 정책) */
+    public function report(Request $request, Recipe $recipe)
+    {
+        \App\Support\AdminPush::toAdmins('🚨 레시피 신고 접수', \Illuminate\Support\Str::limit($recipe->title, 40).' (신고자: '.$request->user()->name.')',
+            ['type' => 'recipe_report', 'recipe_id' => (string) $recipe->id]);
+
+        return back()->with('ok', '신고가 접수되었습니다. 관리자가 확인합니다.');
+    }
+
+    /* ===== 내부 ===== */
+    private function authorizeOwner(Request $request, Recipe $recipe): void
+    {
+        abort_unless($recipe->user_id && ($recipe->user_id === $request->user()->id || $request->user()->is_admin), 403);
+    }
+
+    private function validateWrite(Request $request): array
+    {
+        return $request->validate([
+            'recipe_category_id' => ['required', 'exists:recipe_categories,id'],
+            'title'     => ['required', 'string', 'max:200'],
+            'summary'   => ['nullable', 'string', 'max:300'],
+            'body'      => ['required', 'string', 'max:5000'],
+            'video_url' => ['nullable', 'url', 'max:300'],
+            'photos.*'  => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:8192'],
+        ]);
+    }
+
+    private function fillWrite(Recipe $recipe, array $data, Request $request): void
+    {
+        $recipe->recipe_category_id = $data['recipe_category_id'];
+        $recipe->title = $data['title'];
+        $recipe->summary = $data['summary'] ?? null;
+        // 사용자 입력은 평문 → 안전 HTML(이스케이프 + 줄바꿈)로 저장
+        $recipe->body = '<p>'.nl2br(e(trim($data['body']))).'</p>';
+        $recipe->video_url = trim((string) ($data['video_url'] ?? '')) ?: null;
+        if (blank($recipe->slug)) {
+            $recipe->slug = Recipe::uniqueSlug($data['title'], (int) $data['recipe_category_id'], $recipe->id);
+        }
+    }
+
+    private function handleGallery(Recipe $recipe, Request $request): void
+    {
+        if (! $request->hasFile('photos')) {
+            return;
+        }
+        $dir = public_path('recipe/uploads');
+        if (! is_dir($dir)) {
+            @mkdir($dir, 0775, true);
+        }
+        $sort = (int) $recipe->images()->max('sort');
+        foreach ($request->file('photos') as $file) {
+            $name = now()->format('Ymd_His').'_'.\Illuminate\Support\Str::lower(\Illuminate\Support\Str::random(6)).'.'.strtolower($file->getClientOriginalExtension());
+            $file->move($dir, $name);
+            $path = '/recipe/uploads/'.$name;
+            $recipe->images()->create(['path' => $path, 'sort' => ++$sort]);
+            if (! $recipe->cover_image) {
+                $recipe->cover_image = $path;
+                $recipe->save();
+            }
+        }
+    }
 }
