@@ -37,6 +37,12 @@ class RecipeRemapImages extends Command
         '파인애플' => ['pineapple-fruit-0.jpg'],
     ];
 
+    /** 요리별 실제 사진(과일 매핑보다 우선) → images/recipe/ */
+    public const DISH_MAP = [
+        '파인애플 새우볶음' => ['pine-shrimp-1.jpg', 'pine-shrimp-2.jpg', 'pine-shrimp-3.jpg'],
+        '망고 빙수'         => ['mango-bingsu-1.jpg'],
+    ];
+
     /** 카테고리 slug → 기본 이미지(제목에 과일 없을 때) */
     public const CAT_DEFAULT = [
         '망고' => ['mango-fruit-0.jpg', 'mango-fruit-2.jpg'],
@@ -58,9 +64,16 @@ class RecipeRemapImages extends Command
         return self::CAT_DEFAULT[$catSlug] ?? ['tropical-fruit-market-0.jpg'];
     }
 
-    /** 제목 기반 대표 이미지(안정적 선택) */
+    /** 제목 기반 대표 이미지(안정적 선택) — 요리별 실제 사진 우선 */
     public static function pick(string $title, ?string $catSlug, int $i = 0): string
     {
+        foreach (self::DISH_MAP as $kw => $imgs) {
+            if (mb_strpos($title, $kw) !== false) {
+                $idx = ($i > 0) ? ($i % count($imgs)) : (abs(crc32($title)) % count($imgs));
+
+                return 'images/recipe/'.$imgs[$idx];
+            }
+        }
         $pool = self::poolFor($title, $catSlug);
         $idx = ($i > 0) ? ($i % count($pool)) : (abs(crc32($title)) % count($pool));
 
