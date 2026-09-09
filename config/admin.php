@@ -131,6 +131,14 @@ return [
         'fields' => [],
     ],
 
+    // 레시피 Q&A — 네비 노출용(전용 라우트 /admin/recipe-qna 가 오버라이드)
+    'recipe-qna' => [
+        'label' => '레시피 Q&A', 'model' => Recipe::class, 'icon' => 'question', 'group' => '커뮤니티',
+        'dedicated' => true,
+        'order' => ['id', 'desc'],
+        'columns' => [], 'fields' => [],
+    ],
+
     'coupons' => [
         'label' => '쿠폰', 'model' => Coupon::class, 'icon' => 'tag', 'group' => '프로모션',
         'order' => ['id', 'desc'],

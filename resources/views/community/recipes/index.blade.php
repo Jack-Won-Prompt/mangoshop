@@ -27,9 +27,12 @@
         @media(max-width:520px){.rcp .rgrid{grid-template-columns:repeat(2,1fr);gap:10px}}
     </style>
 
-    <div class="rcp-head">
-        <h1>🍳 레시피 커뮤니티</h1>
-        <p>신선한 수입 과일로 만드는 레시피와 회원들의 요리 이야기</p>
+    <div class="rcp-head" style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px">
+        <div>
+            <h1>🍳 레시피 커뮤니티</h1>
+            <p>신선한 수입 과일로 만드는 레시피와 회원들의 요리 이야기</p>
+        </div>
+        <a href="{{ route('community.recipe.qna') }}" style="background:#fff;border:1px solid #123b26;color:#123b26;text-decoration:none;padding:10px 18px;border-radius:22px;font-size:13.5px;font-weight:700;white-space:nowrap">💬 레시피 물어보기</a>
     </div>
 
     @if($categories->count())

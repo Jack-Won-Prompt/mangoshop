@@ -135,6 +135,15 @@ Route::prefix('community')->name('community.')->controller(CommunityController::
 
 // ===== 레시피 커뮤니티 (공개 · SEO) =====
 Route::prefix('community')->name('community.')->group(function () {
+    // 레시피 물어보기(Q&A) — 열람 공개, 작성 로그인 필수 (ask 를 {question} 보다 먼저)
+    Route::get('/recipe-qna', [\App\Http\Controllers\RecipeQnaController::class, 'index'])->name('recipe.qna');
+    Route::middleware('auth')->group(function () {
+        Route::get('/recipe-qna/ask', [\App\Http\Controllers\RecipeQnaController::class, 'ask'])->name('recipe.qna.ask');
+        Route::post('/recipe-qna', [\App\Http\Controllers\RecipeQnaController::class, 'store'])->name('recipe.qna.store');
+        Route::post('/recipe-qna/{question}/answer', [\App\Http\Controllers\RecipeQnaController::class, 'answer'])->name('recipe.qna.answer');
+    });
+    Route::get('/recipe-qna/{question}', [\App\Http\Controllers\RecipeQnaController::class, 'show'])->name('recipe.qna.show');
+
     Route::get('/recipes', [\App\Http\Controllers\RecipeController::class, 'index'])->name('recipes');
     Route::get('/recipes/{category:slug}', [\App\Http\Controllers\RecipeController::class, 'category'])->name('recipe.category');
     Route::get('/recipes/{category:slug}/{recipe}', [\App\Http\Controllers\RecipeController::class, 'show'])->name('recipe.show');
@@ -179,6 +188,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::delete('/recipes/{recipe}', [\App\Http\Controllers\Admin\RecipeController::class, 'destroy'])->name('recipes.destroy');
     Route::post('/recipes/{recipe}/toggle-pin', [\App\Http\Controllers\Admin\RecipeController::class, 'togglePin'])->name('recipes.togglepin');
     Route::post('/recipes/{recipe}/toggle-status', [\App\Http\Controllers\Admin\RecipeController::class, 'toggleStatus'])->name('recipes.togglestatus');
+
+    // 레시피 Q&A 모더레이션
+    Route::get('/recipe-qna', [\App\Http\Controllers\Admin\RecipeQnaController::class, 'index'])->name('recipe-qna.index');
+    Route::post('/recipe-qna/{question}/toggle', [\App\Http\Controllers\Admin\RecipeQnaController::class, 'toggleQuestion'])->name('recipe-qna.toggle');
+    Route::delete('/recipe-qna/{question}', [\App\Http\Controllers\Admin\RecipeQnaController::class, 'destroyQuestion'])->name('recipe-qna.destroy');
+    Route::delete('/recipe-answers/{answer}', [\App\Http\Controllers\Admin\RecipeQnaController::class, 'destroyAnswer'])->name('recipe-answers.destroy');
 
     // 상품 이미지 자동검색(수입과일몰+네이버) + 확인 후 다운로드
     Route::get('/products/{product}/image-search', [\App\Http\Controllers\Admin\ProductImageController::class, 'search'])->name('products.imagesearch');
