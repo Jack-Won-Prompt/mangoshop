@@ -40,7 +40,11 @@ class RecipeController extends Controller
     {
         $recipe = new Recipe(['status' => 'published', 'is_official' => true, 'is_pinned' => true]);
 
-        return view('admin.recipes.form', ['recipe' => $recipe, 'categories' => RecipeCategory::orderBy('sort_order')->get()]);
+        return view('admin.recipes.form', [
+            'recipe' => $recipe,
+            'categories' => RecipeCategory::orderBy('sort_order')->get(),
+            'allProducts' => $this->productOptions(),
+        ]);
     }
 
     public function store(Request $request)
@@ -51,15 +55,26 @@ class RecipeController extends Controller
         $this->fill($recipe, $data, $request);
         $recipe->save();
         $this->handleImages($recipe, $request);
+        $this->syncProducts($recipe, $request);
 
         return redirect()->route('admin.recipes.index')->with('ok', '레시피가 등록되었습니다.');
     }
 
     public function edit(Recipe $recipe)
     {
-        $recipe->load('images');
+        $recipe->load('images', 'products');
 
-        return view('admin.recipes.form', ['recipe' => $recipe, 'categories' => RecipeCategory::orderBy('sort_order')->get()]);
+        return view('admin.recipes.form', [
+            'recipe' => $recipe,
+            'categories' => RecipeCategory::orderBy('sort_order')->get(),
+            'allProducts' => $this->productOptions(),
+        ]);
+    }
+
+    /** 상품 연결 선택지 (활성 상품) */
+    private function productOptions()
+    {
+        return \App\Models\Product::where('is_active', true)->orderBy('name')->get(['id', 'name', 'code']);
     }
 
     public function update(Request $request, Recipe $recipe)
@@ -74,6 +89,7 @@ class RecipeController extends Controller
             RecipeImage::where('recipe_id', $recipe->id)->whereIn('id', $removeIds)->delete();
         }
         $this->handleImages($recipe, $request);
+        $this->syncProducts($recipe, $request);
 
         return redirect()->route('admin.recipes.edit', $recipe)->with('ok', '레시피가 수정되었습니다.');
     }
@@ -127,7 +143,20 @@ class RecipeController extends Controller
             'video'            => ['nullable', 'file', 'mimetypes:video/mp4,video/webm,video/quicktime', 'max:102400'], // 100MB
             'cover'            => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:8192'],
             'gallery.*'        => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:8192'],
+            'products'         => ['nullable', 'array'],
+            'products.*'       => ['integer', 'exists:products,id'],
         ]);
+    }
+
+    /** 연결 상품 동기화 */
+    private function syncProducts(Recipe $recipe, Request $request): void
+    {
+        $ids = array_values(array_unique(array_map('intval', (array) $request->input('products', []))));
+        $sync = [];
+        foreach ($ids as $i => $id) {
+            $sync[$id] = ['sort' => $i];
+        }
+        $recipe->products()->sync($sync);
     }
 
     private function fill(Recipe $recipe, array $data, Request $request): void

@@ -72,6 +72,10 @@
         .rcp .rcard .thumb{aspect-ratio:1.3;background:#f4f3ec center/cover no-repeat}
         .rcp .rcard .b{padding:10px 11px}
         .rcp .rcard h3{font-size:13px;margin:0;line-height:1.4}
+        .rcp .usedprod{margin:26px 0 6px;padding:18px;background:#f7fbf8;border:1px solid #dcebe0;border-radius:12px}
+        .rcp .usedprod h3{font-size:16px;margin:0 0 14px}
+        .rcp .up-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+        @media(max-width:640px){.rcp .up-grid{grid-template-columns:repeat(2,1fr)}}
         .rcp .tags{display:flex;flex-wrap:wrap;gap:7px;margin:24px 0 6px}
         .rcp .tags a{font-size:12.5px;color:#123b26;background:#eef3ee;border-radius:16px;padding:5px 12px;text-decoration:none}
         .rcp .tags a:hover{background:#dce9df}
@@ -149,6 +153,16 @@
     @if($recipe->images->count())
         <div class="gallery">
             @foreach($recipe->images as $img)<img src="{{ $img->url }}" alt="{{ $recipe->title }} 사진 {{ $loop->iteration }}" loading="lazy">@endforeach
+        </div>
+    @endif
+
+    {{-- 이 레시피에 사용된 상품 --}}
+    @if($recipe->products->count())
+        <div class="usedprod">
+            <h3>🛒 이 레시피에 사용된 상품</h3>
+            <div class="up-grid">
+                @foreach($recipe->products as $p)<x-product-card :product="$p"/>@endforeach
+            </div>
         </div>
     @endif
 

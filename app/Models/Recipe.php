@@ -44,6 +44,12 @@ class Recipe extends Model
         return $this->belongsToMany(User::class, 'recipe_likes')->withTimestamps();
     }
 
+    /** 레시피에 사용된 상품(구매 연결) */
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'recipe_product')->withPivot('sort')->orderByPivot('sort');
+    }
+
     public function isLikedBy(?User $user): bool
     {
         return $user ? $this->likers()->where('user_id', $user->id)->exists() : false;

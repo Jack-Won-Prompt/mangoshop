@@ -105,7 +105,7 @@ class RecipeController extends Controller
     {
         abort_unless($category->is_active, 404);
 
-        $item = Recipe::published()->with('category', 'user', 'images')
+        $item = Recipe::published()->with('category', 'user', 'images', 'products')
             ->where('recipe_category_id', $category->id)
             ->where('slug', $recipe)
             ->firstOrFail();

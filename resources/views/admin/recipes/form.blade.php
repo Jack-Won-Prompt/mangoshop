@@ -82,6 +82,16 @@
                 <label>영상 파일 업로드(선택)<input type="file" name="video" accept="video/mp4,video/webm,video/quicktime" class="ainput" style="padding:8px"></label>
                 <div class="ahint">mp4/webm/mov · 최대 100MB. 서버 업로드 한도(post_max_size)를 넘으면 실패할 수 있습니다.</div>
             </div></div>
+
+            <div class="adm-card"><div class="h">사용된 상품 (구매 연결)</div><div style="padding:20px">
+                @php($selectedP = old('products', $recipe->exists ? $recipe->products->pluck('id')->all() : []))
+                <select name="products[]" multiple size="8" class="ainput" style="height:auto;padding:8px">
+                    @foreach($allProducts as $p)
+                        <option value="{{ $p->id }}" @selected(in_array($p->id, (array) $selectedP))>{{ $p->name }}@if($p->code) ({{ $p->code }})@endif</option>
+                    @endforeach
+                </select>
+                <div class="ahint">Ctrl(⌘)+클릭으로 여러 개 선택 · 상세페이지에 "이 레시피에 사용된 상품"으로 노출됩니다.</div>
+            </div></div>
         </div>
     </div>
 </form>

@@ -22,9 +22,14 @@
     .dcb .cats{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
     .dcb .cats a{font-size:13px;color:#333;text-decoration:none;padding:6px 13px;border:1px solid #e5e4dd;border-radius:6px;background:#fff}
     .dcb .cats a.on{background:#123b26;color:#fff;border-color:#123b26}
-    .dcb .toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid #333;padding-bottom:8px;margin-top:6px}
-    .dcb .tabs a{font-size:13px;color:#666;text-decoration:none;padding:4px 10px;border-radius:5px}
-    .dcb .tabs a.on{background:#eef2ee;color:#123b26;font-weight:700}
+    .dcb .toolbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-bottom:2px solid #333;padding-bottom:8px;margin-top:6px}
+    .dcb .tabs{display:flex;gap:4px}
+    .dcb .tabs a{font-size:13.5px;color:#666;text-decoration:none;padding:5px 13px;border-radius:16px}
+    .dcb .tabs a.on{background:#123b26;color:#fff;font-weight:700}
+    .dcb .sorts{display:flex;gap:4px;align-items:center}
+    .dcb .sorts a{font-size:12.5px;color:#aaa;text-decoration:none;padding:3px 5px}
+    .dcb .sorts a.on{color:#123b26;font-weight:700;text-decoration:underline;text-underline-offset:3px}
+    .dcb .wbtns{margin-left:auto}
     .dcb .wbtns{display:flex;gap:6px}
     .dcb .wbtns button,.dcb .wbtns a{border:0;border-radius:6px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none}
     .dcb .wbtns .q{background:#fff;border:1px solid #123b26;color:#123b26}
@@ -80,9 +85,10 @@
             <a href="{{ $catRoute(['sort'=>$sort]) }}" class="{{ !$type?'on':'' }}">전체</a>
             <a href="{{ $catRoute(['type'=>'recipe','sort'=>$sort]) }}" class="{{ $type==='recipe'?'on':'' }}">레시피</a>
             <a href="{{ $catRoute(['type'=>'question','sort'=>$sort]) }}" class="{{ $type==='question'?'on':'' }}">질문</a>
-            <span style="color:#ddd">|</span>
-            <a href="{{ $catRoute(array_filter(['type'=>$type])) }}" class="{{ $sort==='latest'?'on':'' }}">최신</a>
-            <a href="{{ $catRoute(array_filter(['type'=>$type,'sort'=>'popular'])) }}" class="{{ $sort==='popular'?'on':'' }}">인기</a>
+        </div>
+        <div class="sorts">
+            <a href="{{ $catRoute(array_filter(['type'=>$type])) }}" class="{{ $sort==='latest'?'on':'' }}">최신순</a>
+            <a href="{{ $catRoute(array_filter(['type'=>$type,'sort'=>'popular'])) }}" class="{{ $sort==='popular'?'on':'' }}">인기순</a>
             <a href="{{ $catRoute(array_filter(['type'=>$type,'sort'=>'best'])) }}" class="{{ $sort==='best'?'on':'' }}">개념글</a>
         </div>
         <div class="wbtns">
