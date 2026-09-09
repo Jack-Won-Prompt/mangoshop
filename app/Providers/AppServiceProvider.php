@@ -22,6 +22,10 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // 페이지네이션: 사이트 전용 커스텀 뷰(프레임워크 무관 숫자형)
+        \Illuminate\Pagination\Paginator::defaultView('vendor.pagination.mango');
+        \Illuminate\Pagination\Paginator::defaultSimpleView('vendor.pagination.mango');
+
         // FCM 푸시 트리거 — 주문 상태 변경 / 관리자 상담 답변
         Order::observe(OrderObserver::class);
         ChatMessage::observe(ChatMessageObserver::class);
