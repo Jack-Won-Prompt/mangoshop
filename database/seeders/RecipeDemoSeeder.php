@@ -108,9 +108,10 @@ class RecipeDemoSeeder extends Seeder
         return $set['dishes'][array_rand($set['dishes'])];
     }
 
-    private function img(array $set): string
+    /** 제목(과일)에 맞는 이미지 */
+    private function imgFor(string $title, string $slug, int $i = 0): string
     {
-        return 'images/fruit/'.$set['imgs'][array_rand($set['imgs'])];
+        return \App\Console\Commands\RecipeRemapImages::pick($title, $slug, $i);
     }
 
     private function body(string $dish): string
@@ -152,12 +153,12 @@ class RecipeDemoSeeder extends Seeder
             'title' => '[망고샵 공식] '.$this->title($dish), 'slug' => Recipe::uniqueSlug($dish.'-off-'.Str::random(4), $cat->id),
             'summary' => "{$cat->name}으로 만드는 {$dish}, 망고샵이 알려드려요.",
             'body' => '<p>'.nl2br(e($this->body($dish))).'</p>',
-            'cover_image' => $this->img($set), 'is_official' => true, 'is_pinned' => random_int(1, 100) <= 30,
+            'cover_image' => $this->imgFor($dish, $cat->slug, 0), 'is_official' => true, 'is_pinned' => random_int(1, 100) <= 30,
             'status' => 'published', 'view_count' => random_int(120, 900), 'like_count' => random_int(15, 120),
             'tags' => Recipe::normalizeTags($cat->name.','.explode(' ', $dish)[0].',레시피'),
             'published_at' => $t, 'created_at' => $t, 'updated_at' => $t,
         ]);
-        $this->addPhotos($r, $set, random_int(1, 3));
+        $this->addPhotos($r, $dish, $cat->slug, random_int(1, 3));
         $this->addComments($r, random_int(2, 9));
     }
 
@@ -170,12 +171,12 @@ class RecipeDemoSeeder extends Seeder
             'title' => $this->title($dish), 'slug' => Recipe::uniqueSlug($dish.'-'.Str::random(4), $cat->id),
             'summary' => random_int(1, 2) === 1 ? "{$dish} 만들어봤어요!" : null,
             'body' => '<p>'.nl2br(e($this->body($dish))).'</p>',
-            'cover_image' => $this->img($set), 'is_official' => false, 'is_pinned' => false,
+            'cover_image' => $this->imgFor($dish, $cat->slug, 0), 'is_official' => false, 'is_pinned' => false,
             'status' => 'published', 'view_count' => random_int(10, 400), 'like_count' => random_int(0, 60),
             'tags' => random_int(1, 100) <= 70 ? Recipe::normalizeTags($cat->name.','.explode(' ', $dish)[0]) : null,
             'published_at' => $t, 'created_at' => $t, 'updated_at' => $t,
         ]);
-        $this->addPhotos($r, $set, random_int(1, 3));
+        $this->addPhotos($r, $dish, $cat->slug, random_int(1, 3));
         $this->addComments($r, random_int(0, 7));
     }
 
@@ -211,20 +212,15 @@ class RecipeDemoSeeder extends Seeder
         }
         $q->update(['answer_count' => $cnt]);
         if (random_int(1, 100) <= 30) {
-            $this->addQuestionPhoto($q, $set);
+            $q->images()->create(['path' => $this->imgFor($q->title, $cat->slug, 1), 'sort' => 0, 'created_at' => $q->created_at, 'updated_at' => $q->created_at]);
         }
     }
 
-    private function addPhotos(Recipe $r, array $set, int $count): void
+    private function addPhotos(Recipe $r, string $dish, string $slug, int $count): void
     {
         for ($i = 0; $i < $count; $i++) {
-            $r->images()->create(['path' => $this->img($set), 'sort' => $i, 'created_at' => $r->created_at, 'updated_at' => $r->created_at]);
+            $r->images()->create(['path' => $this->imgFor($dish, $slug, $i + 1), 'sort' => $i, 'created_at' => $r->created_at, 'updated_at' => $r->created_at]);
         }
-    }
-
-    private function addQuestionPhoto(RecipeQuestion $q, array $set): void
-    {
-        $q->images()->create(['path' => $this->img($set), 'sort' => 0, 'created_at' => $q->created_at, 'updated_at' => $q->created_at]);
     }
 
     private function addComments(Recipe $r, int $count): void
