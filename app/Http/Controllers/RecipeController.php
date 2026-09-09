@@ -5,49 +5,100 @@ namespace App\Http\Controllers;
 use App\Models\Recipe;
 use App\Models\RecipeCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 /**
- * 레시피 커뮤니티(공개) — 목록/카테고리/상세.
- * 카테고리 페이지: 공식·고정 레시피를 항상 최상단에 노출 후 최신 글.
+ * 레시피 커뮤니티(공개) — DCinside식 통합 게시판(레시피+질문 말머리) / 상세.
  */
 class RecipeController extends Controller
 {
     public function index(Request $request)
     {
-        $categories = RecipeCategory::active()->orderBy('sort_order')->withCount(['recipes' => fn ($q) => $q->published()])->get();
-
-        $pinned = Recipe::published()->with('category')
-            ->where('is_pinned', true)->latest('published_at')->take(6)->get();
-
-        $latest = Recipe::published()->with('category', 'user')
-            ->latest('published_at')->take(12)->get();
-
-        $popular = Recipe::published()->with('category')
-            ->popular()->take(8)->get();
-
-        return view('community.recipes.index', compact('categories', 'pinned', 'latest', 'popular'));
+        return $this->board($request, null);
     }
 
     public function category(RecipeCategory $category, Request $request)
     {
         abort_unless($category->is_active, 404);
 
-        // 공식·고정 레시피(상단 고정)
-        $pinned = $category->recipes()->published()
-            ->where(fn ($q) => $q->where('is_pinned', true)->orWhere('is_official', true))
-            ->orderByDesc('is_pinned')->latest('published_at')->get();
+        return $this->board($request, $category);
+    }
 
-        // 사용자/일반 글(고정 제외) — 최신 or 인기
-        $sort = $request->get('sort') === 'popular' ? 'popular' : 'latest';
-        $posts = $category->recipes()->published()
-            ->where('is_pinned', false)->where('is_official', false)
-            ->with('user')
-            ->when($sort === 'popular', fn ($q) => $q->popular(), fn ($q) => $q->latest('published_at'))
-            ->paginate(12)->withQueryString();
+    /** 통합 게시판(레시피 + 질문 말머리, 테이블형) */
+    private function board(Request $request, ?RecipeCategory $category)
+    {
+        $catId = $category?->id;
+        $type  = in_array($request->get('type'), ['recipe', 'question'], true) ? $request->get('type') : null;
+        $sort  = in_array($request->get('sort'), ['popular', 'views', 'best'], true) ? $request->get('sort') : 'latest';
 
-        $categories = RecipeCategory::active()->orderBy('sort_order')->get();
+        // 상단 고정(공식·고정 레시피)
+        $notices = collect();
+        if (! $type || $type === 'recipe') {
+            $notices = Recipe::published()->with('category')
+                ->where('is_pinned', true)->when($catId, fn ($q) => $q->where('recipe_category_id', $catId))
+                ->latest('published_at')->take($catId ? 20 : 6)->get()
+                ->map(fn ($r) => $this->rowFromRecipe($r));
+        }
 
-        return view('community.recipes.category', compact('category', 'pinned', 'posts', 'categories', 'sort'));
+        // 일반 목록(union: 레시피 + 질문)
+        $union = $this->boardUnion($catId, $type);
+        $q = DB::query()->fromSub($union, 't');
+        if ($sort === 'best') {          // 개념글: 추천 3+ 레시피
+            $q->where('rec', '>=', 3)->orderByDesc('rec')->orderByDesc('created');
+        } elseif ($sort === 'popular') {
+            $q->orderByRaw('(view_count + rec*3 + cmt*2) DESC');
+        } elseif ($sort === 'views') {
+            $q->orderByDesc('view_count');
+        } else {
+            $q->orderByDesc('created');
+        }
+        // 고정글은 일반 목록에서 제외(중복 방지)
+        $q->where(fn ($w) => $w->where('kind', '!=', 'recipe')->orWhere('is_pinned', 0));
+
+        $rows = $q->paginate(20)->withQueryString();
+
+        $categories = RecipeCategory::active()->orderBy('sort_order')
+            ->withCount(['recipes' => fn ($x) => $x->published()])->get();
+
+        return view('community.recipes.board', compact('category', 'categories', 'notices', 'rows', 'type', 'sort'));
+    }
+
+    /** 레시피/질문 union 서브쿼리 */
+    private function boardUnion(?int $catId, ?string $type)
+    {
+        $recipes = DB::table('recipes as r')
+            ->leftJoin('recipe_categories as rc', 'rc.id', '=', 'r.recipe_category_id')
+            ->leftJoin('users as u', 'u.id', '=', 'r.user_id')
+            ->where('r.status', 'published')
+            ->when($catId, fn ($q) => $q->where('r.recipe_category_id', $catId))
+            ->selectRaw("'recipe' as kind, r.id, r.title, r.slug as recipe_slug, rc.slug as cat_slug, rc.name as cat_name, r.user_id, COALESCE(u.name, '망고샵') as author, r.published_at as created, r.view_count, r.like_count as rec, r.comment_count as cmt, r.is_pinned, r.is_official");
+
+        $questions = DB::table('recipe_questions as q')
+            ->leftJoin('recipe_categories as rc', 'rc.id', '=', 'q.recipe_category_id')
+            ->leftJoin('users as u', 'u.id', '=', 'q.user_id')
+            ->where('q.status', 'published')
+            ->when($catId, fn ($x) => $x->where('q.recipe_category_id', $catId))
+            ->selectRaw("'question' as kind, q.id, q.title, NULL as recipe_slug, rc.slug as cat_slug, rc.name as cat_name, q.user_id, COALESCE(u.name, '회원') as author, q.created_at as created, q.view_count, 0 as rec, q.answer_count as cmt, 0 as is_pinned, 0 as is_official");
+
+        if ($type === 'recipe') {
+            return $recipes;
+        }
+        if ($type === 'question') {
+            return $questions;
+        }
+
+        return $recipes->unionAll($questions);
+    }
+
+    private function rowFromRecipe(Recipe $r): object
+    {
+        return (object) [
+            'kind' => 'recipe', 'id' => $r->id, 'title' => $r->title, 'recipe_slug' => $r->slug,
+            'cat_slug' => $r->category->slug ?? null, 'cat_name' => $r->category->name ?? '레시피',
+            'author' => $r->user_id ? ($r->user->name ?? '회원') : '망고샵', 'created' => $r->published_at,
+            'view_count' => $r->view_count, 'rec' => $r->like_count, 'cmt' => $r->comment_count,
+            'is_pinned' => 1, 'is_official' => $r->is_official ? 1 : 0,
+        ];
     }
 
     public function show(RecipeCategory $category, string $recipe)
