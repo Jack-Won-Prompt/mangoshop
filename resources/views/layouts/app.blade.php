@@ -9,6 +9,31 @@
     <title>@yield('title', $site['name'].' — '.$site['tagline'])</title>
     <meta name="description" content="@yield('desc', '수입 과일 도매·소매 오픈마켓 망고샵 — 태국·베트남·필리핀 애플망고, 아보카도, 열대과일 등 검증된 수입사의 과일을 만나보세요.')">
     <meta name="naver-site-verification" content="fc7cd1dcc5d8a6d5663c53695c24e0fe9523c088" />
+
+    {{-- 정규 URL: 쿼리 파라미터(sort/grade/brand/page) 중복 색인 방지 --}}
+    <link rel="canonical" href="@yield('canonical', url()->current())">
+
+    {{-- Open Graph / Twitter --}}
+    <meta property="og:site_name" content="{{ $site['name'] ?? '망고샵' }}">
+    <meta property="og:type" content="@yield('og_type', 'website')">
+    <meta property="og:title" content="@yield('title', ($site['name'] ?? '망고샵').' — '.($site['tagline'] ?? '수입과일 오픈마켓'))">
+    <meta property="og:description" content="@yield('desc', '수입 과일 도매·소매 오픈마켓 망고샵')">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:image" content="@yield('og_image', asset('images/main/hero-01.jpg'))">
+    <meta name="twitter:card" content="summary_large_image">
+
+    {{-- Organization 구조화 데이터 --}}
+    <script type="application/ld+json">
+    {!! json_encode([
+        '@context' => 'https://schema.org',
+        '@type' => 'Organization',
+        'name' => $site['name'] ?? '망고샵',
+        'url' => url('/'),
+        'logo' => asset('images/main/hero-01.jpg'),
+        'email' => $site['email'] ?? null,
+        'telephone' => $site['cs_tel'] ?? null,
+    ], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) !!}
+    </script>
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A5%AD%3C/text%3E%3C/svg%3E">

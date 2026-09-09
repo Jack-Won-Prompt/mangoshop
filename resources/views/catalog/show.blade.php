@@ -1,5 +1,44 @@
 @extends('layouts.app')
-@section('title', $product->name.' — 망고샵')
+@section('title', $product->name.' | 망고샵')
+@section('desc', \Illuminate\Support\Str::limit($product->summary ?: strip_tags((string) $product->description), 150) ?: ($product->name.' — 망고샵 수입과일'))
+@section('og_type', 'product')
+@section('og_image', $product->thumbnail ? \App\Support\Media::url($product->thumbnail) : asset('images/main/hero-01.jpg'))
+
+@php
+    $seoRetail = (! $product->is_quote && (int) $product->price > 0) ? (int) $product->price : null;
+    $seoAvail = ($product->stock > 0 && $product->sale_status === 'on_sale') ? 'InStock' : 'OutOfStock';
+    $seoProduct = array_filter([
+        '@context' => 'https://schema.org',
+        '@type' => 'Product',
+        'name' => $product->name,
+        'image' => $product->thumbnail ? [\App\Support\Media::url($product->thumbnail)] : null,
+        'description' => \Illuminate\Support\Str::limit($product->summary ?: strip_tags((string) $product->description), 200) ?: $product->name,
+        'sku' => $product->code ?: null,
+        'brand' => ['@type' => 'Brand', 'name' => $product->maker ?: ($product->brand->name ?? '망고샵')],
+        'category' => $product->category->name ?? null,
+    ], fn ($v) => ! is_null($v));
+    if ($seoRetail) {
+        $seoProduct['offers'] = [
+            '@type' => 'Offer', 'price' => $seoRetail, 'priceCurrency' => 'KRW',
+            'availability' => 'https://schema.org/'.$seoAvail, 'url' => url()->current(),
+        ];
+    }
+@endphp
+
+@push('head')
+<script type="application/ld+json">
+{!! json_encode($seoProduct, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) !!}
+</script>
+<script type="application/ld+json">
+{!! json_encode([
+    '@context' => 'https://schema.org', '@type' => 'BreadcrumbList', 'itemListElement' => [
+        ['@type' => 'ListItem', 'position' => 1, 'name' => '홈', 'item' => url('/')],
+        ['@type' => 'ListItem', 'position' => 2, 'name' => $product->category->name ?? '상품', 'item' => route('catalog.category', $product->category->slug ?? '')],
+        ['@type' => 'ListItem', 'position' => 3, 'name' => $product->name, 'item' => url()->current()],
+    ],
+], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) !!}
+</script>
+@endpush
 
 @php
     $user = auth()->user();

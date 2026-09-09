@@ -1,5 +1,22 @@
 @extends('layouts.app')
-@section('title', $title.' — 망고샵')
+@section('title', ($category ? $category->name.' 수입과일 도매·소매' : $title).' | 망고샵')
+@section('desc', $category
+    ? ($category->tagline ?: $category->name.' 도매·소매 — 태국·베트남·필리핀 등 검증된 수입사의 '.$category->name.'를 망고샵에서 만나보세요.')
+    : '망고샵 '.$title.' — 수입 과일 도매·소매 오픈마켓')
+
+@if($category)
+@push('head')
+<script type="application/ld+json">
+{!! json_encode([
+    '@context' => 'https://schema.org', '@type' => 'BreadcrumbList', 'itemListElement' => array_values(array_filter([
+        ['@type' => 'ListItem', 'position' => 1, 'name' => '홈', 'item' => url('/')],
+        $category->parent ? ['@type' => 'ListItem', 'position' => 2, 'name' => $category->parent->name, 'item' => route('catalog.category', $category->parent->slug)] : null,
+        ['@type' => 'ListItem', 'position' => $category->parent ? 3 : 2, 'name' => $category->name, 'item' => route('catalog.category', $category->slug)],
+    ])),
+], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) !!}
+</script>
+@endpush
+@endif
 
 @section('content')
 <div class="page-head">
