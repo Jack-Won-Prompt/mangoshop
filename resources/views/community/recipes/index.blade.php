@@ -34,8 +34,8 @@
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
             @auth
-                <button type="button" class="rcp-openbtn ghost" onclick="rcpOpen('askModal')">💬 레시피 물어보기</button>
-                <button type="button" class="rcp-openbtn" onclick="rcpOpen('writeModal')">✍️ 레시피 작성</button>
+                <button type="button" class="rcp-openbtn ghost" onclick="rcpShow('askForm')">💬 레시피 물어보기</button>
+                <button type="button" class="rcp-openbtn" onclick="rcpShow('writeForm')">✍️ 레시피 작성</button>
             @else
                 <a href="{{ route('login') }}" class="rcp-openbtn ghost" style="text-decoration:none">💬 레시피 물어보기</a>
                 <a href="{{ route('login') }}" class="rcp-openbtn" style="text-decoration:none">✍️ 레시피 작성</a>
@@ -75,11 +75,11 @@
 </div>
 
 @auth
-{{-- ===== 레시피 작성 모달 ===== --}}
-<div class="rcp-modal" id="writeModal" aria-hidden="true">
-    <div class="rcp-dim" onclick="rcpClose('writeModal')"></div>
-    <div class="rcp-dialog" role="dialog" aria-label="레시피 작성">
-        <div class="rcp-mhead"><b>✍️ 레시피 작성</b><button type="button" class="x" onclick="rcpClose('writeModal')">×</button></div>
+{{-- ===== 리스트 하단 인라인 작성 영역 ===== --}}
+<div class="rcp container" style="max-width:820px;padding:0 20px 44px">
+    {{-- 레시피 작성 --}}
+    <section id="writeForm" class="rcp-writebox" hidden>
+        <h2>✍️ 레시피 작성</h2>
         <form method="POST" action="{{ route('community.recipe.store') }}" enctype="multipart/form-data" class="rcp-form">
             @csrf
             <div style="position:absolute;left:-9999px" aria-hidden="true"><input type="text" name="website" tabindex="-1" autocomplete="off"></div>
@@ -91,16 +91,13 @@
             <label>태그(선택)<input type="text" name="tags" placeholder="쉼표 구분 · 예: 애플망고, 디저트"></label>
             <label>사진(여러 장)<input type="file" name="photos[]" accept="image/*" multiple></label>
             <label>영상 파일(선택·mp4/webm)<input type="file" name="video" accept="video/mp4,video/webm,video/quicktime"></label>
-            <button class="submit">레시피 등록</button>
+            <div class="btns"><button class="submit">레시피 등록</button><button type="button" class="cancel" onclick="rcpHide('writeForm')">접기</button></div>
         </form>
-    </div>
-</div>
+    </section>
 
-{{-- ===== 레시피 물어보기 모달 ===== --}}
-<div class="rcp-modal" id="askModal" aria-hidden="true">
-    <div class="rcp-dim" onclick="rcpClose('askModal')"></div>
-    <div class="rcp-dialog" role="dialog" aria-label="레시피 물어보기">
-        <div class="rcp-mhead"><b>💬 레시피 물어보기</b><button type="button" class="x" onclick="rcpClose('askModal')">×</button></div>
+    {{-- 레시피 물어보기 --}}
+    <section id="askForm" class="rcp-writebox" hidden>
+        <h2>💬 레시피 물어보기</h2>
         <form method="POST" action="{{ route('community.recipe.qna.store') }}" enctype="multipart/form-data" class="rcp-form">
             @csrf
             <div style="position:absolute;left:-9999px" aria-hidden="true"><input type="text" name="website" tabindex="-1" autocomplete="off"></div>
@@ -109,31 +106,32 @@
             <label>내용 *<textarea name="body" maxlength="3000" required placeholder="궁금한 점을 자세히 적어주세요."></textarea></label>
             <label>사진 첨부(선택·여러 장)<input type="file" name="photos[]" accept="image/*" multiple></label>
             <label>유튜브 링크(선택)<input type="text" name="video_url" placeholder="https://youtu.be/..."></label>
-            <button class="submit">질문 등록</button>
+            <div class="btns"><button class="submit">질문 등록</button><button type="button" class="cancel" onclick="rcpHide('askForm')">접기</button></div>
         </form>
-    </div>
+    </section>
 </div>
 @endauth
 
 <style>
     .rcp-openbtn{border:0;background:#123b26;color:#fff;padding:10px 18px;border-radius:22px;font-size:13.5px;font-weight:700;white-space:nowrap;cursor:pointer}
     .rcp-openbtn.ghost{background:#fff;border:1px solid #123b26;color:#123b26}
-    .rcp-modal{position:fixed;inset:0;z-index:1000;display:none}
-    .rcp-modal.on{display:block}
-    .rcp-dim{position:absolute;inset:0;background:rgba(20,30,20,.5)}
-    .rcp-dialog{position:relative;max-width:560px;margin:5vh auto;background:#fff;border-radius:14px;max-height:90vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
-    .rcp-mhead{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid #eee;position:sticky;top:0;background:#fff}
-    .rcp-mhead b{font-size:16px}
-    .rcp-mhead .x{border:0;background:none;font-size:24px;cursor:pointer;color:#888;line-height:1}
-    .rcp-form{padding:18px 20px 24px;display:grid;gap:14px}
+    .rcp-writebox{border:1px solid #e6e5de;border-radius:14px;padding:20px 22px 24px;margin-top:18px;background:#fcfcf9}
+    .rcp-writebox h2{font-size:17px;margin:0 0 14px}
+    .rcp-form{display:grid;gap:13px}
     .rcp-form label{display:block;font-size:13px;font-weight:600;color:#33415c}
     .rcp-form input,.rcp-form select,.rcp-form textarea{width:100%;border:1px solid #dcdcd4;border-radius:8px;padding:10px 12px;font-size:14px;font-family:inherit;margin-top:6px}
-    .rcp-form textarea{min-height:130px;line-height:1.6;resize:vertical}
-    .rcp-form .submit{background:#123b26;color:#fff;border:0;border-radius:22px;padding:12px;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px}
+    .rcp-form textarea{min-height:120px;line-height:1.6;resize:vertical}
+    .rcp-form .btns{display:flex;gap:8px;align-items:center;margin-top:4px}
+    .rcp-form .submit{background:#123b26;color:#fff;border:0;border-radius:22px;padding:11px 26px;font-size:15px;font-weight:700;cursor:pointer}
+    .rcp-form .cancel{background:none;border:0;color:#77786f;cursor:pointer;font-size:13px}
 </style>
 <script>
-    function rcpOpen(id){var m=document.getElementById(id);if(m){m.classList.add('on');document.body.style.overflow='hidden';}}
-    function rcpClose(id){var m=document.getElementById(id);if(m){m.classList.remove('on');document.body.style.overflow='';}}
-    document.addEventListener('keydown',function(e){if(e.key==='Escape'){document.querySelectorAll('.rcp-modal.on').forEach(function(m){m.classList.remove('on');});document.body.style.overflow='';}});
+    function rcpShow(id){
+        ['writeForm','askForm'].forEach(function(x){var e=document.getElementById(x);if(e)e.hidden=(x!==id);});
+        var el=document.getElementById(id); if(!el)return;
+        el.hidden=false; el.scrollIntoView({behavior:'smooth',block:'start'});
+        var f=el.querySelector('input[name=title]'); if(f) setTimeout(function(){try{f.focus();}catch(e){}},350);
+    }
+    function rcpHide(id){var e=document.getElementById(id);if(e)e.hidden=true;}
 </script>
 @endsection
