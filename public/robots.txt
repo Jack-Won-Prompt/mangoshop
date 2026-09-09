@@ -1,2 +1,23 @@
 User-agent: *
-Disallow:
+Allow: /
+
+# 비공개·비색인 경로 차단
+Disallow: /admin
+Disallow: /seller
+Disallow: /agent
+Disallow: /mypage
+Disallow: /cart
+Disallow: /order
+Disallow: /payment
+Disallow: /login
+Disallow: /register
+Disallow: /api/
+
+# 중복 색인 방지(필터/정렬 파라미터)
+Disallow: /*?sort=
+Disallow: /*?grade=
+Disallow: /*?brand=
+Disallow: /*?price_min=
+Disallow: /*?price_max=
+
+Sitemap: https://mangoshop.co.kr/sitemap.xml
