@@ -23,7 +23,7 @@ class RecipeController extends Controller
             ->latest('published_at')->take(12)->get();
 
         $popular = Recipe::published()->with('category')
-            ->orderByDesc('view_count')->take(8)->get();
+            ->popular()->take(8)->get();
 
         return view('community.recipes.index', compact('categories', 'pinned', 'latest', 'popular'));
     }
@@ -42,7 +42,7 @@ class RecipeController extends Controller
         $posts = $category->recipes()->published()
             ->where('is_pinned', false)->where('is_official', false)
             ->with('user')
-            ->when($sort === 'popular', fn ($q) => $q->orderByDesc('view_count'), fn ($q) => $q->latest('published_at'))
+            ->when($sort === 'popular', fn ($q) => $q->popular(), fn ($q) => $q->latest('published_at'))
             ->paginate(12)->withQueryString();
 
         $categories = RecipeCategory::active()->orderBy('sort_order')->get();
@@ -158,6 +158,87 @@ class RecipeController extends Controller
         return back()->with('ok', '신고가 접수되었습니다. 관리자가 확인합니다.');
     }
 
+    /* ===== 좋아요 / 댓글 / 태그 (Phase 3) ===== */
+
+    public function like(Request $request, Recipe $recipe)
+    {
+        $user = $request->user();
+        $existing = $recipe->likers()->where('user_id', $user->id)->exists();
+        if ($existing) {
+            $recipe->likers()->detach($user->id);
+            $recipe->decrement('like_count');
+            $liked = false;
+        } else {
+            $recipe->likers()->attach($user->id);
+            $recipe->increment('like_count');
+            $liked = true;
+        }
+        $recipe->refresh();
+
+        if ($request->expectsJson()) {
+            return response()->json(['liked' => $liked, 'count' => $recipe->like_count]);
+        }
+
+        return back();
+    }
+
+    public function comment(Request $request, Recipe $recipe)
+    {
+        abort_unless($recipe->status === 'published', 404);
+        if (filled($request->input('website'))) {
+            return redirect($recipe->url);
+        }
+        $key = 'recipe_c:'.$request->ip();
+        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($key, 20)) {
+            return back()->with('error', '댓글이 너무 자주 등록되었습니다. 잠시 후 다시 시도해 주세요.');
+        }
+        \Illuminate\Support\Facades\RateLimiter::hit($key, 3600);
+
+        $data = $request->validate(['body' => ['required', 'string', 'max:1000']]);
+        $isAdmin = (bool) $request->user()->is_admin;
+        \App\Models\RecipeComment::create([
+            'recipe_id' => $recipe->id,
+            'user_id'   => $request->user()->id,
+            'body'      => $data['body'],
+            'is_admin'  => $isAdmin,
+            'status'    => 'published',
+        ]);
+        $recipe->increment('comment_count');
+
+        if (! $isAdmin) {
+            \App\Support\AdminPush::toAdmins('💬 레시피 새 댓글', \Illuminate\Support\Str::limit($recipe->title, 40),
+                ['type' => 'recipe_comment', 'recipe_id' => (string) $recipe->id]);
+        }
+
+        return redirect($recipe->url.'#comments')->with('ok', '댓글이 등록되었습니다.');
+    }
+
+    public function destroyComment(Request $request, \App\Models\RecipeComment $comment)
+    {
+        abort_unless($request->user()->is_admin || $comment->user_id === $request->user()->id, 403);
+        $recipe = $comment->recipe;
+        $comment->delete();
+        if ($recipe) {
+            $recipe->decrement('comment_count');
+        }
+
+        return back()->with('ok', '댓글을 삭제했습니다.');
+    }
+
+    /** 태그별 레시피 목록(SEO) */
+    public function tag(string $tag)
+    {
+        $tag = trim($tag);
+        $recipes = Recipe::published()->with('category')
+            ->where(fn ($q) => $q->where('tags', $tag)
+                ->orWhere('tags', 'like', $tag.',%')
+                ->orWhere('tags', 'like', '%,'.$tag)
+                ->orWhere('tags', 'like', '%,'.$tag.',%'))
+            ->latest('published_at')->paginate(16)->withQueryString();
+
+        return view('community.recipes.tag', compact('tag', 'recipes'));
+    }
+
     /* ===== 내부 ===== */
     private function authorizeOwner(Request $request, Recipe $recipe): void
     {
@@ -172,6 +253,7 @@ class RecipeController extends Controller
             'summary'   => ['nullable', 'string', 'max:300'],
             'body'      => ['required', 'string', 'max:5000'],
             'video_url' => ['nullable', 'url', 'max:300'],
+            'tags'      => ['nullable', 'string', 'max:200'],
             'photos.*'  => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:8192'],
         ]);
     }
@@ -184,6 +266,7 @@ class RecipeController extends Controller
         // 사용자 입력은 평문 → 안전 HTML(이스케이프 + 줄바꿈)로 저장
         $recipe->body = '<p>'.nl2br(e(trim($data['body']))).'</p>';
         $recipe->video_url = trim((string) ($data['video_url'] ?? '')) ?: null;
+        $recipe->tags = Recipe::normalizeTags($data['tags'] ?? null);
         if (blank($recipe->slug)) {
             $recipe->slug = Recipe::uniqueSlug($data['title'], (int) $data['recipe_category_id'], $recipe->id);
         }

@@ -120,6 +120,7 @@ class RecipeController extends Controller
             'body'             => ['nullable', 'string', 'max:500000'],
             'cook_time'        => ['nullable', 'string', 'max:50'],
             'ingredients'      => ['nullable', 'string', 'max:3000'],
+            'tags'             => ['nullable', 'string', 'max:200'],
             'meta_title'       => ['nullable', 'string', 'max:150'],
             'meta_description' => ['nullable', 'string', 'max:300'],
             'video_url'        => ['nullable', 'url', 'max:300'],
@@ -134,6 +135,7 @@ class RecipeController extends Controller
         foreach (['recipe_category_id', 'title', 'summary', 'cook_time', 'ingredients', 'meta_title', 'meta_description'] as $f) {
             $recipe->{$f} = $data[$f] ?? null;
         }
+        $recipe->tags = Recipe::normalizeTags($data['tags'] ?? null);
         $recipe->body       = RichTextSanitizer::clean($data['body'] ?? null);
         $recipe->is_official = true;                          // 관리자 등록 = 공식
         $recipe->is_pinned  = $request->boolean('is_pinned');

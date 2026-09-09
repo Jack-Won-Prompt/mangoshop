@@ -9,8 +9,8 @@ class Recipe extends Model
 {
     protected $fillable = [
         'recipe_category_id', 'user_id', 'title', 'slug', 'summary', 'body',
-        'cover_image', 'video_url', 'video_path', 'is_official', 'is_pinned', 'status', 'view_count', 'like_count',
-        'cook_time', 'ingredients', 'meta_title', 'meta_description', 'published_at',
+        'cover_image', 'video_url', 'video_path', 'is_official', 'is_pinned', 'status', 'view_count', 'like_count', 'comment_count',
+        'cook_time', 'ingredients', 'tags', 'meta_title', 'meta_description', 'published_at',
     ];
 
     protected $casts = [
@@ -34,10 +34,45 @@ class Recipe extends Model
         return $this->hasMany(RecipeImage::class)->orderBy('sort')->orderBy('id');
     }
 
+    public function comments()
+    {
+        return $this->hasMany(RecipeComment::class)->where('status', 'published')->oldest();
+    }
+
+    public function likers()
+    {
+        return $this->belongsToMany(User::class, 'recipe_likes')->withTimestamps();
+    }
+
+    public function isLikedBy(?User $user): bool
+    {
+        return $user ? $this->likers()->where('user_id', $user->id)->exists() : false;
+    }
+
     /* ===== 스코프 ===== */
     public function scopePublished($q)
     {
         return $q->where('status', 'published');
+    }
+
+    /** 인기 점수순(조회 + 좋아요*3 + 댓글*2) */
+    public function scopePopular($q)
+    {
+        return $q->orderByRaw('(view_count + like_count * 3 + comment_count * 2) DESC');
+    }
+
+    /** 태그 배열 */
+    public function getTagArrayAttribute(): array
+    {
+        return collect(explode(',', (string) $this->tags))->map(fn ($t) => trim($t))->filter()->unique()->values()->all();
+    }
+
+    /** 태그 문자열 정규화(공백 제거·중복 제거 → "a,b,c") */
+    public static function normalizeTags(?string $raw): ?string
+    {
+        $tags = collect(explode(',', (string) $raw))->map(fn ($t) => trim($t))->filter()->unique()->take(10);
+
+        return $tags->isEmpty() ? null : $tags->implode(',');
     }
 
     /* ===== 접근자 ===== */

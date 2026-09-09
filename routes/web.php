@@ -152,7 +152,12 @@ Route::prefix('community')->name('community.')->group(function () {
         Route::put('/recipe-write/{recipe}', [\App\Http\Controllers\RecipeController::class, 'updateOwn'])->name('recipe.update');
         Route::delete('/recipe-write/{recipe}', [\App\Http\Controllers\RecipeController::class, 'destroyOwn'])->name('recipe.destroy');
         Route::post('/recipes/{recipe}/report', [\App\Http\Controllers\RecipeController::class, 'report'])->name('recipe.report');
+        Route::post('/recipes/{recipe}/like', [\App\Http\Controllers\RecipeController::class, 'like'])->name('recipe.like');
+        Route::post('/recipes/{recipe}/comment', [\App\Http\Controllers\RecipeController::class, 'comment'])->name('recipe.comment');
+        Route::delete('/recipe-comments/{comment}', [\App\Http\Controllers\RecipeController::class, 'destroyComment'])->name('recipe.comment.destroy');
     });
+
+    Route::get('/recipe-tag/{tag}', [\App\Http\Controllers\RecipeController::class, 'tag'])->name('recipe.tag');
 
     Route::get('/recipes', [\App\Http\Controllers\RecipeController::class, 'index'])->name('recipes');
     Route::get('/recipes/{category:slug}', [\App\Http\Controllers\RecipeController::class, 'category'])->name('recipe.category');

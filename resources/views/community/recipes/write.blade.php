@@ -47,6 +47,11 @@
             <input type="text" name="video_url" value="{{ old('video_url',$recipe->video_url) }}" placeholder="https://youtu.be/...">
             <div class="hint">요리 영상이 있으면 링크를 넣어주세요.</div>
         </div>
+        <div class="f">
+            <label>태그 (선택)</label>
+            <input type="text" name="tags" value="{{ old('tags',$recipe->tags) }}" placeholder="쉼표로 구분 · 예: 애플망고, 디저트, 여름">
+            <div class="hint">태그로 검색·분류됩니다.</div>
+        </div>
 
         @if($recipe->exists && $recipe->images->count())
         <div class="f">

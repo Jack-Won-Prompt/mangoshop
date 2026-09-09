@@ -72,8 +72,45 @@
         .rcp .rcard .thumb{aspect-ratio:1.3;background:#f4f3ec center/cover no-repeat}
         .rcp .rcard .b{padding:10px 11px}
         .rcp .rcard h3{font-size:13px;margin:0;line-height:1.4}
+        .rcp .tags{display:flex;flex-wrap:wrap;gap:7px;margin:24px 0 6px}
+        .rcp .tags a{font-size:12.5px;color:#123b26;background:#eef3ee;border-radius:16px;padding:5px 12px;text-decoration:none}
+        .rcp .tags a:hover{background:#dce9df}
+        .rcp .likebar{display:flex;align-items:center;gap:16px;margin:20px 0;padding:14px 0;border-top:1px solid #eee;border-bottom:1px solid #eee}
+        .rcp .likebtn{display:inline-flex;align-items:center;gap:7px;border:1px solid #e2b8b8;background:#fff;color:#c0392b;border-radius:22px;padding:9px 20px;font-size:15px;font-weight:700;cursor:pointer;text-decoration:none}
+        .rcp .likebtn .ic{font-size:16px}
+        .rcp .likebtn.on{background:#c0392b;color:#fff;border-color:#c0392b}
+        .rcp .cmt-jump a{color:#77786f;text-decoration:none;font-size:14px}
+        .rcp .comments{margin-top:14px}
+        .rcp .comments h3{font-size:17px;margin:0 0 14px}
+        .rcp .cm{border-top:1px solid #f0f0ea;padding:12px 2px}
+        .rcp .cm.admin{background:#f7fbf8}
+        .rcp .cm .who{font-size:12.5px;font-weight:700;color:#33415c;display:flex;align-items:center;gap:8px}
+        .rcp .cm .who .badge{background:#123b26;color:#fff;font-size:10px;padding:1px 6px;border-radius:9px}
+        .rcp .cm .who .date{font-weight:400;color:#aaa;font-size:11px}
+        .rcp .cm .txt{font-size:14px;line-height:1.7;white-space:pre-wrap;margin-top:5px}
+        .rcp .cmform{margin-top:16px}
+        .rcp .cmform textarea{width:100%;min-height:80px;border:1px solid #dcdcd4;border-radius:8px;padding:10px 12px;font-size:14px;font-family:inherit;line-height:1.6;resize:vertical}
+        .rcp .cmform .sub{margin-top:8px;background:#123b26;color:#fff;border:0;border-radius:20px;padding:9px 22px;font-weight:700;cursor:pointer}
+        .rcp .login-note{margin-top:14px;padding:14px;background:#f7f6f0;border-radius:10px;text-align:center;font-size:14px}
+        .rcp .login-note a{color:#123b26;font-weight:700}
         @media(max-width:640px){.rcp .rgrid{grid-template-columns:repeat(2,1fr)}.rcp .gallery{grid-template-columns:repeat(2,1fr)}}
     </style>
+    @push('scripts')
+    <script>
+    (function(){
+        var f=document.getElementById('likeForm'); if(!f) return;
+        f.addEventListener('submit',function(e){
+            e.preventDefault();
+            var btn=document.getElementById('likeBtn');
+            fetch(f.action,{method:'POST',headers:{'X-CSRF-TOKEN':f.querySelector('[name=_token]').value,'Accept':'application/json'}})
+              .then(r=>r.json()).then(function(d){
+                document.getElementById('likeCount').textContent=d.count;
+                btn.classList.toggle('on',d.liked);
+              }).catch(function(){ f.submit(); });
+        });
+    })();
+    </script>
+    @endpush
 
     <div class="crumb"><a href="{{ route('community.recipes') }}">레시피</a> › <a href="{{ route('community.recipe.category',$recipe->category->slug) }}">{{ $recipe->category->name }}</a></div>
     <h1>{{ $recipe->title }}</h1>
@@ -114,6 +151,57 @@
             @foreach($recipe->images as $img)<img src="{{ $img->url }}" alt="{{ $recipe->title }} 사진 {{ $loop->iteration }}" loading="lazy">@endforeach
         </div>
     @endif
+
+    {{-- 태그 --}}
+    @if(count($recipe->tag_array))
+        <div class="tags">
+            @foreach($recipe->tag_array as $t)<a href="{{ route('community.recipe.tag', $t) }}">#{{ $t }}</a>@endforeach
+        </div>
+    @endif
+
+    {{-- 좋아요 --}}
+    <div class="likebar">
+        @auth
+            <form method="POST" action="{{ route('community.recipe.like', $recipe) }}" id="likeForm">@csrf
+                <button type="submit" class="likebtn {{ $recipe->isLikedBy(auth()->user()) ? 'on' : '' }}" id="likeBtn">
+                    <span class="ic">♥</span> <span id="likeCount">{{ number_format($recipe->like_count) }}</span>
+                </button>
+            </form>
+        @else
+            <a href="{{ route('login') }}" class="likebtn"><span class="ic">♥</span> {{ number_format($recipe->like_count) }}</a>
+        @endauth
+        <span class="cmt-jump"><a href="#comments">💬 댓글 {{ $recipe->comment_count }}</a></span>
+    </div>
+
+    {{-- 댓글 --}}
+    <div class="comments" id="comments">
+        <h3>댓글 {{ $recipe->comments->count() }}</h3>
+        @forelse($recipe->comments as $cm)
+            <div class="cm {{ $cm->is_admin ? 'admin' : '' }}">
+                <div class="who">{{ $cm->is_admin ? '망고샵' : ($cm->user->name ?? '회원') }}@if($cm->is_admin)<span class="badge">관리자</span>@endif
+                    <span class="date">{{ $cm->created_at->format('Y.m.d H:i') }}</span>
+                    @auth @if(auth()->user()->is_admin || auth()->id() === $cm->user_id)
+                        <form method="POST" action="{{ route('community.recipe.comment.destroy', $cm) }}" style="display:inline" onsubmit="return confirm('삭제할까요?')">@csrf @method('DELETE')
+                            <button style="border:0;background:none;color:#e0322d;font-size:11px;cursor:pointer">삭제</button>
+                        </form>
+                    @endif @endauth
+                </div>
+                <div class="txt">{{ $cm->body }}</div>
+            </div>
+        @empty
+            <p style="color:#9a9b91;padding:6px 0 12px">첫 댓글을 남겨보세요!</p>
+        @endforelse
+
+        @auth
+            <form class="cmform" method="POST" action="{{ route('community.recipe.comment', $recipe) }}">@csrf
+                <div style="position:absolute;left:-9999px" aria-hidden="true"><input type="text" name="website" tabindex="-1" autocomplete="off"></div>
+                <textarea name="body" maxlength="1000" required placeholder="댓글을 남겨보세요{{ auth()->user()->is_admin ? ' (관리자로 등록)' : '' }}"></textarea>
+                <button class="sub">댓글 등록</button>
+            </form>
+        @else
+            <div class="login-note">댓글을 남기려면 <a href="{{ route('login') }}">로그인</a>이 필요합니다.</div>
+        @endauth
+    </div>
 
     @if($related->count())
     <div class="related">

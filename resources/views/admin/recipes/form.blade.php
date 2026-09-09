@@ -33,6 +33,7 @@
             <div class="adm-card"><div class="h">레시피 정보(선택 · SEO 리치결과)</div><div style="padding:20px;display:grid;gap:14px">
                 <label>조리 시간<input type="text" name="cook_time" class="ainput" value="{{ $val('cook_time') }}" placeholder="예: 20분"></label>
                 <label>재료(줄바꿈으로 구분)<textarea name="ingredients" class="ainput" rows="4" placeholder="애플망고 2개&#10;우유 200ml&#10;꿀 1스푼">{{ $val('ingredients') }}</textarea></label>
+                <label>태그(쉼표 구분)<input type="text" name="tags" class="ainput" value="{{ $val('tags') }}" placeholder="애플망고, 디저트, 여름"></label>
             </div></div>
 
             <div class="adm-card"><div class="h">SEO</div><div style="padding:20px;display:grid;gap:14px">
