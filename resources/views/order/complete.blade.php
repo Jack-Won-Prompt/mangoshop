@@ -18,6 +18,9 @@
             <h3 style="border:0;margin:0 0 6px"><x-icon name="check"/> 결제 완료</h3>
             <p style="font-size:15px"><b class="text-red" style="font-size:18px">{{ number_format($order->total) }}원</b> 결제가 정상 처리되었습니다.</p>
             <div class="muted" style="font-size:13px;margin-top:6px">결제수단 {{ $order->pay_method ?? '토스페이먼츠' }} · 결제일시 {{ optional($order->paid_at)->format('Y.m.d H:i') }}</div>
+            @if($order->receipt_url)
+                <a href="{{ $order->receipt_url }}" target="_blank" rel="noopener" class="btn btn-ghost" style="margin-top:12px;padding:9px 20px">🧾 결제 영수증 보기</a>
+            @endif
         </div>
     @elseif($order->va_account)
         {{-- 토스 가상계좌 입금대기 --}}
