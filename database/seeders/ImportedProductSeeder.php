@@ -298,6 +298,49 @@ class ImportedProductSeeder extends Seeder
     'is_featured' => false,
     'is_active' => true,
   ),
+  6 =>
+  array (
+    'code' => 'GSP006',
+    'category_slug' => 'giftset',
+    'name' => '애플망고 선물박스 (2kg 내외·5과)',
+    'slug' => 'apple-mango-giftbox-2kg-5',
+    'unit' => 'BOX',
+    'maker' => 'Fresh Fresh',
+    'summary' => '탐스러운 애플망고 2kg 내외(5과) · 오렌지 선물박스 · 택배비 별도',
+    'description' => '<div class="prod-detail">
+  <p style="font-size:15px;line-height:1.85;color:#3d2a12">붉게 익은 <b>애플망고</b>를 부담 없는 구성으로 담은 선물박스입니다. 2kg 내외(5과)로, 가볍게 마음을 전하기 좋은 실속형 선물세트입니다.</p>
+  <ul style="font-size:14px;line-height:1.95;color:#5a4a30;margin:14px 0 6px;padding-left:18px"><li>구성 : 애플망고 <b>2kg 내외 (5과)</b></li><li>가격 : 43,000원 (택배비 별도)</li><li>포장 : 오렌지 선물박스 + 개별 완충 포장</li></ul>
+  <div class="gift-note" style="background:#fff6ef;border:1px solid #ffe0c4;border-radius:12px;padding:16px 18px;margin:16px 0;font-size:14px;line-height:1.9;color:#5a4a30">
+  <b style="color:#c9640a">🎁 선물 포장 안내</b><br>
+  · 하나하나 완충망으로 개별 포장하여 신선함 그대로 안전하게 배송합니다.<br>
+  · <b>선물가방 또는 보자기 포장</b> 선택 시 <b>2,500원</b>이 추가됩니다.<br>
+  · 생물 특성상 개체별 크기·무게 및 포장 개수는 다소 달라질 수 있습니다.
+</div>
+  <img src="images/giftset/orchard/detail-packaging.jpg" alt="마음을 전하는 신선한 망고 선물 · 포장 안내" style="width:100%;height:auto;display:block;border-radius:10px;margin:10px 0">
+</div>',
+    'origin' => '수입산',
+    'variety' => '애플망고',
+    'grade' => '선물용',
+    'box_spec' => '2kg 내외 · 5과',
+    'weight_kg' => '2.00',
+    'moq' => 1,
+    'stock' => 100,
+    'tax_type' => 'exempt',
+    'price' => 43000,
+    'wholesale_price' => NULL,
+    'member_price' => NULL,
+    'thumbnail' => 'images/giftset/orchard/applebox-main.jpg',
+    'images' =>
+    array (
+      0 => 'images/giftset/orchard/applemango-box6.jpg',
+      1 => 'images/giftset/orchard/box-closed.jpg',
+    ),
+    'sale_status' => 'on_sale',
+    'is_new' => true,
+    'is_best' => false,
+    'is_featured' => false,
+    'is_active' => true,
+  ),
 ];
 
         foreach ($rows as $row) {
