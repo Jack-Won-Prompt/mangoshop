@@ -18,7 +18,7 @@
         <tbody>
             <tr><th style="width:150px;text-align:left;padding:14px 18px;background:var(--slate-50);border:1px solid var(--line);font-weight:700">당일출고 기준</th><td style="padding:14px 18px;border:1px solid var(--line)">평일 <b>오후 2:00 이전</b> 결제 완료 건 (재고 보유 상품)</td></tr>
             <tr><th style="text-align:left;padding:14px 18px;background:var(--slate-50);border:1px solid var(--line);font-weight:700">배송 소요</th><td style="padding:14px 18px;border:1px solid var(--line)">출고 후 영업일 기준 <b>1~3일</b> 내 수령</td></tr>
-            <tr><th style="text-align:left;padding:14px 18px;background:var(--slate-50);border:1px solid var(--line);font-weight:700">배송비</th><td style="padding:14px 18px;border:1px solid var(--line)">기본 <b>{{ number_format($site['shipping_fee'] ?? 0) }}원</b> / <b>{{ number_format($site['free_ship_over'] ?? 0) }}원</b> 이상 구매 시 무료배송</td></tr>
+            <tr><th style="text-align:left;padding:14px 18px;background:var(--slate-50);border:1px solid var(--line);font-weight:700">배송비</th><td style="padding:14px 18px;border:1px solid var(--line)">기본 <b>{{ number_format($site['shipping_fee'] ?? 0) }}원</b> (제주 {{ number_format($site['shipping_fee_jeju'] ?? 5000) }}원) · <b>3박스 이상 시 추가 배송비</b></td></tr>
             <tr><th style="text-align:left;padding:14px 18px;background:var(--slate-50);border:1px solid var(--line);font-weight:700">휴무</th><td style="padding:14px 18px;border:1px solid var(--line)">주말 · 공휴일 (해당일 주문은 다음 영업일 출고)</td></tr>
         </tbody>
     </table>

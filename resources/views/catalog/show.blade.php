@@ -125,7 +125,7 @@
                     <div style="font-size:12.5px;color:var(--slate-500);margin-top:4px">※ 도매 회원으로 로그인하면 도매별 전용가가 적용됩니다.</div>
                 @endif
                 @endif
-                <div class="row"><span class="lbl">배송비</span><span>{{ $sell >= $site['free_ship_over'] ? '무료배송' : number_format($site['shipping_fee']).'원 (5만원 이상 무료)' }}</span></div>
+                <div class="row"><span class="lbl">배송비</span><span>{{ number_format($site['shipping_fee']) }}원 (3박스 이상 시 추가 배송비)</span></div>
                 @if($soldout)<div class="row"><span class="lbl">재고</span><span style="color:var(--red)">품절</span></div>@endif
             </div>
 
