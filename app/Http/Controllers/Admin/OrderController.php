@@ -76,6 +76,11 @@ class OrderController extends Controller
             'status'      => in_array($order->status, ['cancelled', 'done']) ? $order->status : 'shipped',
         ]);
 
-        return back()->with('ok', '송장이 등록되어 배송중 처리되었습니다.');
+        // 고객 배송 알림 — 이메일 + SMS
+        $notifier = app(\App\Services\OrderNotifier::class);
+        $notifier->mailCustomerShipped($order);
+        $notifier->onShipped($order);
+
+        return back()->with('ok', '송장이 등록되어 배송중 처리되었습니다. (고객 알림 발송)');
     }
 }

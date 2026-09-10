@@ -67,6 +67,39 @@ class OrderNotifier
         }
     }
 
+    /** 결제완료 → 고객에게 주문서+영수증 이메일 (그룹 대표 1회). */
+    public function mailCustomerPaid(Order $order): void
+    {
+        $this->sendCustomer($order, new \App\Mail\OrderCustomerMail($order, 'paid'));
+    }
+
+    /** 무통장 주문접수 → 고객에게 입금 안내 이메일. */
+    public function mailCustomerBankPending(Order $order): void
+    {
+        $this->sendCustomer($order, new \App\Mail\OrderCustomerMail($order, 'bank'));
+    }
+
+    /** 송장 등록 → 고객에게 배송 시작 이메일. */
+    public function mailCustomerShipped(Order $order): void
+    {
+        $this->sendCustomer($order, new \App\Mail\OrderShippedMail($order));
+    }
+
+    /** 고객 이메일 발송 공통(회원 이메일, 실패 무시). */
+    private function sendCustomer(Order $order, \Illuminate\Mail\Mailable $mail): void
+    {
+        try {
+            $order->loadMissing('user');
+            $email = $order->user?->email;
+            if (! $email) {
+                return;
+            }
+            Mail::to($email)->send($mail);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+    }
+
     /** 발송(송장 등록) 시 구매자에게 SMS. */
     public function onShipped(Order $order): void
     {

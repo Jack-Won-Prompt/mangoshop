@@ -155,6 +155,9 @@ class OrderController extends Controller
             return redirect()->route('order.pay', $order);
         }
 
+        // 무통장: 주문접수 + 입금 안내 이메일
+        app(\App\Services\OrderNotifier::class)->mailCustomerBankPending($order);
+
         return redirect()->route('order.complete', $order)->with('ok', '주문이 접수되었습니다.');
     }
 
@@ -203,6 +206,8 @@ class OrderController extends Controller
         if ($isPg) {
             return redirect()->route('order.pay', $order);
         }
+
+        app(\App\Services\OrderNotifier::class)->mailCustomerBankPending($order);
 
         return redirect()->route('order.complete', $order)->with('ok', '분할배송 주문이 접수되었습니다.');
     }

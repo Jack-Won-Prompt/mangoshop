@@ -134,6 +134,7 @@ class PaymentController extends Controller
         $order->groupOrders()->update([
             'pay_provider' => 'toss',
             'payment_key'  => $data['paymentKey'],
+            'receipt_url'  => $res['receipt']['url'] ?? null,
             'pay_status'   => $res['status'] ?? null,
             'pay_method'   => $res['method'] ?? null,
         ]);
