@@ -24,7 +24,7 @@
 
         <hr style="border:0;border-top:1px solid #eef1f6;margin:18px 0">
         <div style="font-size:12px;color:#9aa3b2;line-height:1.8">
-            <b>{{ $site['company'] ?? '망고샵' }}</b> · 고객센터 {{ $site['cs_tel'] ?? '' }}<br>
+            <b>{{ $site['name'] ?? '망고샵' }}</b> · 고객센터 {{ $site['cs_tel'] ?? '' }}<br>
             배송 조회는 택배사 사정에 따라 등록 후 몇 시간 뒤부터 확인됩니다.
         </div>
     </div>

@@ -62,7 +62,7 @@
 
         <hr style="border:0;border-top:1px solid #f0e6d6;margin:20px 0">
         <div style="font-size:12px;color:#a99a80;line-height:1.8">
-            <b>{{ $site['company'] ?? '망고샵' }}</b> · 고객센터 {{ $site['cs_tel'] ?? '' }}<br>
+            <b>{{ $site['name'] ?? '망고샵' }}</b> · 고객센터 {{ $site['cs_tel'] ?? '' }}<br>
             결제 후 당일 발송되며 지역에 따라 도착까지 1~2일 소요됩니다.
         </div>
     </div>
