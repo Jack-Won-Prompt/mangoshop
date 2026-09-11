@@ -35,3 +35,11 @@ yarn-error.log
 /선물용 상품 이미지
 /mangoshop-24fb8-firebase-adminsdk-fbsvc-a719e5f372.json
 storage/app/fcm-service-account.json
+
+# 루트에 떨어지는 Laravel 로그 — 저장소에 넣지 않는다
+/laravel-*.log
+
+# 작업용 자산 폴더(대용량) — 저장소 제외
+/레시피
+/상품상세
+/mango_platform_assets (1)
