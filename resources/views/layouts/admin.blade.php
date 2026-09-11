@@ -10,7 +10,7 @@
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
     <link rel="icon" href="{{ asset('images/logo-mark.svg') }}?v=2">
     <link rel="stylesheet" href="{{ asset('css/site.css') }}?v=22">
-    <link rel="stylesheet" href="{{ asset('css/admin.css') }}?v=6">
+    <link rel="stylesheet" href="{{ asset('css/admin.css') }}?v=7">
 </head>
 <body>
     @include('partials.icons')
@@ -51,7 +51,6 @@
                 <a href="{{ route('admin.settings.edit') }}" class="{{ request()->routeIs('admin.settings.*') ? 'on' : '' }}"><x-icon name="tools"/> 사이트 설정</a>
             </nav>
             <div class="adm-foot">
-                <a href="{{ route('home') }}" target="_blank"><x-icon name="arrow-right"/> 쇼핑몰 보기</a>
                 <form method="POST" action="{{ route('logout') }}">@csrf
                     <button type="submit"><x-icon name="logout"/> 로그아웃</button>
                 </form>
@@ -61,7 +60,10 @@
         <div class="adm-main">
             <header class="adm-top">
                 <h1>@yield('heading', '관리자')</h1>
-                <div class="who"><x-icon name="user" :size="16"/> {{ auth()->user()->name }} 님</div>
+                <div class="top-r">
+                    <a href="{{ route('home') }}" target="_blank" class="shop-link"><x-icon name="arrow-right" :size="15"/> 쇼핑몰 보기</a>
+                    <div class="who"><x-icon name="user" :size="16"/> {{ auth()->user()->name }} 님</div>
+                </div>
             </header>
             <div class="adm-body">
                 @if(session('ok'))<div class="flash"><x-icon name="check"/> {{ session('ok') }}</div>@endif

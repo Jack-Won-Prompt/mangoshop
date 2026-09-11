@@ -19,6 +19,9 @@
 .adm-top{background:#fff;border-bottom:1px solid var(--a-line);padding:18px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
 .adm-top h1{font-size:20px;font-weight:800;color:var(--a-ink)}
 .adm-top .who{font-size:13px;color:#6b7794;display:flex;align-items:center;gap:6px}
+.adm-top .top-r{display:flex;align-items:center;gap:14px}
+.adm-top .shop-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--a-navy);background:#fff;border:1px solid var(--a-line);border-radius:8px;padding:7px 12px;text-decoration:none;white-space:nowrap}
+.adm-top .shop-link:hover{background:#f5f7fb}
 .adm-body{padding:28px}
 .flash{display:flex;align-items:center;gap:10px;background:#fff4ea;border:1px solid #ffd9a6;color:var(--a-navy);padding:12px 16px;border-radius:10px;font-weight:700;font-size:14px;margin-bottom:18px}
 .flash .icon{width:18px;height:18px}
