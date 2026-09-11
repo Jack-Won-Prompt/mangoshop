@@ -41,6 +41,7 @@ class SettingController extends Controller
             'popular_keywords'   => ['nullable', 'string', 'max:500'],
             'home_new_title'     => ['nullable', 'string', 'max:60'],
             'home_new_sub'       => ['nullable', 'string', 'max:120'],
+            'home_show_recipe'   => ['nullable', 'boolean'],
             'inquiry_emails'     => ['nullable', 'array'],
             'inquiry_emails.*'   => ['nullable', 'email', 'max:100'],
         ]);
@@ -62,10 +63,11 @@ class SettingController extends Controller
         $inquiryEmails = collect($request->input('inquiry_emails', []))
             ->map(fn ($e) => trim((string) $e))->filter()->unique()->take(3)->values()->all();
 
-        $site = array_merge(config('site'), array_diff_key($data, array_flip(['banks', 'popular_keywords', 'inquiry_emails'])), [
+        $site = array_merge(config('site'), array_diff_key($data, array_flip(['banks', 'popular_keywords', 'inquiry_emails', 'home_show_recipe'])), [
             'banks'            => $banks,
             'popular_keywords' => $keywords,
             'inquiry_emails'   => $inquiryEmails,
+            'home_show_recipe' => $request->boolean('home_show_recipe'),   // 체크박스: 미체크=false 명시 저장
         ]);
 
         Setting::put('site', $site);

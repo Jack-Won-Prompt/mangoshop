@@ -106,6 +106,13 @@
                 <input type="text" name="home_new_sub" class="ainput" value="{{ old('home_new_sub', $site['home_new_sub'] ?? '') }}" placeholder="예: 명절 선물로 좋은 프리미엄 수입과일">
             </div>
             <div class="ahint">메인화면 상단 ‘새로 들어온 과일’ 영역의 제목·부제를 변경합니다.</div>
+            <div class="afield" style="margin-top:14px">
+                <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-weight:600">
+                    <input type="checkbox" name="home_show_recipe" value="1" style="width:16px;height:16px" @checked(old('home_show_recipe', $site['home_show_recipe'] ?? true))>
+                    메인페이지 ‘최신 등록 레시피’ 영역 노출
+                </label>
+                <div class="ahint">체크 해제 시 메인페이지에서 레시피 커뮤니티 영역이 숨겨집니다.</div>
+            </div>
         </div>
     </div>
 

@@ -63,8 +63,8 @@
 </section>
 @endif
 
-{{-- ===== 3-1. 최신 등록 레시피 (선물셋트 아래) ===== --}}
-@if(($recipeItems ?? collect())->count())
+{{-- ===== 3-1. 최신 등록 레시피 (선물셋트 아래) · 관리자 설정으로 노출 토글 ===== --}}
+@if(($recipeItems ?? collect())->count() && ($site['home_show_recipe'] ?? true))
 <section class="mg-section">
     <div class="mg-wrap">
         <div class="mg-sec-head">
