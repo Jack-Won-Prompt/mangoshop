@@ -43,3 +43,10 @@ storage/app/fcm-service-account.json
 /레시피
 /상품상세
 /mango_platform_assets (1)
+
+# TCPDF 폰트 캐시. 배포할 때마다 서버에서 다시 만들어진다.
+/storage/fonts/installed-fonts.json
+/storage/fonts/nanum_*
+
+# 서버에서 npm 을 돌리면 생긴다. 이 저장소는 lock 파일을 두지 않는다.
+/package-lock.json
