@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <meta name="x-apple-disable-message-reformatting">
-<title>{{ $siteName }} 수입사 입점 초대</title>
+<title>{{ $siteName }} 수입사 입점 제안</title>
 </head>
 <body style="margin:0;padding:0;background:#f4f5f7;-webkit-text-size-adjust:100%;">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;">{{ $siteName }} 수입 과일 오픈마켓 입점 파트너로 초대합니다.</div>
@@ -47,7 +47,7 @@
     <tr><td style="background:#ffffff;padding:26px 40px 4px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #f0f0f2;padding-top:24px;">
         @foreach([
-          ['🏬','전용 스토어 개설','브랜드 스토어가 즉시 생성되어 소비자에게 노출됩니다.'],
+          ['🏬','전용 매장 개설','브랜드 매장이 즉시 생성되어 소비자에게 노출됩니다.'],
           ['📦','상품·주문 관리','상품 등록부터 주문·배송·정산까지 한 곳에서.'],
           ['🚚','콜드체인 물류 지원','신선 배송·정산 프로세스를 함께 지원합니다.'],
         ] as $b)
@@ -85,7 +85,7 @@
         @if(!empty($s['address'])){{ $s['address'] }}<br>@endif
         고객센터 {{ $s['cs_tel'] ?? '1600-0000' }}@if(!empty($s['email'])) · {{ $s['email'] }}@endif
       </div>
-      <div style="font-size:11px;color:#c0c0c0;margin-top:12px;">본 메일은 입점 초대를 위해 발송되었습니다. © {{ date('Y') }} {{ $siteName }}</div>
+      <div style="font-size:11px;color:#c0c0c0;margin-top:12px;">본 메일은 입점 제안을 위해 발송되었습니다. © {{ date('Y') }} {{ $siteName }}</div>
     </td></tr>
 
   </table>

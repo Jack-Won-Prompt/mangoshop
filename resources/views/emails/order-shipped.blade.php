@@ -13,7 +13,7 @@
         </table>
 
         <div style="text-align:center;margin:6px 0 18px">
-            <a href="{{ $track }}" style="display:inline-block;background:#0b3d91;color:#fff;font-weight:700;font-size:15px;text-decoration:none;padding:13px 32px;border-radius:28px">📦 배송 조회하기 →</a>
+            <a href="{{ $track }}" style="display:inline-block;background:#0b3d91;color:#fff;font-weight:700;font-size:15px;text-decoration:none;padding:13px 32px;border-radius:28px">배송 조회</a>
         </div>
 
         <div style="background:#f6f8fc;border-radius:10px;padding:12px 15px;font-size:13px;color:#4b5563;margin-bottom:8px">

@@ -22,7 +22,7 @@ class SellerInviteMail extends Mailable
 
         return new Envelope(
             from: new Address(config('mail.from.address'), $siteName),
-            subject: '['.$siteName.'] 수입사 입점 초대 — 함께하실 파트너를 찾습니다',
+            subject: '['.$siteName.'] 수입사 입점 제안 안내',
         );
     }
 

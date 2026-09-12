@@ -24,7 +24,7 @@
                 <span><strong>망고샵</strong><span>ADMIN</span></span>
             </a>
             <nav class="adm-nav">
-                <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'on' : '' }}"><x-icon name="chart"/> 대시보드</a>
+                <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'on' : '' }}"><x-icon name="chart"/> 업무 현황</a>
                 <a href="{{ route('admin.reports.sales') }}" class="{{ request()->routeIs('admin.reports.*') ? 'on' : '' }}"><x-icon name="chart"/> 매출 리포트</a>
 
                 <div class="grp">주문/회원</div>
@@ -33,12 +33,12 @@
                 <a href="{{ route('admin.taxinvoice.index') }}" class="{{ request()->routeIs('admin.taxinvoice.*') ? 'on' : '' }}"><x-icon name="doc"/> 세금계산서</a>
                 <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'on' : '' }}"><x-icon name="user"/> 회원관리</a>
                 <a href="{{ route('admin.visit-history.index') }}" class="{{ request()->routeIs('admin.visit-history.*') ? 'on' : '' }}"><x-icon name="chart"/> 방문이력</a>
-                <a href="{{ route('admin.seller-invites.index') }}" class="{{ request()->routeIs('admin.seller-invites.*') ? 'on' : '' }}"><x-icon name="mail"/> 입점 초대</a>
+                <a href="{{ route('admin.seller-invites.index') }}" class="{{ request()->routeIs('admin.seller-invites.*') ? 'on' : '' }}"><x-icon name="mail"/> 입점 제안</a>
                 <a href="{{ route('admin.chat.index') }}" class="{{ request()->routeIs('admin.chat.*') ? 'on' : '' }}"><x-icon name="headset"/> 실시간 상담</a>
                 <a href="{{ route('admin.inquiries.index') }}" class="{{ request()->routeIs('admin.inquiries.*') ? 'on' : '' }}"><x-icon name="question"/> 문의관리</a>
                 <a href="{{ route('admin.reviews.index') }}" class="{{ request()->routeIs('admin.reviews.*') ? 'on' : '' }}"><x-icon name="star"/> 후기관리</a>
-                <a href="{{ route('admin.coupang.index') }}" class="{{ request()->routeIs('admin.coupang.*') ? 'on' : '' }}"><x-icon name="tag"/> 쿠팡 경쟁가</a>
-                <a href="{{ route('admin.push.index') }}" class="{{ request()->routeIs('admin.push.*') ? 'on' : '' }}"><x-icon name="headset"/> 푸시 알림</a>
+                <a href="{{ route('admin.coupang.index') }}" class="{{ request()->routeIs('admin.coupang.*') ? 'on' : '' }}"><x-icon name="tag"/> 경쟁가 비교</a>
+                <a href="{{ route('admin.push.index') }}" class="{{ request()->routeIs('admin.push.*') ? 'on' : '' }}"><x-icon name="headset"/> 앱 알림 발송</a>
 
                 @foreach($groups as $gname => $items)
                     <div class="grp">{{ $gname }}</div>

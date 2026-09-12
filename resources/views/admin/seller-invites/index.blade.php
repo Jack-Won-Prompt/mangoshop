@@ -1,6 +1,6 @@
 @extends('layouts.admin')
-@section('title', '입점 초대')
-@section('heading', '입점 초대')
+@section('title', '입점 제안')
+@section('heading', '입점 제안')
 
 @section('content')
 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px">
@@ -19,7 +19,7 @@
         <div class="afield" style="margin:0"><label>주력 원산지</label><input type="text" name="origin_focus" class="ainput" placeholder="예: 태국"></div>
         <button class="abtn abtn-pri" style="white-space:nowrap">초대 발송</button>
     </form>
-    <p style="padding:0 18px 16px;margin:0;font-size:12.5px;color:#8a92a6">초대 링크는 14일간 유효합니다. 수락 시 판매자 계정과 전용 스토어가 생성됩니다.</p>
+    <p style="padding:0 18px 16px;margin:0;font-size:12.5px;color:#8a92a6">입점 신청 링크는 14일간 유효합니다. 신청 완료 시 판매자 계정과 전용 매장이 생성됩니다.</p>
 </div>
 
 {{-- 초대 목록 --}}

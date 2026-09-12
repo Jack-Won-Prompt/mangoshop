@@ -21,7 +21,7 @@
         <div style="text-align:center;margin-bottom:22px">
             <div style="display:inline-block;background:linear-gradient(120deg,#ffd9a6,#ffe9cf);color:#e85d00;font-weight:800;font-size:12.5px;letter-spacing:1px;padding:7px 16px;border-radius:20px">SELLER ONBOARDING</div>
             <h1 style="font-size:26px;font-weight:900;margin:14px 0 6px">망고샵 수입사 입점 신청</h1>
-            <p class="muted" style="font-size:14px">초대받은 <b style="color:var(--navy-800)">{{ $invite->email }}</b> 계정으로 입점 스토어를 개설합니다.</p>
+            <p class="muted" style="font-size:14px">초대받은 <b style="color:var(--navy-800)">{{ $invite->email }}</b> 계정으로 입점 매장을 개설합니다.</p>
         </div>
 
         <div class="form-card" style="padding:28px 30px">
@@ -42,7 +42,7 @@
                     <div class="field"><label>비밀번호 <span class="req">*</span></label><input type="password" name="password" class="input" required minlength="8" placeholder="8자 이상"></div>
                     <div class="field"><label>비밀번호 확인 <span class="req">*</span></label><input type="password" name="password_confirmation" class="input" required minlength="8"></div>
                 </div>
-                <p class="muted" style="font-size:12.5px;margin:4px 0 16px">신청 완료 시 판매자 계정이 생성되고 전용 스토어가 개설됩니다. 로그인 이메일은 <b>{{ $invite->email }}</b> 입니다.</p>
+                <p class="muted" style="font-size:12.5px;margin:4px 0 16px">신청 완료 시 판매자 계정이 생성되고 전용 매장이 개설됩니다. 로그인 이메일은 <b>{{ $invite->email }}</b> 입니다.</p>
                 <button type="submit" class="btn btn-primary btn-lg btn-block">입점 신청 완료</button>
             </form>
         </div>

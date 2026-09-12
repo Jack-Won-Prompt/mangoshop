@@ -203,7 +203,7 @@
                 <div class="txt">{{ $cm->body }}</div>
             </div>
         @empty
-            <p style="color:#9a9b91;padding:6px 0 12px">첫 댓글을 남겨보세요!</p>
+            <p style="color:#9a9b91;padding:6px 0 12px">등록된 댓글이 없습니다.</p>
         @endforelse
 
         @auth

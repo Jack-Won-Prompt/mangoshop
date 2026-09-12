@@ -81,7 +81,7 @@
         </div>
         <div style="margin-top:20px">{{ $posts->links() }}</div>
     @else
-        <p style="color:#9a9b91;padding:20px 0">아직 회원 레시피가 없습니다. 첫 레시피를 남겨보세요!</p>
+        <p style="color:#9a9b91;padding:20px 0">등록된 회원 레시피가 없습니다.</p>
     @endif
 </div>
 @endsection

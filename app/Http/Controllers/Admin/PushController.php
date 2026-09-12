@@ -59,6 +59,6 @@ class PushController extends Controller
                 break;
         }
 
-        return back()->with('ok', "푸시 알림을 {$sent}건 발송했습니다.");
+        return back()->with('ok', "앱 알림을 {$sent}건 발송했습니다.");
     }
 }

@@ -171,7 +171,7 @@ class SellerCenterController extends Controller
         ]);
         $seller->update($data);
 
-        return back()->with('ok', '스토어 정보가 저장되었습니다.');
+        return back()->with('ok', '매장 정보가 저장되었습니다.');
     }
 
     /* ===== 헬퍼 ===== */

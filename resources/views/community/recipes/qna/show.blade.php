@@ -64,7 +64,7 @@
             </div>
         </div>
     @empty
-        <p style="color:#9a9b91;padding:8px 0 16px">아직 답변이 없습니다. 첫 답변을 남겨보세요!</p>
+        <p style="color:#9a9b91;padding:8px 0 16px">등록된 답변이 없습니다.</p>
     @endforelse
 
     @auth

@@ -1,10 +1,10 @@
 @extends('layouts.seller')
-@section('title', '스토어 설정')
-@section('heading', '스토어 설정')
+@section('title', '매장 정보 설정')
+@section('heading', '매장 정보 설정')
 
 @section('content')
 <div class="adm-card" style="max-width:720px">
-    <div class="h">스토어 정보</div>
+    <div class="h">매장 정보</div>
     <form method="POST" action="{{ route('seller.center.store.update') }}" style="padding:20px">
         @csrf @method('PUT')
 
@@ -19,7 +19,7 @@
             <div class="afield" style="margin:0"><label>이메일</label><input type="email" name="email" class="ainput" value="{{ old('email', $seller->email) }}"></div>
         </div>
 
-        <div class="afield" style="margin-top:12px"><label>스토어 소개</label><textarea name="intro" class="atextarea" rows="3">{{ old('intro', $seller->intro) }}</textarea></div>
+        <div class="afield" style="margin-top:12px"><label>매장 소개</label><textarea name="intro" class="atextarea" rows="3">{{ old('intro', $seller->intro) }}</textarea></div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
             <div class="afield" style="margin:0"><label>기본 배송비(원)</label><input type="number" name="shipping_fee" class="ainput" value="{{ old('shipping_fee', $seller->shipping_fee) }}"></div>

@@ -43,7 +43,7 @@
                 </div>
             </li>
         @empty
-            <li style="text-align:center;color:#9a9b91;padding:40px 0">첫 질문을 남겨보세요!</li>
+            <li style="text-align:center;color:#9a9b91;padding:40px 0">등록된 질문이 없습니다.</li>
         @endforelse
     </ul>
 
