@@ -24,7 +24,7 @@
 </div>
 
 @if($seller->shipping_notice)
-<div class="mg-strip"><div class="mg-wrap" style="justify-content:flex-start"><div class="item">🚚 <b>배송 안내</b> {{ $seller->shipping_notice }}</div></div></div>
+<div class="mg-strip"><div class="mg-wrap" style="justify-content:flex-start"><div class="item"><b>배송 안내</b> {{ $seller->shipping_notice }}</div></div></div>
 @endif
 
 <div class="mg-section">

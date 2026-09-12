@@ -1,6 +1,6 @@
 @extends('layouts.admin')
-@section('title', '푸시 알림')
-@section('heading', '푸시 알림 발송')
+@section('title', '앱 알림 발송')
+@section('heading', '앱 알림 발송')
 
 @section('content')
 <div style="max-width:640px">

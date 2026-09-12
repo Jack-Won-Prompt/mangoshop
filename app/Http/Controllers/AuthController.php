@@ -118,7 +118,7 @@ class AuthController extends Controller
 
         $msg = $isBusiness
             ? '회원가입이 완료되었습니다. 도매 승인 후 도매별 전용가가 적용됩니다.'
-            : '회원가입이 완료되었습니다. 환영합니다!';
+            : '회원가입이 완료되었습니다.';
 
         return redirect()->route('home')->with('ok', $msg);
     }

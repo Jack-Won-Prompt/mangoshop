@@ -19,16 +19,16 @@
                 <span><strong>망고샵</strong><span>SELLER</span></span>
             </a>
             <nav class="adm-nav">
-                <a href="{{ route('seller.center.index') }}" class="{{ request()->routeIs('seller.center.index') ? 'on' : '' }}"><x-icon name="chart"/> 대시보드</a>
+                <a href="{{ route('seller.center.index') }}" class="{{ request()->routeIs('seller.center.index') ? 'on' : '' }}"><x-icon name="chart"/> 업무 현황</a>
 
                 <div class="grp">판매관리</div>
                 <a href="{{ route('seller.center.products') }}" class="{{ request()->routeIs('seller.center.products') ? 'on' : '' }}"><x-icon name="package"/> 상품관리</a>
                 <a href="{{ route('seller.center.orders') }}" class="{{ request()->routeIs('seller.center.orders') ? 'on' : '' }}"><x-icon name="cart"/> 주문관리</a>
                 <a href="{{ route('seller.center.settlements') }}" class="{{ request()->routeIs('seller.center.settlements') ? 'on' : '' }}"><x-icon name="coin"/> 정산내역</a>
 
-                <div class="grp">스토어</div>
-                <a href="{{ route('seller.center.store') }}" class="{{ request()->routeIs('seller.center.store') ? 'on' : '' }}"><x-icon name="tools"/> 스토어 설정</a>
-                <a href="{{ route('seller.show', auth()->user()->seller->slug) }}" target="_blank"><x-icon name="arrow-right"/> 내 스토어 보기</a>
+                <div class="grp">매장</div>
+                <a href="{{ route('seller.center.store') }}" class="{{ request()->routeIs('seller.center.store') ? 'on' : '' }}"><x-icon name="tools"/> 매장 정보 설정</a>
+                <a href="{{ route('seller.show', auth()->user()->seller->slug) }}" target="_blank"><x-icon name="arrow-right"/> 내 매장 보기</a>
             </nav>
             <div class="adm-foot">
                 <form method="POST" action="{{ route('logout') }}">@csrf

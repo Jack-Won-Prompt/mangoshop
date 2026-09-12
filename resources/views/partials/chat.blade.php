@@ -30,7 +30,7 @@
         {{-- 2단계: 대화 --}}
         <div class="chat-conv" id="chatConv" hidden>
             <div class="chat-body" id="chatBody">
-                <div class="chat-greet">안녕하세요! 망고샵입니다. 😊<br>무엇을 도와드릴까요?</div>
+                <div class="chat-greet">안녕하세요. 망고샵 고객센터입니다.<br>문의하실 내용을 입력해 주십시오.</div>
             </div>
             <form class="chat-input" id="chatForm">
                 <textarea id="chatText" placeholder="메시지를 입력하세요" rows="1" maxlength="1000"></textarea>

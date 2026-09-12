@@ -1,6 +1,6 @@
 @extends('layouts.seller')
-@section('title', '대시보드')
-@section('heading', '대시보드')
+@section('title', '업무 현황')
+@section('heading', '업무 현황')
 
 @section('content')
 <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px">
@@ -11,7 +11,7 @@
 </div>
 
 <div class="adm-card">
-    <div class="h">스토어 정보</div>
+    <div class="h">매장 정보</div>
     <div style="padding:18px 20px;display:flex;align-items:center;gap:16px">
         <div style="flex:none;width:52px;height:52px;border-radius:13px;background:#fff4ea;display:flex;align-items:center;justify-content:center;font-size:28px">🏬</div>
         <div style="flex:1">
@@ -20,7 +20,7 @@
             </div>
             <div style="color:#6b7794;font-size:13px;margin-top:3px">{{ $seller->origin_focus }} · 수수료 {{ rtrim(rtrim(number_format($seller->commission_rate,2),'0'),'.') }}%</div>
         </div>
-        <a href="{{ route('seller.center.store') }}" class="abtn abtn-ghost abtn-sm">스토어 설정</a>
+        <a href="{{ route('seller.center.store') }}" class="abtn abtn-ghost abtn-sm">매장 정보 설정</a>
     </div>
 </div>
 

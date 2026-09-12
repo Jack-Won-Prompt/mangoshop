@@ -1,6 +1,6 @@
 @extends('layouts.admin')
-@section('title', '대시보드')
-@section('heading', '대시보드')
+@section('title', '업무 현황')
+@section('heading', '업무 현황')
 
 @section('content')
 <div class="adm-stats">

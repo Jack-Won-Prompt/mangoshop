@@ -61,7 +61,7 @@
             <div class="afield" style="margin:0"><label>판매가(원) <span style="color:#e0322d">*</span></label><input type="number" name="price" class="ainput" value="{{ old('price', $product->price) }}" required></div>
             <div class="afield" style="margin:0"><label>도매가(원)</label><input type="number" name="wholesale_price" class="ainput" value="{{ old('wholesale_price', $product->wholesale_price) }}"></div>
             <div class="afield" style="margin:0"><label>재고 <span style="color:#e0322d">*</span></label><input type="number" name="stock" class="ainput" value="{{ old('stock', $product->stock ?? 0) }}" required></div>
-            <div class="afield" style="margin:0"><label>최소주문(MOQ)</label><input type="number" name="moq" class="ainput" value="{{ old('moq', $product->moq ?? 1) }}"></div>
+            <div class="afield" style="margin:0"><label>최소 주문수량</label><input type="number" name="moq" class="ainput" value="{{ old('moq', $product->moq ?? 1) }}"></div>
         </div>
 
         <div class="afield" style="margin-top:12px"><label>요약</label><input type="text" name="summary" class="ainput" value="{{ old('summary', $product->summary) }}" placeholder="원산지·등급·규격 한 줄 요약"></div>

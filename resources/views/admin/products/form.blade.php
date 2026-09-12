@@ -27,7 +27,7 @@
                         </select></div>
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
-                    <div class="afield"><label>상품코드(SKU)</label><input type="text" name="code" class="ainput" value="{{ $val('code') }}"></div>
+                    <div class="afield"><label>상품코드</label><input type="text" name="code" class="ainput" value="{{ $val('code') }}"></div>
                     <div class="afield"><label>슬러그(URL)</label><input type="text" name="slug" class="ainput" value="{{ $val('slug') }}" placeholder="비우면 자동생성"></div>
                     <div class="afield"><label>판매단위</label><input type="text" name="unit" class="ainput" value="{{ $val('unit','BOX') }}" placeholder="BOX/EA/SET"></div>
                 </div>
@@ -100,7 +100,7 @@
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
                     <div class="afield"><label>재고 <span style="color:#e0322d">*</span></label><input type="number" name="stock" class="ainput" value="{{ $val('stock',0) }}" required></div>
-                    <div class="afield"><label>최소주문(MOQ)</label><input type="number" name="moq" class="ainput" value="{{ $val('moq',1) }}"></div>
+                    <div class="afield"><label>최소 주문수량</label><input type="number" name="moq" class="ainput" value="{{ $val('moq',1) }}"></div>
                 </div>
             </div></div>
 

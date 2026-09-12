@@ -80,6 +80,6 @@ class SellerInviteController extends Controller
         });
 
         return redirect()->route('seller.show', $seller->slug)
-            ->with('ok', '입점이 완료되었습니다! 전용 스토어가 개설되었습니다.');
+            ->with('ok', '입점이 완료되었습니다. 전용 매장이 개설되었습니다.');
     }
 }

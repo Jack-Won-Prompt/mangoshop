@@ -146,7 +146,7 @@
                     <td>{{ number_format($r->rec) }}</td>
                 </tr>
             @empty
-                <tr><td colspan="6" class="empty">게시글이 없습니다. 첫 글을 남겨보세요!</td></tr>
+                <tr><td colspan="6" class="empty">등록된 게시글이 없습니다.</td></tr>
             @endforelse
         </tbody>
     </table>

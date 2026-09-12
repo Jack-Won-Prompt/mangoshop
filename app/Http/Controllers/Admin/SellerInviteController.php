@@ -38,7 +38,7 @@ class SellerInviteController extends Controller
             'invited_by'   => $request->user()->id,
         ]);
 
-        return $this->dispatchMail($invite, '입점 초대 메일을 발송했습니다. ('.$invite->email.')');
+        return $this->dispatchMail($invite, '입점 제안 메일을 발송했습니다. ('.$invite->email.')');
     }
 
     public function resend(SellerInvite $invite)

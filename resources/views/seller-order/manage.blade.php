@@ -33,7 +33,7 @@
 <body>
 <div class="wrap">
     <div class="top">
-        <h1>🥭 주문 확인 · 배송처리</h1>
+        <h1>주문 확인 · 배송 처리</h1>
         <div class="no">{{ $order->order_no }} · {{ optional($order->paid_at ?: $order->created_at)->format('Y.m.d H:i') }}
             @if($order->seller) · {{ $order->seller->name }}@endif</div>
     </div>

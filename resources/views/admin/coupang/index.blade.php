@@ -1,6 +1,6 @@
 @extends('layouts.admin')
-@section('title', '쿠팡 경쟁가')
-@section('heading', '쿠팡 경쟁가 조회')
+@section('title', '경쟁가 비교')
+@section('heading', '쿠팡 판매가 비교 조회')
 
 @section('content')
 <div class="adm-card">
@@ -69,7 +69,7 @@
         @endif
 
         <table class="atable">
-            <thead><tr><th style="width:50px">순위</th><th>판매자(스토어)</th><th>상품명</th><th style="width:120px;text-align:right">판매가</th><th style="width:90px">배송</th><th style="width:110px">평점/리뷰</th><th style="width:90px">망고샵比</th><th style="width:60px"></th></tr></thead>
+            <thead><tr><th style="width:50px">순위</th><th>판매자</th><th>상품명</th><th style="width:120px;text-align:right">판매가</th><th style="width:90px">배송</th><th style="width:110px">평점/후기</th><th style="width:90px">망고샵 대비</th><th style="width:60px"></th></tr></thead>
             <tbody>
             @forelse($results as $i => $r)
                 <tr>
