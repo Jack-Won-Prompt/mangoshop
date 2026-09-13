@@ -56,4 +56,10 @@ return [
         ],
     ],
 
+    // 운영 예외 보고. 값은 .env 에만 둔다 — 없으면 보고를 조용히 건너뛴다.
+    'supportworks' => [
+        'error_url'   => env('SW_ERROR_URL'),
+        'error_token' => env('SW_ERROR_TOKEN'),
+    ],
+
 ];
