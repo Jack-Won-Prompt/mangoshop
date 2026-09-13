@@ -3,7 +3,7 @@
 @section('heading', '사이트 설정')
 
 @section('content')
-<form method="POST" action="{{ route('admin.settings.update') }}" style="max-width:880px">
+<form method="POST" action="{{ route('admin.settings.update') }}" enctype="multipart/form-data" style="max-width:880px">
     @csrf @method('PUT')
 
     {{-- 기본 정보 --}}
@@ -116,6 +116,66 @@
         </div>
     </div>
 
+    {{-- 메인 팝업 (상품 홍보) --}}
+    @php($pp = $site['popup'] ?? [])
+    @php($ppImg = old('popup_image_path', $pp['image'] ?? ''))
+    <div class="adm-card" id="popup">
+        <div class="h">메인 팝업 (상품 홍보)</div>
+        <div style="padding:20px">
+            <div class="afield">
+                <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-weight:600">
+                    <input type="checkbox" name="popup_enabled" value="1" style="width:16px;height:16px" @checked(old('popup_enabled', $pp['enabled'] ?? false))>
+                    메인페이지 접속 시 팝업 노출
+                </label>
+                <div class="ahint">방문자가 ‘오늘 하루 보지 않기’를 누르면 그날은 다시 뜨지 않습니다. 이미지·링크·문구·기간을 바꾸면 모든 방문자에게 다시 표시됩니다.</div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                <div class="afield"><label>제목</label><input type="text" name="popup_title" class="ainput" maxlength="60" value="{{ old('popup_title', $pp['title'] ?? '') }}" placeholder="예: 추석 명절 선물세트"></div>
+                <div class="afield"><label>부제</label><input type="text" name="popup_sub" class="ainput" maxlength="100" value="{{ old('popup_sub', $pp['sub'] ?? '') }}" placeholder="예: 프리미엄 애플망고 선물세트 · 8과/9과 선택"></div>
+            </div>
+
+            <div class="afield">
+                <label>팝업 이미지</label>
+                <div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap">
+                    @if($ppImg)
+                        <img src="{{ preg_match('#^https?://#i', $ppImg) ? $ppImg : asset(ltrim($ppImg, '/')) }}" alt="현재 팝업 이미지" style="width:120px;height:120px;object-fit:cover;border:1px solid #e5e7eb;border-radius:8px">
+                    @endif
+                    <div style="flex:1;min-width:240px">
+                        <input type="file" name="popup_image" accept="image/jpeg,image/png,image/webp,image/gif" class="ainput" style="padding:7px">
+                        <input type="text" name="popup_image_path" class="ainput" style="margin-top:8px" value="{{ $ppImg }}" placeholder="images/giftset/orchard/applemango-main.jpg">
+                        <div class="ahint">새 파일을 올리면 교체됩니다(JPG·PNG·WEBP·GIF, 5MB 이하, 권장 정사각형 800px 이상). 아래 칸에 이미지 경로나 https 주소를 직접 입력할 수도 있습니다.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="afield">
+                <label>클릭 시 이동할 주소</label>
+                <div style="display:grid;grid-template-columns:260px 1fr;gap:10px">
+                    <select class="aselect" id="popupProductPick">
+                        <option value="">상품에서 선택…</option>
+                        @foreach($products as $p)
+                            <option value="product/{{ $p->slug }}">{{ $p->name }}</option>
+                        @endforeach
+                    </select>
+                    <input type="text" name="popup_link" id="popupLink" class="ainput" maxlength="300" value="{{ old('popup_link', $pp['link'] ?? '') }}" placeholder="product/premium-apple-mango-giftset 또는 https://…">
+                </div>
+                <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;margin-top:8px">
+                    <input type="checkbox" name="popup_new_window" value="1" style="width:16px;height:16px" @checked(old('popup_new_window', $pp['new_window'] ?? false))>
+                    새 창으로 열기
+                </label>
+                <div class="ahint">비워두면 이미지 클릭 시 이동하지 않습니다.</div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+                <div class="afield"><label>버튼 문구</label><input type="text" name="popup_button" class="ainput" maxlength="30" value="{{ old('popup_button', $pp['button'] ?? '') }}" placeholder="자세히 보기"></div>
+                <div class="afield"><label>노출 시작일</label><input type="date" name="popup_start" class="ainput" value="{{ old('popup_start', $pp['start'] ?? '') }}"></div>
+                <div class="afield"><label>노출 종료일</label><input type="date" name="popup_end" class="ainput" value="{{ old('popup_end', $pp['end'] ?? '') }}"></div>
+            </div>
+            <div class="ahint">노출 기간을 비워두면 기간 제한 없이 표시됩니다. 종료일 당일까지 노출됩니다.</div>
+        </div>
+    </div>
+
     {{-- 고객 문의 알림 이메일 --}}
     <div class="adm-card">
         <div class="h">고객 문의 알림 이메일</div>
@@ -147,6 +207,13 @@
 </form>
 
 <script>
+(function () {
+    var pick = document.getElementById('popupProductPick');
+    var link = document.getElementById('popupLink');
+    pick.addEventListener('change', function () {
+        if (pick.value) link.value = pick.value;
+    });
+})();
 (function () {
     var add = document.getElementById('addBank');
     var tbody = document.querySelector('#bankTable tbody');

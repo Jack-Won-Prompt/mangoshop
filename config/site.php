@@ -49,6 +49,21 @@ return [
     'home_new_sub'   => '이번 주 새롭게 입고된 신상품',
     'home_show_recipe' => true,   // 메인페이지 '최신 등록 레시피' 영역 노출
 
+    // 메인페이지 상품 홍보 팝업(관리자 사이트설정 > 메인 팝업에서 편집)
+    //  - image/link 는 사이트 기준 상대경로(asset()/url() 로 변환) 또는 http(s) 절대주소
+    //  - start/end(Y-m-d) 비우면 기간 제한 없음
+    'popup' => [
+        'enabled'    => true,
+        'title'      => '추석 명절 선물세트',
+        'sub'        => '프리미엄 애플망고 선물세트 · 8과/9과 선택',
+        'button'     => '선물세트 보러가기',
+        'image'      => 'images/giftset/orchard/applemango-main.jpg',
+        'link'       => 'product/premium-apple-mango-giftset',
+        'new_window' => false,
+        'start'      => null,
+        'end'        => null,
+    ],
+
     /*
     | 모바일 앱 버전 관리 (강제/선택 업데이트)
     | - latest_build : 최신 배포 빌드(versionCode). 이보다 낮으면 "업데이트 있음" 안내.
