@@ -53,7 +53,7 @@ return [
     //  - image/link 는 사이트 기준 상대경로(asset()/url() 로 변환) 또는 http(s) 절대주소
     //  - start/end(Y-m-d) 비우면 기간 제한 없음
     'popup' => [
-        'enabled'    => true,
+        'enabled'    => false,   // 기본 비노출 — 관리자 사이트설정 > 메인 팝업에서 켜기
         'title'      => '추석 명절 선물세트',
         'sub'        => '프리미엄 애플망고 선물세트 · 8과/9과 선택',
         'button'     => '선물세트 보러가기',
