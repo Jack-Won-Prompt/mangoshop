@@ -38,6 +38,25 @@ command -v git >/dev/null 2>&1 || die "git 이 설치되어 있지 않습니다.
 
 PREV_REF="$(git rev-parse --short HEAD)"
 
+# --- 올릴 것이 있는지 먼저 본다 ------------------------------------------------
+# 점검 모드를 켜기 전에 확인한다. 바뀐 것이 없는데도 내렸다 올리면 그 10여 초 동안
+# 접속한 사람에게 503 만 보여 주고 얻는 것은 없다 — 실제로 같은 커밋에 두 번
+# 배포해서 사이트만 잠깐 내려간 적이 있다.
+#
+# 코드는 같아도 다시 돌려야 할 때가 있다(시더·캐시 재생성). 그때는 FORCE=1 을 준다.
+log "원격 확인 (origin/$BRANCH)"
+git fetch --prune origin
+git checkout "$BRANCH"
+
+LOCAL_REF="$(git rev-parse HEAD)"
+REMOTE_REF="$(git rev-parse "origin/$BRANCH")"
+
+if [ "$LOCAL_REF" = "$REMOTE_REF" ] && [ "${FORCE:-0}" != "1" ]; then
+    log "이미 최신입니다 ($PREV_REF). 배포할 것이 없어 그대로 둡니다."
+    log "코드가 같아도 다시 돌리려면 FORCE=1 bash deploy.sh"
+    exit 0
+fi
+
 # 오류가 나거나 중단돼도 마지막에 반드시 점검 모드를 해제한다
 finish() { "$PHP" artisan up >/dev/null 2>&1 || true; }
 trap finish EXIT
@@ -47,8 +66,6 @@ log "점검 모드 진입 (커스텀 503 표시)"
 "$PHP" artisan down --render="errors.503" --retry=15 || true
 
 log "코드 가져오기 (origin/$BRANCH)"
-git fetch --prune origin
-git checkout "$BRANCH"
 # 운영에는 로컬 변경이 없어야 한다. 갈라졌으면 fast-forward 실패로 안전하게 중단.
 git pull --ff-only origin "$BRANCH"
 NEW_REF="$(git rev-parse --short HEAD)"
