@@ -78,8 +78,8 @@ return [
         [
             'enabled'    => true,
             'title'      => '프랜차이즈·매장·카페 과일 문의',
-            'button'     => '과일 문의하기',
-            'image'      => 'images/fruit/tropical-fruit-market-0.jpg', // TODO: 실제 배너로 교체
+            'button'     => '',  // 배너 이미지에 CTA 포함 → 중복 버튼 없음(이미지 클릭 시 문의하기)
+            'image'      => 'images/popup/fruit-inquiry.jpg',
             'link'       => 'community/inquiry',
             'new_window' => false,
             'start'      => null, 'end' => null,
