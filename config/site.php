@@ -64,6 +64,28 @@ return [
         'end'        => null,
     ],
 
+    // 메인 팝업 여러 개 동시 노출(설정 시 'popup' 대신 이 목록을 사용)
+    'popups' => [
+        [
+            'enabled'    => true,
+            'title'      => '추석 명절 선물세트',
+            'button'     => '선물세트 보러가기',
+            'image'      => 'images/giftset/orchard/applemango-main.jpg',
+            'link'       => 'product/premium-apple-mango-giftset',
+            'new_window' => false,
+            'start'      => null, 'end' => null,
+        ],
+        [
+            'enabled'    => true,
+            'title'      => '프랜차이즈·매장·카페 과일 문의',
+            'button'     => '과일 문의하기',
+            'image'      => 'images/fruit/tropical-fruit-market-0.jpg', // TODO: 실제 배너로 교체
+            'link'       => 'community/inquiry',
+            'new_window' => false,
+            'start'      => null, 'end' => null,
+        ],
+    ],
+
     /*
     | 모바일 앱 버전 관리 (강제/선택 업데이트)
     | - latest_build : 최신 배포 빌드(versionCode). 이보다 낮으면 "업데이트 있음" 안내.
