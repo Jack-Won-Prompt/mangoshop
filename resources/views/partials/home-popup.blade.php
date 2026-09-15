@@ -13,12 +13,8 @@
             $link = $raw === '' ? route('community.inquiry') : (preg_match('#^https?://#i', $raw) ? $raw : url('/'.ltrim($raw, '/')));
             $key  = 'mgpop_'.substr(md5($img.'|'.$link), 0, 10);
             $tgt  = ($pp['new_window'] ?? false) ? 'target="_blank" rel="noopener"' : '';
-            // 겹치지 않게 분리 배치: 0=좌상단, 1=좌하단, 그 외 스태거
-            $pos  = $i === 0 ? 'left:20px;top:90px'
-                  : ($i === 1 ? 'left:20px;bottom:24px'
-                  : 'left:'.(20 + $i * 30).'px;top:'.(90 + $i * 30).'px');
         @endphp
-        <div class="mgpop-box" data-key="{{ $key }}" style="{{ $pos }}" hidden>
+        <div class="mgpop-box" data-key="{{ $key }}" style="left:16px;top:90px" hidden>
             <div class="mgpop-bar" data-drag>
                 <span class="mgpop-title">{{ $pp['title'] ?: '망고샵 이벤트' }}</span>
                 <button type="button" class="mgpop-x" data-close aria-label="닫기">✕</button>
@@ -48,10 +44,14 @@
 <script>
 (function(){
     var today=new Date().toDateString();
+    var stackY=90;
     document.querySelectorAll('#mgPopHost .mgpop-box').forEach(function(box){
         var key=box.dataset.key;
         try{ if(localStorage.getItem(key)===today){ box.remove(); return; } }catch(e){}
         box.hidden=false;
+        // 겹치지 않게 세로로 쌓기(추석 위 → 과일문의 아래)
+        box.style.left='16px'; box.style.top=stackY+'px'; box.style.bottom='auto';
+        stackY += box.getBoundingClientRect().height + 12;
 
         box.querySelector('[data-close]').addEventListener('click',function(){
             try{ var c=box.querySelector('[data-hide]'); if(c&&c.checked) localStorage.setItem(key,today); }catch(e){}
