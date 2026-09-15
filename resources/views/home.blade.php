@@ -190,6 +190,9 @@
     </div>
 </section>
 
+{{-- 메인 팝업(관리자 사이트설정 > 메인 팝업) --}}
+@include('partials.home-popup')
+
 @endsection
 
 @push('scripts')
