@@ -2,8 +2,6 @@
 
 @section('content')
 
-@include('partials.home-popup')
-
 {{-- ===== 1. 풀와이드 롤링 히어로 (화이트 · 실사진 · 생동감) ===== --}}
 @if($mainBanners->count())
 @php($heroAcc = [asset('images/fruit/lychee-fruit-0.jpg'), asset('images/fruit/mangosteen-0.jpg'), asset('images/fruit/grapefruit-0.jpg')])

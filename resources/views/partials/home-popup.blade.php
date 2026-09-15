@@ -13,8 +13,12 @@
             $link = $raw === '' ? route('community.inquiry') : (preg_match('#^https?://#i', $raw) ? $raw : url('/'.ltrim($raw, '/')));
             $key  = 'mgpop_'.substr(md5($img.'|'.$link), 0, 10);
             $tgt  = ($pp['new_window'] ?? false) ? 'target="_blank" rel="noopener"' : '';
+            // 겹치지 않게 분리 배치: 0=좌상단, 1=좌하단, 그 외 스태거
+            $pos  = $i === 0 ? 'left:20px;top:90px'
+                  : ($i === 1 ? 'left:20px;bottom:24px'
+                  : 'left:'.(20 + $i * 30).'px;top:'.(90 + $i * 30).'px');
         @endphp
-        <div class="mgpop-box" data-key="{{ $key }}" style="left:{{ 24 + $i * 34 }}px;top:{{ 90 + $i * 34 }}px" hidden>
+        <div class="mgpop-box" data-key="{{ $key }}" style="{{ $pos }}" hidden>
             <div class="mgpop-bar" data-drag>
                 <span class="mgpop-title">{{ $pp['title'] ?: '망고샵 이벤트' }}</span>
                 <button type="button" class="mgpop-x" data-close aria-label="닫기">✕</button>
