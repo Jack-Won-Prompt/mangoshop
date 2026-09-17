@@ -189,6 +189,14 @@
         [{header:[false,2,3,4]}],['bold','italic','underline','strike'],[{color:[]},{background:[]}],
         [{list:'ordered'},{list:'bullet'}],[{align:[]}],['blockquote','link','image'],['clean']]}});
 
+    // 웹/문서에서 복사한 이미지(HTML의 <img>)를 Quill이 지우지 않고 유지 → 저장 시 서버가 자체 저장
+    var Delta=Quill.import('delta');
+    q.clipboard.addMatcher('IMG', function(node, delta){
+        var src=node.getAttribute('src')||'';
+        if(/^data:image\//i.test(src) || /^https?:\/\//i.test(src)){ return new Delta().insert({image:src}); }
+        return delta;
+    });
+
     function upload(file){var fd=new FormData();fd.append('file',file);
         fetch(uploadUrl,{method:'POST',headers:{'X-CSRF-TOKEN':csrf,'Accept':'application/json'},body:fd})
         .then(r=>r.json()).then(d=>{if(!d.url)return;var r=q.getSelection(true)||{index:q.getLength()};
