@@ -119,7 +119,12 @@ class RecipeController extends Controller
 
     public function editorUpload(Request $request)
     {
-        $request->validate(['file' => ['required', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:8192']]);
+        $request->validate([
+            'file' => ['required', 'image', 'mimetypes:image/jpeg,image/png,image/webp,image/gif', 'max:20480'],
+        ], [
+            'file.max'       => '이미지는 20MB 이하만 업로드할 수 있습니다.',
+            'file.mimetypes' => 'jpg, png, webp, gif 이미지만 붙여넣을 수 있습니다.',
+        ]);
         $path = $this->saveUpload($request->file('file'));
 
         return response()->json(['url' => asset(ltrim($path, '/'))]);
@@ -210,7 +215,11 @@ class RecipeController extends Controller
         if (! is_dir($dir)) {
             @mkdir($dir, 0775, true);
         }
-        $name = now()->format('Ymd_His').'_'.Str::lower(Str::random(6)).'.'.strtolower($file->getClientOriginalExtension());
+        $ext = strtolower($file->getClientOriginalExtension() ?: ($file->guessExtension() ?: 'png'));
+        if ($ext === 'jpeg') {
+            $ext = 'jpg';
+        }
+        $name = now()->format('Ymd_His').'_'.Str::lower(Str::random(6)).'.'.$ext;
         $file->move($dir, $name);
 
         return '/recipe/uploads/'.$name;

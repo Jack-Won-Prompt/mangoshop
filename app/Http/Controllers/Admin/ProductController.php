@@ -142,7 +142,14 @@ class ProductController extends Controller
     /** 리치에디터 이미지 업로드(AJAX) → {url} */
     public function editorUpload(Request $request)
     {
-        $request->validate(['file' => ['required', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:8192']]);
+        // 클립보드 붙여넣기 파일은 확장자가 없을 수 있어 mimetypes(실제 MIME)로 검증
+        $request->validate([
+            'file' => ['required', 'image', 'mimetypes:image/jpeg,image/png,image/webp,image/gif', 'max:20480'],
+        ], [
+            'file.max'       => '이미지는 20MB 이하만 업로드할 수 있습니다.',
+            'file.mimetypes' => 'jpg, png, webp, gif 이미지만 붙여넣을 수 있습니다.',
+            'file.image'     => '이미지 파일만 붙여넣을 수 있습니다.',
+        ]);
         $path = $this->saveUpload($request->file('file'), 'editor');
 
         return response()->json(['url' => asset(ltrim($path, '/'))]);
@@ -283,7 +290,12 @@ class ProductController extends Controller
         if (! is_dir($dir)) {
             @mkdir($dir, 0775, true);
         }
-        $name = now()->format('Ymd_His').'_'.Str::lower(Str::random(6)).'.'.strtolower($file->getClientOriginalExtension());
+        // 확장자: 원본 → 없으면 MIME 추론(클립보드 blob 대응)
+        $ext = strtolower($file->getClientOriginalExtension() ?: ($file->guessExtension() ?: 'png'));
+        if ($ext === 'jpeg') {
+            $ext = 'jpg';
+        }
+        $name = now()->format('Ymd_His').'_'.Str::lower(Str::random(6)).'.'.$ext;
         $file->move($dir, $name);
 
         return '/product/uploads'.($sub ? '/'.$sub : '').'/'.$name;
