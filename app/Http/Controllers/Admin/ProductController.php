@@ -290,42 +290,86 @@ class ProductController extends Controller
     }
 
     /**
-     * 상세설명에 인라인으로 붙여넣은 base64 이미지(data:image/...)를 파일로 저장하고
-     * src 를 정적 URL 로 치환한다. 검증(max:500000자) 이전에 실행하여 본문 크기 폭증을 막는다.
-     * 클라이언트 붙여넣기 핸들러가 놓친 경우(브라우저/출처별 차이)까지 서버에서 처리.
+     * 상세설명에 붙여넣은 이미지를 서버에 자체 저장한다(검증 이전 실행).
+     *  1) 인라인 base64(data:image/...) → 파일화
+     *  2) 외부 http(s) 이미지(<img src>) → 다운로드하여 자체 저장(자사 호스트는 유지)
+     * → 붙여넣기 출처(스크린샷/파일/외부 웹/문서)에 관계없이 상세이미지가 남는다.
      */
     private function extractInlineImages(Request $request): void
     {
         $html = (string) $request->input('description', '');
-        if (stripos($html, 'data:image/') === false) {
+        if ($html === '') {
             return;
         }
 
-        $ext = ['png' => 'png', 'jpeg' => 'jpg', 'jpg' => 'jpg', 'gif' => 'gif', 'webp' => 'webp'];
         $dir = public_path('product/uploads/editor');
         if (! is_dir($dir)) {
             @mkdir($dir, 0775, true);
         }
+        $extMap = ['image/png' => 'png', 'image/jpeg' => 'jpg', 'image/jpg' => 'jpg', 'image/gif' => 'gif', 'image/webp' => 'webp'];
+        $changed = false;
 
-        $html = preg_replace_callback(
-            '#data:image/(png|jpe?g|gif|webp);base64,([A-Za-z0-9+/=\s]+)#i',
-            function ($m) use ($ext, $dir) {
-                $type = strtolower($m[1]);
-                $bin = base64_decode(preg_replace('/\s+/', '', $m[2]), true);
-                if ($bin === false || $bin === '') {
-                    return $m[0]; // 디코드 실패 시 원본 유지
-                }
-                $name = now()->format('Ymd_His').'_'.Str::lower(Str::random(8)).'.'.($ext[$type] ?? 'png');
-                if (@file_put_contents($dir.'/'.$name, $bin) === false) {
-                    return $m[0]; // 저장 실패 시 원본 유지
-                }
+        // 1) 인라인 base64
+        if (stripos($html, 'data:image/') !== false) {
+            $b64 = ['png' => 'png', 'jpeg' => 'jpg', 'jpg' => 'jpg', 'gif' => 'gif', 'webp' => 'webp'];
+            $html = preg_replace_callback(
+                '#data:image/(png|jpe?g|gif|webp);base64,([A-Za-z0-9+/=\s]+)#i',
+                function ($m) use ($dir, $b64, &$changed) {
+                    $bin = base64_decode(preg_replace('/\s+/', '', $m[2]), true);
+                    if ($bin === false || $bin === '') {
+                        return $m[0];
+                    }
+                    $name = now()->format('Ymd_His').'_'.Str::lower(Str::random(8)).'.'.($b64[strtolower($m[1])] ?? 'png');
+                    if (@file_put_contents($dir.'/'.$name, $bin) === false) {
+                        return $m[0];
+                    }
+                    $changed = true;
 
-                return asset('product/uploads/editor/'.$name);
-            },
-            $html
-        );
+                    return asset('product/uploads/editor/'.$name);
+                },
+                $html
+            );
+        }
 
-        $request->merge(['description' => $html]);
+        // 2) 외부 http(s) 이미지 다운로드(자사 호스트 제외)
+        if (stripos($html, 'src="http') !== false) {
+            $ownHost = parse_url((string) config('app.url'), PHP_URL_HOST);
+            $html = preg_replace_callback(
+                '#(<img\b[^>]*\bsrc=")(https?://[^"]+)(")#i',
+                function ($m) use ($dir, $extMap, $ownHost, &$changed) {
+                    $url = $m[2];
+                    $host = parse_url($url, PHP_URL_HOST);
+                    if ($ownHost && $host && stripos($host, $ownHost) !== false) {
+                        return $m[0]; // 자사 이미지 유지
+                    }
+                    try {
+                        $resp = \Illuminate\Support\Facades\Http::timeout(8)->retry(1, 200)->get($url);
+                        if (! $resp->ok()) {
+                            return $m[0];
+                        }
+                        $ct = strtolower(trim(explode(';', (string) $resp->header('Content-Type'))[0]));
+                        $bin = $resp->body();
+                        if (! isset($extMap[$ct]) || strlen($bin) < 50 || strlen($bin) > 8 * 1024 * 1024) {
+                            return $m[0];
+                        }
+                        $name = now()->format('Ymd_His').'_'.Str::lower(Str::random(8)).'.'.$extMap[$ct];
+                        if (@file_put_contents($dir.'/'.$name, $bin) === false) {
+                            return $m[0];
+                        }
+                        $changed = true;
+
+                        return $m[1].asset('product/uploads/editor/'.$name).$m[3];
+                    } catch (\Throwable $e) {
+                        return $m[0];
+                    }
+                },
+                $html
+            );
+        }
+
+        if ($changed) {
+            $request->merge(['description' => $html]);
+        }
     }
 
     private function uniqueSlug(string $base, ?int $ignoreId = null): string
