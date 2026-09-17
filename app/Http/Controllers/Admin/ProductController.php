@@ -144,9 +144,9 @@ class ProductController extends Controller
     {
         // 클립보드 붙여넣기 파일은 확장자가 없을 수 있어 mimetypes(실제 MIME)로 검증
         $request->validate([
-            'file' => ['required', 'image', 'mimetypes:image/jpeg,image/png,image/webp,image/gif', 'max:20480'],
+            'file' => ['required', 'image', 'mimetypes:image/jpeg,image/png,image/webp,image/gif', 'max:51200'],
         ], [
-            'file.max'       => '이미지는 20MB 이하만 업로드할 수 있습니다.',
+            'file.max'       => '이미지는 50MB 이하만 업로드할 수 있습니다.',
             'file.mimetypes' => 'jpg, png, webp, gif 이미지만 붙여넣을 수 있습니다.',
             'file.image'     => '이미지 파일만 붙여넣을 수 있습니다.',
         ]);
@@ -361,7 +361,7 @@ class ProductController extends Controller
                         }
                         $ct = strtolower(trim(explode(';', (string) $resp->header('Content-Type'))[0]));
                         $bin = $resp->body();
-                        if (! isset($extMap[$ct]) || strlen($bin) < 50 || strlen($bin) > 8 * 1024 * 1024) {
+                        if (! isset($extMap[$ct]) || strlen($bin) < 50 || strlen($bin) > 50 * 1024 * 1024) {
                             return $m[0];
                         }
                         $name = now()->format('Ymd_His').'_'.Str::lower(Str::random(8)).'.'.$extMap[$ct];

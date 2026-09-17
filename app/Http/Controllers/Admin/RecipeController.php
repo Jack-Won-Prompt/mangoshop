@@ -120,9 +120,9 @@ class RecipeController extends Controller
     public function editorUpload(Request $request)
     {
         $request->validate([
-            'file' => ['required', 'image', 'mimetypes:image/jpeg,image/png,image/webp,image/gif', 'max:20480'],
+            'file' => ['required', 'image', 'mimetypes:image/jpeg,image/png,image/webp,image/gif', 'max:51200'],
         ], [
-            'file.max'       => '이미지는 20MB 이하만 업로드할 수 있습니다.',
+            'file.max'       => '이미지는 50MB 이하만 업로드할 수 있습니다.',
             'file.mimetypes' => 'jpg, png, webp, gif 이미지만 붙여넣을 수 있습니다.',
         ]);
         $path = $this->saveUpload($request->file('file'));
