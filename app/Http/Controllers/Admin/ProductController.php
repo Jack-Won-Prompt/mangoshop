@@ -184,6 +184,7 @@ class ProductController extends Controller
             'badge'           => ['nullable', 'string', 'max:30'],
             'sort_order'      => ['nullable', 'integer', 'min:0'],
             'thumbnail'       => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:8192'],
+            'remove_thumbnail' => ['nullable', 'boolean'],
             'gallery.*'       => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:8192'],
             'detail_images.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:8192'],
             'options'                 => ['nullable', 'array', 'max:100'],
@@ -224,6 +225,8 @@ class ProductController extends Controller
 
         if ($request->hasFile('thumbnail')) {
             $product->thumbnail = ltrim($this->saveUpload($request->file('thumbnail')), '/');
+        } elseif ($request->boolean('remove_thumbnail')) {
+            $product->thumbnail = null;   // 명시적 삭제(새 파일 없음) — 파일은 갤러리와 공유될 수 있어 DB만 비움
         }
     }
 
@@ -233,7 +236,8 @@ class ProductController extends Controller
         $this->storeImages($product, $request, 'gallery', 'gallery');
         $this->storeImages($product, $request, 'detail_images', 'detail');
 
-        if (! $product->thumbnail && $product->galleryImages()->exists()) {
+        // 대표이미지를 명시적으로 삭제한 경우엔 갤러리로 자동 보완하지 않음(삭제 의도 존중)
+        if (! $product->thumbnail && ! $request->boolean('remove_thumbnail') && $product->galleryImages()->exists()) {
             $product->update(['thumbnail' => ltrim($product->galleryImages()->first()->path, '/')]);
         }
     }

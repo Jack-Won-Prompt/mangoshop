@@ -126,6 +126,10 @@
                     <input type="file" name="thumbnail" accept="image/*" class="ainput" style="padding:8px" onchange="prev(this,'mainPrev','mainPh')">
                 </div>
                 @if($product->exists && $product->thumbnail)
+                    <label class="inline" style="display:flex;align-items:center;gap:8px;margin-top:10px;font-weight:500;color:#e0322d">
+                        <input type="checkbox" name="remove_thumbnail" value="1" onchange="var p=document.getElementById('mainPrev'),h=document.getElementById('mainPh');if(this.checked){p.style.opacity=.3}else{p.style.opacity=1}">
+                        대표 이미지 삭제(저장 시 제거 · 새 파일을 올리면 교체)
+                    </label>
                     <a href="{{ route('admin.products.image', $product) }}" class="abtn abtn-ghost abtn-sm" style="margin-top:10px">✂ 이미지 편집(회전·자르기·밝기)</a>
                 @endif
             </div></div>
