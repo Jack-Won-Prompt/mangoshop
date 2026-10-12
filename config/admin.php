@@ -29,7 +29,7 @@ return [
             ['name' => 'name', 'label' => '카테고리명', 'type' => 'text', 'required' => true],
             ['name' => 'slug', 'label' => '슬러그(영문 URL)', 'type' => 'text', 'required' => true],
             ['name' => 'tagline', 'label' => '한 줄 설명', 'type' => 'text'],
-            ['name' => 'icon', 'label' => '아이콘 키', 'type' => 'text', 'hint' => '예: syringe, glove, bandage, drop, ivbag, catheter, needle, virus, shield, scan, cross, box'],
+            ['name' => 'icon', 'label' => '아이콘 키', 'type' => 'text', 'hint' => '예: cat-mango, cat-avocado, cat-pineapple, cat-citrus, cat-berry, cat-gift, box, tag, grid, package, truck, coin, fire, heart, star'],
             ['name' => 'sort_order', 'label' => '정렬 순서', 'type' => 'number'],
             ['name' => 'is_active', 'label' => '노출', 'type' => 'checkbox'],
         ],
