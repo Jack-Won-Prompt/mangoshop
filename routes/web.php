@@ -300,6 +300,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::put('/inquiries/{inquiry}/answer', [AdminInquiryController::class, 'answer'])->name('inquiries.answer');
     Route::delete('/inquiries/{inquiry}', [AdminInquiryController::class, 'destroy'])->name('inquiries.destroy');
 
+    // SR 관리 (Claude 콘솔) — 제네릭 CRUD 보다 먼저(전용 경로)
+    Route::get('/sr', [\App\Http\Controllers\Admin\SrController::class, 'index'])->name('sr.index');
+    Route::post('/sr', [\App\Http\Controllers\Admin\SrController::class, 'store'])->name('sr.store');
+    Route::get('/sr/thread/{thread}', [\App\Http\Controllers\Admin\SrController::class, 'show'])->name('sr.show');
+    Route::post('/sr/thread/{thread}/message', [\App\Http\Controllers\Admin\SrController::class, 'message'])->name('sr.message');
+    Route::delete('/sr/thread/{thread}', [\App\Http\Controllers\Admin\SrController::class, 'destroy'])->name('sr.destroy');
+    Route::get('/sr/thread/{thread}/file/{message}/{idx}', [\App\Http\Controllers\Admin\SrController::class, 'attachment'])->name('sr.attachment');
+
     // 설정 기반 제네릭 CRUD (categories, brands, products, banners, notices, faqs)
     Route::get('/{resource}', [AdminResourceController::class, 'index'])->name('index');
     Route::get('/{resource}/create', [AdminResourceController::class, 'create'])->name('create');

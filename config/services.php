@@ -56,6 +56,15 @@ return [
         ],
     ],
 
+    // Anthropic Claude API (관리자 SR 콘솔). 키는 .env(ANTHROPIC_API_KEY)에만 둔다.
+    'anthropic' => [
+        'key'        => env('ANTHROPIC_API_KEY'),
+        'model'      => env('ANTHROPIC_MODEL', 'claude-sonnet-5'),
+        'version'    => env('ANTHROPIC_VERSION', '2023-06-01'),
+        'max_tokens' => (int) env('ANTHROPIC_MAX_TOKENS', 4096),
+        'base'       => 'https://api.anthropic.com',
+    ],
+
     // 운영 예외 보고. 값은 .env 에만 둔다 — 없으면 보고를 조용히 건너뛴다.
     'supportworks' => [
         'error_url'   => env('SW_ERROR_URL'),
