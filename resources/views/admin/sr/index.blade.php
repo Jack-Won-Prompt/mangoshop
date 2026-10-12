@@ -107,7 +107,7 @@
 
 <style>
     .adm-body{padding:0 !important}
-    .sr{display:grid;grid-template-columns:260px 1fr;height:calc(100vh - 62px);min-height:520px}
+    .sr{display:grid;grid-template-columns:260px 1fr;height:calc(100vh - 74px);min-height:520px}
     .sr-list{border-right:1px solid var(--a-line,#e3e8f1);display:flex;flex-direction:column;background:#fafbfd;min-width:0;min-height:0}
     .sr-new{display:flex;align-items:center;justify-content:center;gap:6px;width:calc(100% - 24px);margin:12px;padding:11px;border:1px solid var(--a-line,#e3e8f1);background:#fff;border-radius:9px;font-weight:700;cursor:pointer;color:#123b26}
     .sr-new:hover{background:#f0f3ee}
