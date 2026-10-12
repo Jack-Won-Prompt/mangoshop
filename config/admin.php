@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Coupon;
 use App\Models\Faq;
 use App\Models\Notice;
+use App\Models\Popup;
 use App\Models\Product;
 use App\Models\Recipe;
 use App\Models\RecipeCategory;
@@ -101,6 +102,25 @@ return [
             ['name' => 'is_active', 'label' => '노출', 'type' => 'checkbox'],
         ],
         'defaults' => ['is_active' => true, 'position' => 'main'],
+    ],
+
+    // 메인 팝업(여러 개 동시 노출 가능) — 메인화면 홍보 팝업
+    'popups' => [
+        'label' => '메인 팝업', 'model' => Popup::class, 'icon' => 'monitor', 'group' => '전시관리',
+        'order' => ['sort_order', 'asc'],
+        'columns' => ['image' => '이미지', 'title' => '제목', 'link' => '링크', 'sort_order' => '순서', 'is_active' => '노출'],
+        'fields' => [
+            ['name' => 'title', 'label' => '제목', 'type' => 'text', 'hint' => '팝업 상단 바에 표시(비우면 "망고샵 이벤트")'],
+            ['name' => 'image', 'label' => '팝업 이미지', 'type' => 'image', 'required' => true, 'hint' => 'JPG·PNG·WEBP·GIF, 4MB 이하. 권장 정사각형/세로형 800px 이상'],
+            ['name' => 'link', 'label' => '클릭 시 이동 주소', 'type' => 'text', 'hint' => '예: community/inquiry, product/슬러그, https://… (비우면 문의하기로 이동)'],
+            ['name' => 'button', 'label' => '버튼 문구', 'type' => 'text', 'hint' => '비우면 버튼 없이 이미지 클릭만'],
+            ['name' => 'new_window', 'label' => '새 창으로 열기', 'type' => 'checkbox'],
+            ['name' => 'start_date', 'label' => '노출 시작일(선택)', 'type' => 'date'],
+            ['name' => 'end_date', 'label' => '노출 종료일(선택)', 'type' => 'date'],
+            ['name' => 'sort_order', 'label' => '정렬 순서(작을수록 위)', 'type' => 'number'],
+            ['name' => 'is_active', 'label' => '노출', 'type' => 'checkbox'],
+        ],
+        'defaults' => ['is_active' => true, 'new_window' => false, 'sort_order' => 0],
     ],
 
     // 레시피 카테고리(제네릭 CRUD) — 레시피 글은 전용 컨트롤러(Admin\RecipeController)가 처리

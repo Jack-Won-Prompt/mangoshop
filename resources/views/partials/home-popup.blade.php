@@ -1,27 +1,26 @@
 @php
-    $pps = collect($site['popups'] ?? [$site['popup'] ?? []]);
-    $today = now()->toDateString();
-    $active = $pps->filter(fn ($p) => ($p['enabled'] ?? false) && ! empty($p['image'])
-        && (empty($p['start']) || $today >= $p['start']) && (empty($p['end']) || $today <= $p['end']))->values();
+    // 팝업 관리 메뉴(관리자) 기반 — 활성 + 기간 조건을 만족하는 팝업만 노출
+    $active = \App\Models\Popup::visible();
 @endphp
 @if($active->count())
 <div id="mgPopHost">
-    @foreach($active as $i => $pp)
+    @foreach($active as $pp)
         @php
-            $img  = preg_match('#^https?://#i', $pp['image']) ? $pp['image'] : asset(ltrim($pp['image'], '/'));
-            $raw  = trim((string) ($pp['link'] ?? ''));
+            $img  = \App\Support\Media::url($pp->image);
+            $raw  = trim((string) ($pp->link ?? ''));
             $link = $raw === '' ? route('community.inquiry') : (preg_match('#^https?://#i', $raw) ? $raw : url('/'.ltrim($raw, '/')));
-            $key  = 'mgpop_'.substr(md5($img.'|'.$link), 0, 10);
-            $tgt  = ($pp['new_window'] ?? false) ? 'target="_blank" rel="noopener"' : '';
+            $title = $pp->title ?: '망고샵 이벤트';
+            $key  = 'mgpop_'.substr(md5($img.'|'.$link.'|'.$pp->updated_at), 0, 10);
+            $tgt  = $pp->new_window ? 'target="_blank" rel="noopener"' : '';
         @endphp
         <div class="mgpop-box" data-key="{{ $key }}" style="left:16px;top:90px" hidden>
             <div class="mgpop-bar" data-drag>
-                <span class="mgpop-title">{{ $pp['title'] ?: '망고샵 이벤트' }}</span>
+                <span class="mgpop-title">{{ $title }}</span>
                 <button type="button" class="mgpop-x" data-close aria-label="닫기">✕</button>
             </div>
-            <a class="mgpop-img" href="{{ $link }}" {!! $tgt !!}><img src="{{ $img }}" alt="{{ $pp['title'] ?: '망고샵 이벤트' }}"></a>
-            @if(!empty($pp['button']))
-                <a class="mgpop-cta" href="{{ $link }}" {!! $tgt !!}>{{ $pp['button'] }} <span>›</span></a>
+            <a class="mgpop-img" href="{{ $link }}" {!! $tgt !!}><img src="{{ $img }}" alt="{{ $title }}"></a>
+            @if(!empty($pp->button))
+                <a class="mgpop-cta" href="{{ $link }}" {!! $tgt !!}>{{ $pp->button }} <span>›</span></a>
             @endif
             <div class="mgpop-foot"><label class="mgpop-hide"><input type="checkbox" data-hide> 오늘 하루 보지 않기</label></div>
         </div>

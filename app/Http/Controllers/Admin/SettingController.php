@@ -3,10 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product;
 use App\Models\Setting;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 class SettingController extends Controller
@@ -15,9 +13,7 @@ class SettingController extends Controller
     {
         // config('site')는 AppServiceProvider에서 DB설정과 병합된 최종값
         return view('admin.settings.edit', [
-            'site'     => config('site'),
-            // 메인 팝업 링크 선택용 판매중 상품 목록
-            'products' => Product::active()->orderBy('name')->get(['id', 'name', 'slug']),
+            'site' => config('site'),
         ]);
     }
 
@@ -54,17 +50,6 @@ class SettingController extends Controller
             'home_show_recipe'   => ['nullable', 'boolean'],
             'inquiry_emails'     => ['nullable', 'array'],
             'inquiry_emails.*'   => ['nullable', 'email', 'max:100'],
-            // 메인 팝업
-            'popup_enabled'      => ['nullable', 'boolean'],
-            'popup_title'        => ['nullable', 'string', 'max:60'],
-            'popup_sub'          => ['nullable', 'string', 'max:100'],
-            'popup_button'       => ['nullable', 'string', 'max:30'],
-            'popup_link'         => ['nullable', 'string', 'max:300', $noScriptUrl],
-            'popup_new_window'   => ['nullable', 'boolean'],
-            'popup_image_path'   => ['nullable', 'string', 'max:300', $noScriptUrl],
-            'popup_image'        => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:5120'],
-            'popup_start'        => ['nullable', 'date'],
-            'popup_end'          => ['nullable', 'date', 'after_or_equal:popup_start'],
             // 메인 피처 밴드 2블록 (적립·캐시백 / 수입·유통)
             'feat'               => ['nullable', 'array'],
             'feat.*.kicker'      => ['nullable', 'string', 'max:40'],
@@ -76,8 +61,6 @@ class SettingController extends Controller
             'feat.*.image_path'  => ['nullable', 'string', 'max:300', $noScriptUrl],
             'feat.*.image'       => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:5120'],
         ], [
-            'popup_end.after_or_equal' => '팝업 종료일은 시작일 이후여야 합니다.',
-            'popup_image.max'          => '팝업 이미지는 5MB 이하만 업로드할 수 있습니다.',
             'feat.*.image.max'         => '피처 이미지는 5MB 이하만 업로드할 수 있습니다.',
         ]);
 
@@ -106,35 +89,12 @@ class SettingController extends Controller
             'popular_keywords' => $keywords,
             'inquiry_emails'   => $inquiryEmails,
             'home_show_recipe' => $request->boolean('home_show_recipe'),   // 체크박스: 미체크=false 명시 저장
-            'popup'            => $this->popupFrom($request),
             'home_features'    => $this->featuresFrom($request),
         ]);
 
         Setting::put('site', $site);
 
         return back()->with('ok', '사이트 설정이 저장되었습니다.');
-    }
-
-    private function popupFrom(Request $request): array
-    {
-        $image = trim((string) $request->input('popup_image_path', ''));
-        if ($request->hasFile('popup_image')) {
-            $image = $this->savePopupImage($request->file('popup_image'));
-        }
-
-        $date = fn (string $f) => $request->filled($f) ? Carbon::parse($request->input($f))->toDateString() : null;
-
-        return [
-            'enabled'    => $request->boolean('popup_enabled'),
-            'title'      => trim((string) $request->input('popup_title', '')),
-            'sub'        => trim((string) $request->input('popup_sub', '')),
-            'button'     => trim((string) $request->input('popup_button', '')),
-            'image'      => $image,
-            'link'       => trim((string) $request->input('popup_link', '')),
-            'new_window' => $request->boolean('popup_new_window'),
-            'start'      => $date('popup_start'),
-            'end'        => $date('popup_end'),
-        ];
     }
 
     /** 메인 피처 밴드(적립·캐시백 / 수입·유통) 입력을 기존 순서/기본값 위에 병합 */
@@ -168,12 +128,6 @@ class SettingController extends Controller
         }
 
         return array_values($current);
-    }
-
-    /** 팝업 이미지를 public/product/uploads/popup 에 저장하고 사이트 기준 상대경로를 반환 */
-    private function savePopupImage($file): string
-    {
-        return $this->saveUploadImage($file, 'popup');
     }
 
     /** 사이트설정 이미지를 public/product/uploads/{sub} 에 저장하고 상대경로 반환 */
