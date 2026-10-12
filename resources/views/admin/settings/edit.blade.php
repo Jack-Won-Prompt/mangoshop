@@ -116,6 +116,46 @@
         </div>
     </div>
 
+    {{-- 메인화면 피처 밴드 (적립·캐시백 / 수입·유통) --}}
+    @php($feats = $site['home_features'] ?? [])
+    @php($featLabels = ['① 적립·캐시백 영역 (좌측 상단, POINTS & CASHBACK)', '② 수입·유통 영역 (하단, IMPORT & DISTRIBUTION)'])
+    <div class="adm-card">
+        <div class="h">메인화면 피처 밴드 (텍스트·이미지)</div>
+        <div style="padding:20px;display:grid;gap:24px">
+            @foreach($feats as $i => $f)
+                @php($fImg = old("feat.$i.image_path", $f['image'] ?? ''))
+                <div style="border:1px solid #eef0f4;border-radius:10px;padding:16px;display:grid;gap:14px">
+                    <div style="font-weight:700;color:#33415c">{{ $featLabels[$i] ?? ('피처 블록 '.($i + 1)) }}</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                        <div class="afield"><label>소제목(영문 키커)</label><input type="text" name="feat[{{ $i }}][kicker]" class="ainput" maxlength="40" value="{{ old("feat.$i.kicker", $f['kicker'] ?? '') }}" placeholder="예: POINTS & CASHBACK"></div>
+                        <div class="afield"><label>버튼 문구</label><input type="text" name="feat[{{ $i }}][button]" class="ainput" maxlength="30" value="{{ old("feat.$i.button", $f['button'] ?? '') }}" placeholder="예: 후기 쓰고 적립받기"></div>
+                    </div>
+                    <div class="afield">
+                        <label>제목</label>
+                        <input type="text" name="feat[{{ $i }}][title]" class="ainput" maxlength="200" value="{{ old("feat.$i.title", $f['title'] ?? '') }}" placeholder="예: 사고, 후기 쓰면&lt;br&gt;&lt;b&gt;적립금&lt;/b&gt;이 쌓입니다">
+                        <div class="ahint">줄바꿈은 &lt;br&gt;, 강조는 &lt;b&gt;…&lt;/b&gt; 로 입력합니다. (그 외 태그는 자동 제거)</div>
+                    </div>
+                    <div class="afield"><label>설명 문구</label><textarea name="feat[{{ $i }}][desc]" class="ainput" rows="2" maxlength="400" placeholder="영역 설명 문구">{{ old("feat.$i.desc", $f['desc'] ?? '') }}</textarea></div>
+                    <div class="afield"><label>태그 칩(쉼표로 구분)</label><input type="text" name="feat[{{ $i }}][chips]" class="ainput" maxlength="300" value="{{ old("feat.$i.chips", implode(', ', (array) ($f['chips'] ?? []))) }}" placeholder="예: 신규가입 3,000P, 구매 3% 적립, 상품후기 3% 적립"></div>
+                    <div class="afield"><label>클릭 시 이동 주소</label><input type="text" name="feat[{{ $i }}][link]" class="ainput" maxlength="300" value="{{ old("feat.$i.link", $f['link'] ?? '') }}" placeholder="예: community/reviews 또는 https://…"></div>
+                    <div class="afield">
+                        <label>배경 이미지</label>
+                        <div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap">
+                            @if($fImg)
+                                <img src="{{ preg_match('#^https?://#i', $fImg) ? $fImg : asset(ltrim($fImg, '/')) }}" alt="현재 이미지" style="width:140px;height:92px;object-fit:cover;border:1px solid #e5e7eb;border-radius:8px">
+                            @endif
+                            <div style="flex:1;min-width:240px">
+                                <input type="file" name="feat[{{ $i }}][image]" accept="image/jpeg,image/png,image/webp,image/gif" class="ainput" style="padding:7px">
+                                <input type="text" name="feat[{{ $i }}][image_path]" class="ainput" style="margin-top:8px" value="{{ $fImg }}" placeholder="images/main/cashback-points.jpg">
+                                <div class="ahint">새 파일을 올리면 교체됩니다(JPG·PNG·WEBP·GIF, 5MB 이하, 권장 가로형 1200×800). 경로나 https 주소를 직접 입력할 수도 있습니다.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+
     {{-- 메인 팝업 (상품 홍보) --}}
     @php($pp = $site['popup'] ?? [])
     @php($ppImg = old('popup_image_path', $pp['image'] ?? ''))

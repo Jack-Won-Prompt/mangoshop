@@ -57,4 +57,22 @@ class Media
             $html
         );
     }
+
+    /**
+     * 메인 피처 밴드 등 제목용 안전 HTML.
+     * - <br>, <b>/<strong> 만 허용(속성 제거). 나머지는 이스케이프.
+     * - 관리자 입력을 공개 페이지에 {!! !!} 로 렌더할 때 XSS 방지.
+     */
+    public static function headline(?string $raw): string
+    {
+        if ($raw === null || $raw === '') {
+            return '';
+        }
+        $kept = strip_tags($raw, '<br><b><strong>');
+        // 허용 태그의 속성 제거(onclick 등 차단)
+        $kept = preg_replace('#<(br|b|strong)\b[^>]*?(/?)>#i', '<$1$2>', $kept);
+        $kept = preg_replace('#</(b|strong)\s*>#i', '</$1>', $kept);
+
+        return $kept;
+    }
 }

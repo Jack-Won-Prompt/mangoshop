@@ -65,9 +65,20 @@ class SettingController extends Controller
             'popup_image'        => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:5120'],
             'popup_start'        => ['nullable', 'date'],
             'popup_end'          => ['nullable', 'date', 'after_or_equal:popup_start'],
+            // 메인 피처 밴드 2블록 (적립·캐시백 / 수입·유통)
+            'feat'               => ['nullable', 'array'],
+            'feat.*.kicker'      => ['nullable', 'string', 'max:40'],
+            'feat.*.title'       => ['nullable', 'string', 'max:200'],
+            'feat.*.desc'        => ['nullable', 'string', 'max:400'],
+            'feat.*.chips'       => ['nullable', 'string', 'max:300'],
+            'feat.*.button'      => ['nullable', 'string', 'max:30'],
+            'feat.*.link'        => ['nullable', 'string', 'max:300', $noScriptUrl],
+            'feat.*.image_path'  => ['nullable', 'string', 'max:300', $noScriptUrl],
+            'feat.*.image'       => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:5120'],
         ], [
             'popup_end.after_or_equal' => '팝업 종료일은 시작일 이후여야 합니다.',
             'popup_image.max'          => '팝업 이미지는 5MB 이하만 업로드할 수 있습니다.',
+            'feat.*.image.max'         => '피처 이미지는 5MB 이하만 업로드할 수 있습니다.',
         ]);
 
         // 빈 계좌행 제거
@@ -90,12 +101,13 @@ class SettingController extends Controller
         // 팝업 입력(popup_*)은 site 최상위가 아닌 site.popup 으로 묶어 저장
         $plain = array_filter($data, fn ($k) => ! str_starts_with($k, 'popup_'), ARRAY_FILTER_USE_KEY);
 
-        $site = array_merge(config('site'), array_diff_key($plain, array_flip(['banks', 'popular_keywords', 'inquiry_emails', 'home_show_recipe'])), [
+        $site = array_merge(config('site'), array_diff_key($plain, array_flip(['banks', 'popular_keywords', 'inquiry_emails', 'home_show_recipe', 'feat'])), [
             'banks'            => $banks,
             'popular_keywords' => $keywords,
             'inquiry_emails'   => $inquiryEmails,
             'home_show_recipe' => $request->boolean('home_show_recipe'),   // 체크박스: 미체크=false 명시 저장
             'popup'            => $this->popupFrom($request),
+            'home_features'    => $this->featuresFrom($request),
         ]);
 
         Setting::put('site', $site);
@@ -125,16 +137,56 @@ class SettingController extends Controller
         ];
     }
 
+    /** 메인 피처 밴드(적립·캐시백 / 수입·유통) 입력을 기존 순서/기본값 위에 병합 */
+    private function featuresFrom(Request $request): array
+    {
+        $current = config('site.home_features', []);
+        $input   = (array) $request->input('feat', []);
+        $files   = (array) $request->file('feat', []);
+
+        foreach ($input as $i => $f) {
+            $block = $current[$i] ?? [];
+
+            // 이미지: 새 파일 업로드 우선 → 경로 직접입력 → 기존값 유지
+            $image = trim((string) ($f['image_path'] ?? ($block['image'] ?? '')));
+            if (! empty($files[$i]['image'])) {
+                $image = $this->saveUploadImage($files[$i]['image'], 'home');
+            }
+
+            $chips = collect(explode(',', (string) ($f['chips'] ?? '')))
+                ->map(fn ($c) => trim($c))->filter()->values()->all();
+
+            $current[$i] = [
+                'kicker' => trim((string) ($f['kicker'] ?? ($block['kicker'] ?? ''))),
+                'title'  => \App\Support\Media::headline($f['title'] ?? ($block['title'] ?? '')),
+                'desc'   => trim((string) ($f['desc'] ?? ($block['desc'] ?? ''))),
+                'chips'  => $chips,
+                'button' => trim((string) ($f['button'] ?? ($block['button'] ?? ''))),
+                'link'   => trim((string) ($f['link'] ?? ($block['link'] ?? ''))),
+                'image'  => $image,
+            ];
+        }
+
+        return array_values($current);
+    }
+
     /** 팝업 이미지를 public/product/uploads/popup 에 저장하고 사이트 기준 상대경로를 반환 */
     private function savePopupImage($file): string
     {
-        $dir = public_path('product/uploads/popup');
+        return $this->saveUploadImage($file, 'popup');
+    }
+
+    /** 사이트설정 이미지를 public/product/uploads/{sub} 에 저장하고 상대경로 반환 */
+    private function saveUploadImage($file, string $sub): string
+    {
+        $dir = public_path('product/uploads/'.$sub);
         if (! is_dir($dir)) {
             @mkdir($dir, 0775, true);
         }
-        $name = now()->format('Ymd_His').'_'.Str::lower(Str::random(6)).'.'.strtolower($file->getClientOriginalExtension());
+        $ext = strtolower($file->getClientOriginalExtension() ?: ($file->guessExtension() ?: 'jpg'));
+        $name = now()->format('Ymd_His').'_'.Str::lower(Str::random(6)).'.'.$ext;
         $file->move($dir, $name);
 
-        return 'product/uploads/popup/'.$name;
+        return 'product/uploads/'.$sub.'/'.$name;
     }
 }

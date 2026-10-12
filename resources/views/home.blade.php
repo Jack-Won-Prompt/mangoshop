@@ -131,37 +131,38 @@
 </section>
 @endif
 
-{{-- ===== 4-1. 실사진 피처 밴드 (적립·캐시백 / 수입사 직거래·입점) ===== --}}
+{{-- ===== 4-1. 실사진 피처 밴드 (적립·캐시백 / 수입사 직거래·입점) · 관리자 사이트설정에서 편집 ===== --}}
+@php($feats = $site['home_features'] ?? [])
+@php($featUrl = fn($v) => $v ? (preg_match('#^https?://#i', $v) ? $v : asset(ltrim($v, '/'))) : '')
+@php($featOverlay = ['linear-gradient(120deg, rgba(255,183,71,.12), rgba(255,107,0,.05))', 'linear-gradient(120deg, rgba(22,163,74,.10), rgba(22,163,74,.04))'])
+@if(count($feats))
 <section class="mg-feature">
     <div class="mg-wrap">
-        {{-- 적립·캐시백 (실사진: 여성 + 포인트 화면) --}}
-        <div class="mg-feat-row a">
-            <div class="mg-feat-photo" role="img" aria-label="스마트폰으로 적립 포인트를 확인하는 고객"></div>
-            <div class="mg-feat-txt">
-                <div class="ki">POINTS &amp; CASHBACK</div>
-                <h3>사고, 후기 쓰면<br><b>적립금</b>이 쌓입니다</h3>
-                <p>구매부터 후기까지, 망고샵을 이용할수록 혜택이 커집니다. 앱에서 적립·캐시백 리워드를 바로 확인하세요.</p>
-                <div class="mg-feat-chips">
-                    <span>신규가입 3,000P</span><span>구매 3% 적립</span><span>상품후기 3% 적립</span>
+        @foreach($feats as $i => $f)
+            @php($img = $featUrl($f['image'] ?? ''))
+            @php($isBiz = $i % 2 === 1)
+            <div class="mg-feat-row {{ $isBiz ? 'b rev' : 'a' }}">
+                <div class="mg-feat-photo" role="img" aria-label="{{ strip_tags($f['kicker'] ?? '') }}"
+                     @if($img)style="background-image:{{ ($featOverlay[$i] ?? $featOverlay[0]) }}, url('{{ $img }}')"@endif></div>
+                <div class="mg-feat-txt">
+                    @if(!empty($f['kicker']))<div class="ki">{{ $f['kicker'] }}</div>@endif
+                    @if(!empty($f['title']))<h3>{!! \App\Support\Media::headline($f['title']) !!}</h3>@endif
+                    @if(!empty($f['desc']))<p>{{ $f['desc'] }}</p>@endif
+                    @if(!empty($f['chips']))
+                        <div class="mg-feat-chips">
+                            @foreach((array) $f['chips'] as $chip)<span>{{ $chip }}</span>@endforeach
+                        </div>
+                    @endif
+                    @if(!empty($f['button']) && !empty($f['link']))
+                        @php($lnk = preg_match('#^https?://#i', $f['link']) ? $f['link'] : url($f['link']))
+                        <a href="{{ $lnk }}" class="mg-btn {{ $isBiz ? 'gho' : 'pri' }}" style="padding:12px 26px">{{ $f['button'] }} <x-icon name="arrow-right" :size="15"/></a>
+                    @endif
                 </div>
-                <a href="{{ route('community.reviews') }}" class="mg-btn pri" style="padding:12px 26px">후기 쓰고 적립받기 <x-icon name="arrow-right" :size="15"/></a>
             </div>
-        </div>
-        {{-- 수입사 직거래·입점 (실사진: 물류창고 악수) --}}
-        <div class="mg-feat-row b rev">
-            <div class="mg-feat-photo" role="img" aria-label="열대과일 수입·유통 파트너십"></div>
-            <div class="mg-feat-txt">
-                <div class="ki">IMPORT &amp; DISTRIBUTION</div>
-                <h3>검증된 수입사와<br><b>직거래</b>합니다</h3>
-                <p>글로벌 파트너십으로 들여온 프리미엄 열대과일을 산지 그대로. 수입사 입점 파트너를 상시 모집합니다.</p>
-                <div class="mg-feat-chips">
-                    <span>품질 · 신뢰 · 글로벌 파트너십</span><span>콜드체인 원스톱 지원</span>
-                </div>
-                <a href="{{ route('community.inquiry') }}" class="mg-btn gho" style="padding:12px 26px">입점 문의하기 <x-icon name="arrow-right" :size="15"/></a>
-            </div>
-        </div>
+        @endforeach
     </div>
 </section>
+@endif
 
 {{-- ===== 6. 입점 수입사 섹션은 요청에 따라 숨김 ===== --}}
 

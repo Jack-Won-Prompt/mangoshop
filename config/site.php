@@ -49,6 +49,30 @@ return [
     'home_new_sub'   => '이번 주 새롭게 입고된 신상품',
     'home_show_recipe' => true,   // 메인페이지 '최신 등록 레시피' 영역 노출
 
+    // 메인화면 피처 밴드(실사진 2블록) — 관리자 사이트설정에서 텍스트·이미지 편집
+    //  - title 은 <br><b> 만 허용(관리자 입력 시 서버에서 안전 태그로 제한)
+    //  - image/link 는 사이트 기준 상대경로(asset()/url()) 또는 http(s) 절대주소
+    'home_features' => [
+        [
+            'kicker' => 'POINTS & CASHBACK',
+            'title'  => '사고, 후기 쓰면<br><b>적립금</b>이 쌓입니다',
+            'desc'   => '구매부터 후기까지, 망고샵을 이용할수록 혜택이 커집니다. 앱에서 적립·캐시백 리워드를 바로 확인하세요.',
+            'chips'  => ['신규가입 3,000P', '구매 3% 적립', '상품후기 3% 적립'],
+            'button' => '후기 쓰고 적립받기',
+            'link'   => 'community/reviews',
+            'image'  => 'images/main/cashback-points.jpg',
+        ],
+        [
+            'kicker' => 'IMPORT & DISTRIBUTION',
+            'title'  => '검증된 수입사와<br><b>직거래</b>합니다',
+            'desc'   => '글로벌 파트너십으로 들여온 프리미엄 열대과일을 산지 그대로. 수입사 입점 파트너를 상시 모집합니다.',
+            'chips'  => ['품질 · 신뢰 · 글로벌 파트너십', '콜드체인 원스톱 지원'],
+            'button' => '입점 문의하기',
+            'link'   => 'community/inquiry',
+            'image'  => 'images/main/import-distribution.jpg',
+        ],
+    ],
+
     // 메인페이지 상품 홍보 팝업(관리자 사이트설정 > 메인 팝업에서 편집)
     //  - image/link 는 사이트 기준 상대경로(asset()/url() 로 변환) 또는 http(s) 절대주소
     //  - start/end(Y-m-d) 비우면 기간 제한 없음
