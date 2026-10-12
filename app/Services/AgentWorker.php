@@ -515,10 +515,7 @@ TXT;
         if (! $thread) {
             return 'SR 을 찾을 수 없습니다.';
         }
-        $already = $thread->messages()->where('role', 'assistant')->exists();
-        if ($already && ! (($fix['fixed'] ?? false) || ($fix['already'] ?? false))) {
-            return '이미 등록한 답변이 있고 이번에도 반영하지 못해 그대로 두었습니다.'.($fix['message'] ?? '');
-        }
+        $already = false;
 
         $answer = $this->composeSrAnswer($thread, $analysis, $fix, $already);
 
