@@ -20,7 +20,8 @@
                 사업자등록번호 : {{ $site['biz_no'] ?? '' }} &nbsp;|&nbsp; 통신판매업 신고 : {{ $site['mailorder'] ?? '' }}<br>
                 주소 : {{ $site['address'] ?? '' }}<br>
                 이메일 : {{ $site['email'] ?? '' }}
-                <div style="color:#bbb;font-size:11.5px;margin-top:12px">© {{ date('Y') }} MANGOSHOP. All rights reserved.</div>
+                {{-- 저작권 문구 옆에 '리프렌즈' 표기를 작은 글씨로 덧붙임(링크 없이 텍스트만) --}}
+                <div style="color:#bbb;font-size:11.5px;margin-top:12px">© {{ date('Y') }} MANGOSHOP. All rights reserved. <span style="font-size:10.5px">리프렌즈</span></div>
             </div>
             <div class="mg-foot-cs">
                 <div style="font-size:13px;color:#999;font-weight:700">고객센터</div>
