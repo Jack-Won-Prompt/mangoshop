@@ -13,7 +13,16 @@ class ClientErrorController extends Controller
 {
     public function store(Request $request)
     {
-        $in = $request->only(['name', 'message', 'file', 'line', 'url', 'stack']);
+        $keys = ['name', 'message', 'file', 'line', 'url', 'stack'];
+        $in = $request->only($keys);
+
+        // JSON/비콘 등으로 입력이 비면 원본 본문에서 직접 파싱(폴백)
+        if (trim((string) ($in['message'] ?? '')) === '') {
+            $raw = json_decode((string) $request->getContent(), true);
+            if (is_array($raw)) {
+                $in = array_merge($in, array_intersect_key($raw, array_flip($keys)));
+            }
+        }
 
         // 과도한 페이로드 차단
         foreach (['name', 'message', 'file', 'url'] as $k) {
