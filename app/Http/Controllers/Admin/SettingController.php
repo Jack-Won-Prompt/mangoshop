@@ -50,6 +50,10 @@ class SettingController extends Controller
             'home_show_recipe'   => ['nullable', 'boolean'],
             'inquiry_emails'     => ['nullable', 'array'],
             'inquiry_emails.*'   => ['nullable', 'email', 'max:100'],
+            // 메인 상품 섹션 순서/노출
+            'sections'           => ['nullable', 'array'],
+            'sections.*'         => ['string', 'max:20'],
+            'section_visible'    => ['nullable', 'array'],
             // 메인 혜택 안내 스트립(4칸)
             'strip'              => ['nullable', 'array'],
             'strip.*.icon'       => ['nullable', 'string', 'max:30'],
@@ -89,18 +93,43 @@ class SettingController extends Controller
         // 팝업 입력(popup_*)은 site 최상위가 아닌 site.popup 으로 묶어 저장
         $plain = array_filter($data, fn ($k) => ! str_starts_with($k, 'popup_'), ARRAY_FILTER_USE_KEY);
 
-        $site = array_merge(config('site'), array_diff_key($plain, array_flip(['banks', 'popular_keywords', 'inquiry_emails', 'home_show_recipe', 'feat', 'strip'])), [
+        $site = array_merge(config('site'), array_diff_key($plain, array_flip(['banks', 'popular_keywords', 'inquiry_emails', 'home_show_recipe', 'feat', 'strip', 'sections', 'section_visible'])), [
             'banks'            => $banks,
             'popular_keywords' => $keywords,
             'inquiry_emails'   => $inquiryEmails,
             'home_show_recipe' => $request->boolean('home_show_recipe'),   // 체크박스: 미체크=false 명시 저장
             'home_features'    => $this->featuresFrom($request),
             'home_strip'       => $this->stripFrom($request),
+            'home_sections'    => $this->sectionsFrom($request),
         ]);
 
         Setting::put('site', $site);
 
         return back()->with('ok', '사이트 설정이 저장되었습니다.');
+    }
+
+    /** 메인 상품 섹션 순서/노출 — 전송된 순서(sections[]) + 체크된 노출(section_visible[]) */
+    private function sectionsFrom(Request $request): array
+    {
+        $allowed = ['best', 'new', 'deal'];
+        $order = collect((array) $request->input('sections', []))
+            ->map(fn ($k) => (string) $k)->filter(fn ($k) => in_array($k, $allowed, true))
+            ->unique()->values()->all();
+
+        // 누락된 키는 기존/기본 순서 뒤에 보존
+        $current = collect(config('site.home_sections', []))->pluck('key')->all();
+        foreach (array_merge($current, $allowed) as $k) {
+            if (in_array($k, $allowed, true) && ! in_array($k, $order, true)) {
+                $order[] = $k;
+            }
+        }
+
+        $visible = (array) $request->input('section_visible', []);
+
+        return collect($order)->map(fn ($k) => [
+            'key'     => $k,
+            'visible' => (bool) ($visible[$k] ?? false),
+        ])->values()->all();
     }
 
     /** 메인 혜택 안내 스트립(4칸) 입력을 기존 순서/기본값 위에 병합 */

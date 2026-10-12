@@ -49,6 +49,14 @@ return [
     'home_new_sub'   => '이번 주 새롭게 입고된 신상품',
     'home_show_recipe' => true,   // 메인페이지 '최신 등록 레시피' 영역 노출
 
+    // 메인 상품 섹션 노출 순서·여부 (관리자 사이트설정에서 변경)
+    //  key: best(이달의 베스트) / new(새로 들어온·선물세트) / deal(사업자 전용 도매)
+    'home_sections' => [
+        ['key' => 'best', 'visible' => true],
+        ['key' => 'new',  'visible' => true],
+        ['key' => 'deal', 'visible' => true],
+    ],
+
     // 메인 배너 아래 혜택 안내 스트립(4칸) — 관리자 사이트설정에서 아이콘·제목·설명 편집
     'home_strip' => [
         ['icon' => 'truck',    'title' => '주문 후 순차 발송',   'desc' => '입고 일정에 맞춰 출고'],

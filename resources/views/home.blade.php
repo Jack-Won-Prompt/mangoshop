@@ -49,7 +49,11 @@
 </div>
 @endif
 
-{{-- ===== 3. 새로 들어온 과일 (베스트 위로 이동) ===== --}}
+{{-- ===== 3. 메인 상품 섹션 (관리자 사이트설정에서 순서/노출 관리) ===== --}}
+@php($homeSections = collect($site['home_sections'] ?? [['key'=>'best','visible'=>true],['key'=>'new','visible'=>true],['key'=>'deal','visible'=>true]])->filter(fn($s)=>($s['visible'] ?? true)))
+@foreach($homeSections as $sec)
+@switch($sec['key'])
+@case('new')
 @if($newProducts->count())
 <section class="mg-section">
     <div class="mg-wrap">
@@ -64,6 +68,43 @@
     </div>
 </section>
 @endif
+@break
+@case('best')
+@if($bestProducts->count())
+<section class="mg-section">
+    <div class="mg-wrap">
+        <div class="mg-sec-head">
+            <div class="ki">BEST ITEM</div>
+            <h3>이달의 베스트 과일</h3>
+            <p>망고샵에서 가장 많이 찾는 인기 수입 과일</p>
+        </div>
+        <div class="mg-grid g5">
+            @foreach($bestProducts->take(10) as $p)<x-product-card :product="$p"/>@endforeach
+        </div>
+        <div class="mg-sec-more"><a href="{{ route('catalog.index', ['sort' => 'best']) }}" class="mg-btn gho" style="padding:12px 28px">베스트 전체보기 <x-icon name="arrow-right" :size="15"/></a></div>
+    </div>
+</section>
+@endif
+@break
+@case('deal')
+@if($featuredProducts->count())
+<section class="mg-section alt">
+    <div class="mg-wrap">
+        <div class="mg-sec-head biz">
+            <div class="ki" style="color:var(--mg-accent-d)">FOR BUSINESS</div>
+            <h3>사업자 전용 도매 특가</h3>
+            <p>도매회원 승인 후 도매 전용가와 수량구간 대량할인으로 만나보세요</p>
+        </div>
+        <div class="mg-grid g5">
+            @foreach($dealProducts->take(5) as $p)<x-product-card :product="$p"/>@endforeach
+        </div>
+        <div class="mg-sec-more"><a href="{{ route('catalog.index', ['grade' => 'wholesale']) }}" class="mg-btn pri" style="padding:12px 28px">사업자 전용몰 <x-icon name="arrow-right" :size="15"/></a></div>
+    </div>
+</section>
+@endif
+@break
+@endswitch
+@endforeach
 
 {{-- ===== 3-1. 최신 등록 레시피 (선물셋트 아래) · 관리자 설정으로 노출 토글 ===== --}}
 @if(($recipeItems ?? collect())->count() && ($site['home_show_recipe'] ?? true))
@@ -97,40 +138,6 @@
 .mg-recipe-card b{display:block;font-size:14px;padding:4px 12px 14px;line-height:1.4}
 @media(max-width:900px){.mg-recipe-grid{grid-template-columns:repeat(2,1fr)}}
 </style>
-@endif
-
-{{-- ===== 4. 이달의 베스트 ===== --}}
-@if($bestProducts->count())
-<section class="mg-section">
-    <div class="mg-wrap">
-        <div class="mg-sec-head">
-            <div class="ki">BEST ITEM</div>
-            <h3>이달의 베스트 과일</h3>
-            <p>망고샵에서 가장 많이 찾는 인기 수입 과일</p>
-        </div>
-        <div class="mg-grid g5">
-            @foreach($bestProducts->take(10) as $p)<x-product-card :product="$p"/>@endforeach
-        </div>
-        <div class="mg-sec-more"><a href="{{ route('catalog.index', ['sort' => 'best']) }}" class="mg-btn gho" style="padding:12px 28px">베스트 전체보기 <x-icon name="arrow-right" :size="15"/></a></div>
-    </div>
-</section>
-@endif
-
-{{-- ===== 4. 사업자 전용 (도매) ===== --}}
-@if($featuredProducts->count())
-<section class="mg-section alt">
-    <div class="mg-wrap">
-        <div class="mg-sec-head biz">
-            <div class="ki" style="color:var(--mg-accent-d)">FOR BUSINESS</div>
-            <h3>사업자 전용 도매 특가</h3>
-            <p>도매회원 승인 후 도매 전용가와 수량구간 대량할인으로 만나보세요</p>
-        </div>
-        <div class="mg-grid g5">
-            @foreach($dealProducts->take(5) as $p)<x-product-card :product="$p"/>@endforeach
-        </div>
-        <div class="mg-sec-more"><a href="{{ route('catalog.index', ['grade' => 'wholesale']) }}" class="mg-btn pri" style="padding:12px 28px">사업자 전용몰 <x-icon name="arrow-right" :size="15"/></a></div>
-    </div>
-</section>
 @endif
 
 {{-- ===== 4-1. 실사진 피처 밴드 (적립·캐시백 / 수입사 직거래·입점) · 관리자 사이트설정에서 편집 ===== --}}

@@ -116,6 +116,30 @@
         </div>
     </div>
 
+    {{-- 메인 상품 섹션 순서/노출 --}}
+    @php($secLabels = ['best' => '이달의 베스트 과일', 'new' => '새로 들어온 과일(선물세트)', 'deal' => '사업자 전용 도매 특가'])
+    @php($curSections = collect($site['home_sections'] ?? [['key'=>'best','visible'=>true],['key'=>'new','visible'=>true],['key'=>'deal','visible'=>true]]))
+    <div class="adm-card">
+        <div class="h">메인 상품 섹션 순서 · 노출</div>
+        <div style="padding:20px">
+            <div class="ahint" style="margin-bottom:12px">메인페이지 상품 섹션의 <b>노출 순서</b>와 <b>표시/숨김</b>을 조정합니다. ▲▼로 순서를 바꾸고, 체크를 끄면 해당 섹션이 메인에서 숨겨집니다.</div>
+            <div id="secList" style="display:grid;gap:8px">
+                @foreach($curSections as $s)
+                    <div class="sec-row" data-key="{{ $s['key'] }}" style="display:flex;align-items:center;gap:10px;border:1px solid #eef0f4;border-radius:9px;padding:10px 12px;background:#fff">
+                        <span class="sec-handle" style="cursor:default;color:#c7cedd;font-weight:800">≡</span>
+                        <label style="display:flex;align-items:center;gap:8px;flex:1;font-weight:600;color:#33415c;margin:0">
+                            <input type="checkbox" name="section_visible[{{ $s['key'] }}]" value="1" @checked($s['visible'] ?? true) style="width:16px;height:16px">
+                            {{ $secLabels[$s['key']] ?? $s['key'] }}
+                        </label>
+                        <input type="hidden" name="sections[]" value="{{ $s['key'] }}" class="sec-order">
+                        <button type="button" class="abtn abtn-ghost abtn-sm sec-up" title="위로">▲</button>
+                        <button type="button" class="abtn abtn-ghost abtn-sm sec-down" title="아래로">▼</button>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+
     {{-- 메인 혜택 안내 스트립 (배너 아래 4칸) --}}
     @php($strip = $site['home_strip'] ?? [])
     <div class="adm-card">
@@ -213,6 +237,20 @@
 </form>
 
 <script>
+(function () {
+    // 메인 섹션 순서 ▲▼
+    var list = document.getElementById('secList');
+    if (list) {
+        list.addEventListener('click', function (e) {
+            var up = e.target.closest('.sec-up'), down = e.target.closest('.sec-down');
+            if (!up && !down) return;
+            var row = e.target.closest('.sec-row');
+            if (!row) return;
+            if (up && row.previousElementSibling) list.insertBefore(row, row.previousElementSibling);
+            if (down && row.nextElementSibling) list.insertBefore(row.nextElementSibling, row);
+        });
+    }
+})();
 (function () {
     var add = document.getElementById('addBank');
     var tbody = document.querySelector('#bankTable tbody');
