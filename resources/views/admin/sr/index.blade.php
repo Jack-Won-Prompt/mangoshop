@@ -55,7 +55,7 @@
             <div class="sr-applybar" id="srApplyBar" data-status="{{ $effApply }}" style="{{ $effApply === 'none' ? 'display:none' : '' }}">
                 <span class="sr-applybar-txt" id="srApplyTxt">
                     @if($effApply === 'requested')
-                        🛠 개발 반영 요청됨 · {{ optional($thread->apply_requested_at)->format('Y-m-d H:i') }} · 담당자가 검토 후 반영합니다.
+                        🛠 반영 진행 중… {{ optional($thread->apply_requested_at)->format('Y-m-d H:i') }} · 처리가 끝나면 결과가 대화에 등록됩니다.
                     @elseif($effApply === 'done')
                         ✅ 반영 완료 처리됨
                     @endif
@@ -252,7 +252,7 @@
         function paint(status, time){
             if(status==='none'){ bar.style.display='none'; btn.classList.remove('req'); btn.innerHTML='<svg width="15" height="15"><use href="#i-check"/></svg> 개발 반영 요청'; return; }
             bar.style.display=''; bar.setAttribute('data-status',status); btn.classList.add('req');
-            if(status==='requested'){ btn.innerHTML='🛠 요청됨'; txt.textContent='🛠 개발 반영 요청됨 · '+(time||'')+' · 담당자가 검토 후 반영합니다.'; }
+            if(status==='requested'){ btn.innerHTML='🛠 반영 중'; txt.textContent='🛠 반영 진행 중… '+(time||'')+' · 처리가 끝나면 결과가 대화에 등록됩니다.'; }
             else if(status==='done'){ btn.innerHTML='✅ 반영 완료'; txt.textContent='✅ 반영 완료 처리됨'; }
         }
         function call(action, note){
@@ -264,12 +264,21 @@
                     var on=document.querySelector('.sr-thread.on .t'); // 좌측 점 갱신
                     if(on){ var dot=on.querySelector('.sr-dot'); if(dot) dot.remove();
                         if(d.apply_status!=='none'){ var i=document.createElement('i'); i.className='sr-dot'+(d.apply_status==='done'?' done':''); on.insertBefore(i,on.firstChild); } }
+                    // 반영 요청 시 대화에 '진행 중' 안내 표시
+                    if(action==='request'){
+                        var mw=document.getElementById('srMsgs');
+                        if(mw && !mw.querySelector('.sr-progress')){
+                            var pw=document.createElement('div'); pw.className='sr-msg assistant sr-progress';
+                            pw.innerHTML='<div class="sr-ava">🛠</div><div class="sr-bubble"><div class="sr-body"><span class="sr-typing"><i></i><i></i><i></i></span> 반영 진행 중입니다… 처리가 끝나면 결과가 이 대화에 등록됩니다. (잠시 후 새로고침해 확인)</div></div>';
+                            mw.appendChild(pw); mw.scrollTop=mw.scrollHeight;
+                        }
+                    }
                 } })
                 .catch(function(){ btn.disabled=false; alert('처리 중 오류가 발생했습니다.'); });
         }
         // 로드 시 서버 상태 반영
         var init=bar?bar.getAttribute('data-status'):'none';
-        if(init && init!=='none'){ btn.classList.add('req'); btn.innerHTML=(init==='done'?'✅ 반영 완료':'🛠 요청됨'); }
+        if(init && init!=='none'){ btn.classList.add('req'); btn.innerHTML=(init==='done'?'✅ 반영 완료':'🛠 반영 중'); }
 
         btn.addEventListener('click',function(){
             if(btn.classList.contains('req')) return; // 이미 요청/완료 상태면 바의 버튼으로 조작
