@@ -265,8 +265,8 @@
         var fd=new FormData(); fd.append('content',content);
         files.forEach(function(f){ fd.append('files[]',f); });
 
-        // 낙관적 렌더
-        var localAtts=files.map(function(f){ return {name:f.name, image:/^image\//.test(f.type), url:'#'}; });
+        // 낙관적 렌더 (이미지는 로컬 미리보기 URL 사용 — 전송 직후 깨짐 방지)
+        var localAtts=files.map(function(f){ return {name:f.name, image:/^image\//.test(f.type), url:URL.createObjectURL(f)}; });
         bubble('user', content, localAtts);
         text.value=''; text.style.height='auto'; files=[]; renderChips();
         sendBtn.disabled=true;
