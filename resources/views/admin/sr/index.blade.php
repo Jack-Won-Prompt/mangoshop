@@ -51,11 +51,12 @@
                 </div>
             </div>
 
-            <div class="sr-applybar" id="srApplyBar" data-status="{{ $thread->apply_status }}" style="{{ $thread->apply_status === 'none' ? 'display:none' : '' }}">
+            @php($effApply = ($messages->count() && optional($messages->last())->role === 'user') ? 'none' : $thread->apply_status)
+            <div class="sr-applybar" id="srApplyBar" data-status="{{ $effApply }}" style="{{ $effApply === 'none' ? 'display:none' : '' }}">
                 <span class="sr-applybar-txt" id="srApplyTxt">
-                    @if($thread->apply_status === 'requested')
+                    @if($effApply === 'requested')
                         🛠 개발 반영 요청됨 · {{ optional($thread->apply_requested_at)->format('Y-m-d H:i') }} · 담당자가 검토 후 반영합니다.
-                    @elseif($thread->apply_status === 'done')
+                    @elseif($effApply === 'done')
                         ✅ 반영 완료 처리됨
                     @endif
                 </span>
@@ -350,6 +351,11 @@
                 // 제목/목록 갱신
                 var tt=document.getElementById('srTitle'); if(tt && res.d.title) tt.textContent=res.d.title;
                 var on=document.querySelector('.sr-thread.on .t'); if(on && res.d.title) on.textContent=res.d.title;
+                // 새 지시가 들어왔으니 '개발 반영 요청'을 다시 눌러 재요청할 수 있게 복귀
+                var reBtn=document.getElementById('srApplyBtn');
+                if(reBtn){ reBtn.classList.remove('req'); reBtn.innerHTML='<svg width="15" height="15"><use href="#i-check"/></svg> 개발 반영 요청'; }
+                var reBar=document.getElementById('srApplyBar');
+                if(reBar){ reBar.style.display='none'; reBar.setAttribute('data-status','none'); }
             })
             .catch(function(){ typ.remove(); sendBtn.disabled=false; bubble('assistant','⚠ 네트워크 오류. 다시 시도해 주세요.'); });
     });
