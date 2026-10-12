@@ -76,8 +76,8 @@ class AgentIntake
 
             $key = 'sr:'.$thread->id;
             $twin = AgentTask::where('dedupe_key', $key)->latest('id')->first();
-            if ($twin) {
-                self::wake($twin);
+            if ($twin && in_array($twin->status, ['pending', 'working'], true)) {
+                self::wake($twin);   // 아직 처리 중이면 중복 생성 말고 깨우기만
 
                 return;
             }
