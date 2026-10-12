@@ -451,6 +451,8 @@ main{min-height:60vh}
    FOOTER
    ========================================================= */
 .site-footer{background:var(--ink);color:#9aa6c2;margin-top:50px;font-size:13.5px}
+/* 푸터 보조 문구 — 눈에 띄지 않게 작은 글씨·흐린 색으로 처리 */
+.mg-footer-tagline{font-size:12px;color:#9aa6c2;margin:0;padding:14px 20px 0;max-width:var(--container);margin-left:auto;margin-right:auto}
 .foot-top{border-bottom:1px solid #2a3450}
 .foot-top .container{display:flex;gap:50px;padding:38px 20px}
 .foot-cs{flex:none;min-width:230px}

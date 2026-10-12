@@ -1,4 +1,6 @@
 <footer class="mg-footer">
+    {{-- 푸터 상단 보조 문구 : 눈에 띄지 않는 작은 글씨로 노출 --}}
+    <p class="mg-footer-tagline">신선한 수입과일 전문</p>
     <div class="mg-foot-top">
         <div class="mg-wrap">
             <a href="{{ route('community.notices') }}">공지사항</a>
