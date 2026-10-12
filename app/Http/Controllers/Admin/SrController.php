@@ -132,6 +132,68 @@ class SrController extends Controller
         ]);
     }
 
+    /** 개발 반영 요청 상태 변경 (request | cancel | done) — 실행이 아니라 담당자 처리용 표시+통지 */
+    public function applyStatus(Request $request, SrThread $thread)
+    {
+        $data = $request->validate([
+            'action' => ['required', 'in:request,cancel,done'],
+            'note'   => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        if ($data['action'] === 'request') {
+            $thread->update([
+                'apply_status'       => 'requested',
+                'apply_note'         => $data['note'] ?? null,
+                'apply_requested_at' => now(),
+            ]);
+            $this->notifyApplyRequest($thread, $request->user());
+        } elseif ($data['action'] === 'done') {
+            $thread->update(['apply_status' => 'done']);
+        } else { // cancel
+            $thread->update(['apply_status' => 'none', 'apply_requested_at' => null]);
+        }
+
+        return response()->json([
+            'ok'           => true,
+            'apply_status' => $thread->apply_status,
+            'requested_at' => optional($thread->apply_requested_at)->format('Y-m-d H:i'),
+        ]);
+    }
+
+    /** 담당자(관리자 앱 FCM + 운영 알림 이메일)에게 반영 요청 통지 */
+    private function notifyApplyRequest(SrThread $thread, $requester): void
+    {
+        $title = '🛠 개발 반영 요청';
+        $body = Str::limit($thread->title, 50).' · 요청자 '.($requester->name ?? '관리자');
+
+        try {
+            \App\Support\AdminPush::toAdmins($title, $body, [
+                'type'      => 'sr_apply',
+                'thread_id' => (string) $thread->id,
+            ]);
+        } catch (\Throwable $e) {
+            // 알림 실패는 요청 자체를 막지 않음
+        }
+
+        $emails = collect(config('site.inquiry_emails', []))->filter()->all();
+        if ($emails) {
+            try {
+                $url = route('admin.sr.show', $thread);
+                $text = "SR 콘솔에서 개발 반영이 요청되었습니다.\n\n".
+                        "제목: {$thread->title}\n".
+                        '요청자: '.($requester->name ?? '관리자')."\n".
+                        '요청시각: '.now()->format('Y-m-d H:i')."\n".
+                        ($thread->apply_note ? "메모: {$thread->apply_note}\n" : '').
+                        "\n바로가기: {$url}\n";
+                \Illuminate\Support\Facades\Mail::raw($text, function ($m) use ($emails, $thread) {
+                    $m->to($emails)->subject('[망고샵 SR] 개발 반영 요청 — '.Str::limit($thread->title, 40));
+                });
+            } catch (\Throwable $e) {
+                // 이메일 실패도 무시(FCM/기록은 유지)
+            }
+        }
+    }
+
     /** 첨부 파일 다운로드/미리보기 (관리자 전용) */
     public function attachment(Request $request, SrThread $thread, int $message, int $idx)
     {
@@ -204,6 +266,7 @@ class SrController extends Controller
 - 선택지가 있으면 장단점을 쉬운 말로 제시하고, 예상 효과·주의할 점·필요한 결정사항을 안내한다.
 - 불확실하면 추측하지 말고 무엇을 더 확인해야 하는지 쉬운 말로 되묻는다.
 - 실제 구현·반영은 개발 담당자가 처리한다는 전제로, 관리자가 의사결정에 필요한 내용 위주로 돕는다.
+- 방향이 정리되면, 관리자가 원할 경우 화면 상단의 "개발 반영 요청" 버튼을 눌러 담당자에게 반영을 요청할 수 있음을 한 줄로 안내해도 좋다(강요하지 말 것).
 TXT;
     }
 }

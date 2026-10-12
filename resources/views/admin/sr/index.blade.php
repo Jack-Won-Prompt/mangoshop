@@ -15,7 +15,7 @@
         <div class="sr-threads">
             @forelse($threads as $t)
                 <a href="{{ route('admin.sr.show', $t) }}" class="sr-thread {{ $thread && $thread->id === $t->id ? 'on' : '' }}">
-                    <span class="t">{{ $t->title }}</span>
+                    <span class="t">@if($t->apply_status === 'requested')<i class="sr-dot" title="반영 요청됨"></i>@elseif($t->apply_status === 'done')<i class="sr-dot done" title="반영 완료"></i>@endif{{ $t->title }}</span>
                     <span class="d">{{ optional($t->last_message_at)->format('m/d H:i') }}</span>
                 </a>
             @empty
@@ -44,10 +44,25 @@
                 <div class="sr-title" id="srTitle">{{ $thread->title }}</div>
                 <div class="sr-head-r">
                     <span class="sr-model-badge">AI 어시스턴트</span>
+                    <button type="button" class="sr-apply-btn" id="srApplyBtn" data-url="{{ route('admin.sr.apply', $thread) }}"><x-icon name="check" :size="15"/> 개발 반영 요청</button>
                     <form method="POST" action="{{ route('admin.sr.destroy', $thread) }}" onsubmit="return confirm('이 요청을 삭제할까요?')">@csrf @method('DELETE')
                         <button class="sr-del" type="submit" title="삭제"><x-icon name="trash" :size="15"/></button>
                     </form>
                 </div>
+            </div>
+
+            <div class="sr-applybar" id="srApplyBar" data-status="{{ $thread->apply_status }}" style="{{ $thread->apply_status === 'none' ? 'display:none' : '' }}">
+                <span class="sr-applybar-txt" id="srApplyTxt">
+                    @if($thread->apply_status === 'requested')
+                        🛠 개발 반영 요청됨 · {{ optional($thread->apply_requested_at)->format('Y-m-d H:i') }} · 담당자가 검토 후 반영합니다.
+                    @elseif($thread->apply_status === 'done')
+                        ✅ 반영 완료 처리됨
+                    @endif
+                </span>
+                <span class="sr-applybar-act">
+                    <button type="button" class="sr-mini" data-act="done">완료 처리</button>
+                    <button type="button" class="sr-mini ghost" data-act="cancel">요청 취소</button>
+                </span>
             </div>
 
             <div class="sr-msgs" id="srMsgs">
@@ -113,6 +128,17 @@
     .sr-head-r{display:flex;align-items:center;gap:10px;flex:none}
     .sr-del{border:1px solid var(--a-line,#e3e8f1);background:#fff;border-radius:7px;padding:6px 8px;cursor:pointer;color:#b4232a}
     .sr-del:hover{background:#fef2f2}
+    .sr-apply-btn{display:inline-flex;align-items:center;gap:5px;border:1px solid #123b26;background:#123b26;color:#fff;border-radius:8px;padding:7px 12px;font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap}
+    .sr-apply-btn:hover{background:#0d2d1d}
+    .sr-apply-btn.req{background:#fff;color:#123b26}
+    .sr-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#e0892f;margin-right:6px;vertical-align:middle}
+    .sr-dot.done{background:#22a35a}
+    .sr-applybar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:9px 18px;background:#fff7ed;border-bottom:1px solid #fde4c8;font-size:12.5px;color:#9a3412}
+    .sr-applybar[data-status="done"]{background:#ecfdf3;border-bottom-color:#c7eed5;color:#15803d}
+    .sr-applybar-act{display:flex;gap:6px;flex:none}
+    .sr-mini{border:1px solid #d6a46a;background:#fff;color:#9a3412;border-radius:7px;padding:5px 10px;font-size:12px;cursor:pointer}
+    .sr-mini.ghost{border-color:#e3e8f1;color:#6b7280}
+    .sr-applybar[data-status="done"] .sr-mini{border-color:#9fd9b4;color:#15803d}
 
     .sr-msgs{flex:1;overflow:auto;padding:22px 18px;display:flex;flex-direction:column;gap:18px;background:#f7f8fa}
     .sr-msg{display:flex;gap:11px;max-width:900px;width:100%;margin:0 auto}
@@ -217,6 +243,46 @@
     var msgs=document.getElementById('srMsgs');
     function scrollBottom(){ if(msgs) msgs.scrollTop=msgs.scrollHeight; }
     scrollBottom();
+
+    // ===== 개발 반영 요청 =====
+    (function(){
+        var btn=document.getElementById('srApplyBtn'), bar=document.getElementById('srApplyBar'), txt=document.getElementById('srApplyTxt');
+        if(!btn) return;
+        function paint(status, time){
+            if(status==='none'){ bar.style.display='none'; btn.classList.remove('req'); btn.innerHTML='<svg width="15" height="15"><use href="#i-check"/></svg> 개발 반영 요청'; return; }
+            bar.style.display=''; bar.setAttribute('data-status',status); btn.classList.add('req');
+            if(status==='requested'){ btn.innerHTML='🛠 요청됨'; txt.textContent='🛠 개발 반영 요청됨 · '+(time||'')+' · 담당자가 검토 후 반영합니다.'; }
+            else if(status==='done'){ btn.innerHTML='✅ 반영 완료'; txt.textContent='✅ 반영 완료 처리됨'; }
+        }
+        function call(action, note){
+            var fd=new FormData(); fd.append('action',action); if(note) fd.append('note',note);
+            btn.disabled=true;
+            fetch(btn.dataset.url,{method:'POST',headers:{'X-CSRF-TOKEN':csrf,'Accept':'application/json'},body:fd})
+                .then(function(r){return r.json();})
+                .then(function(d){ btn.disabled=false; if(d.ok){ paint(d.apply_status, d.requested_at);
+                    var on=document.querySelector('.sr-thread.on .t'); // 좌측 점 갱신
+                    if(on){ var dot=on.querySelector('.sr-dot'); if(dot) dot.remove();
+                        if(d.apply_status!=='none'){ var i=document.createElement('i'); i.className='sr-dot'+(d.apply_status==='done'?' done':''); on.insertBefore(i,on.firstChild); } }
+                } })
+                .catch(function(){ btn.disabled=false; alert('처리 중 오류가 발생했습니다.'); });
+        }
+        // 로드 시 서버 상태 반영
+        var init=bar?bar.getAttribute('data-status'):'none';
+        if(init && init!=='none'){ btn.classList.add('req'); btn.innerHTML=(init==='done'?'✅ 반영 완료':'🛠 요청됨'); }
+
+        btn.addEventListener('click',function(){
+            if(btn.classList.contains('req')) return; // 이미 요청/완료 상태면 바의 버튼으로 조작
+            if(!confirm('이 요청 내용을 개발 담당자에게 반영 요청하시겠어요?\n(담당자에게 앱 알림/이메일로 통지됩니다)')) return;
+            call('request');
+        });
+        bar && bar.querySelectorAll('.sr-mini').forEach(function(b){
+            b.addEventListener('click',function(){
+                var act=b.dataset.act;
+                if(act==='cancel' && !confirm('반영 요청을 취소할까요?')) return;
+                call(act);
+            });
+        });
+    })();
 
     var form=document.getElementById('srComposer'); if(!form) return;
     var text=document.getElementById('srText'), fileInput=document.getElementById('srFiles'),

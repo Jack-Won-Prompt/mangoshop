@@ -306,6 +306,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/sr/thread/{thread}', [\App\Http\Controllers\Admin\SrController::class, 'show'])->name('sr.show');
     Route::post('/sr/thread/{thread}/message', [\App\Http\Controllers\Admin\SrController::class, 'message'])->name('sr.message');
     Route::delete('/sr/thread/{thread}', [\App\Http\Controllers\Admin\SrController::class, 'destroy'])->name('sr.destroy');
+    Route::post('/sr/thread/{thread}/apply-status', [\App\Http\Controllers\Admin\SrController::class, 'applyStatus'])->name('sr.apply');
     Route::get('/sr/thread/{thread}/file/{message}/{idx}', [\App\Http\Controllers\Admin\SrController::class, 'attachment'])->name('sr.attachment');
 
     // 설정 기반 제네릭 CRUD (categories, brands, products, banners, notices, faqs)

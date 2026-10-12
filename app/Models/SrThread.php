@@ -6,10 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class SrThread extends Model
 {
-    protected $fillable = ['user_id', 'title', 'model', 'last_message_at'];
+    protected $fillable = [
+        'user_id', 'title', 'model', 'last_message_at',
+        'apply_status', 'apply_note', 'apply_requested_at',
+    ];
 
     protected $casts = [
-        'last_message_at' => 'datetime',
+        'last_message_at'    => 'datetime',
+        'apply_requested_at' => 'datetime',
     ];
 
     public function messages()
