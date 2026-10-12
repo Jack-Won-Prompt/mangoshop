@@ -31,6 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'payment/toss/webhook',
             'payment/portone/webhook',
             'client-error',
+            'agent/hook',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

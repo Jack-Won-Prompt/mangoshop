@@ -147,6 +147,7 @@ class SrController extends Controller
                 'apply_requested_at' => now(),
             ]);
             $this->notifyApplyRequest($thread, $request->user());
+             \App\Services\AgentIntake::sr($thread);
         } elseif ($data['action'] === 'done') {
             $thread->update(['apply_status' => 'done']);
         } else { // cancel

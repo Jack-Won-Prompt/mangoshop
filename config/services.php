@@ -65,6 +65,12 @@ return [
         'base'       => 'https://api.anthropic.com',
     ],
 
+    'agent' => [
+        'api_key'        => env('ANTHROPIC_API_KEY'),
+        'hook_url'       => env('AGENT_HOOK_URL'),
+        'operator_email' => env('AGENT_OPERATOR_EMAIL'),
+    ],
+
     // 운영 예외 보고. 값은 .env 에만 둔다 — 없으면 보고를 조용히 건너뛴다.
     'supportworks' => [
         'error_url'   => env('SW_ERROR_URL'),

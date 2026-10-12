@@ -103,6 +103,7 @@ class ErrorReporter
 
         self::notify($event, repeat: false);
         $event->update(['notified_at' => now()]);
+        \App\Services\AgentIntake::error($event);
     }
 
     private static function normalize(string $message): string

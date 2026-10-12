@@ -328,6 +328,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 Route::post('/client-error', [\App\Http\Controllers\ClientErrorController::class, 'store'])
     ->middleware('throttle:30,1')->name('client-error');
 
+    Route::post('/agent/hook', [\App\Http\Controllers\AgentHookController::class, 'handle']);
+    
 // ===== 1:1 실시간 상담 (회원/비회원 공용) =====
 Route::get('/chat/open', [ChatController::class, 'open'])->name('chat.open');
 Route::post('/chat/start', [ChatController::class, 'start'])->name('chat.start');
