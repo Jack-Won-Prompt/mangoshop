@@ -87,6 +87,9 @@
             </div>
 
             <form class="sr-composer" id="srComposer" data-send="{{ route('admin.sr.message', $thread) }}">
+                <div class="sr-comp-top">
+                    <button type="button" class="sr-apply-btn sr-apply-sm" id="srApplyBtn2" data-url="{{ route('admin.sr.apply', $thread) }}"><x-icon name="check" :size="14"/> 개발 반영 요청</button>
+                </div>
                 <div class="sr-atts" id="srAtts"></div>
                 <div class="sr-input-row">
                     <label class="sr-clip" title="파일 첨부">
@@ -171,6 +174,8 @@
     .sr-body.md blockquote{border-left:3px solid #cbd5e1;margin:.5em 0;padding:.1em 12px;color:#54607a}
 
     .sr-composer{border-top:1px solid var(--a-line,#e3e8f1);padding:12px 16px 14px;background:#fff}
+    .sr-comp-top{display:flex;justify-content:flex-end;margin-bottom:8px}
+    .sr-apply-sm{padding:6px 12px;font-size:12px}
     .sr-atts{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
     .sr-atts:empty{display:none}
     .sr-chip{display:inline-flex;align-items:center;gap:6px;background:#f1f3f9;border-radius:8px;padding:5px 9px;font-size:12px;color:#334}
@@ -247,20 +252,23 @@
 
     // ===== 개발 반영 요청 =====
     (function(){
-        var btn=document.getElementById('srApplyBtn'), bar=document.getElementById('srApplyBar'), txt=document.getElementById('srApplyTxt');
-        if(!btn) return;
+        var btns=[document.getElementById('srApplyBtn'), document.getElementById('srApplyBtn2')].filter(Boolean);
+        var bar=document.getElementById('srApplyBar'), txt=document.getElementById('srApplyTxt');
+        if(!btns.length) return;
+        var url=btns[0].dataset.url;
+        function setBtns(html, req){ btns.forEach(function(b){ if(req===true)b.classList.add('req'); if(req===false)b.classList.remove('req'); if(html)b.innerHTML=html; }); }
         function paint(status, time){
-            if(status==='none'){ bar.style.display='none'; btn.classList.remove('req'); btn.innerHTML='<svg width="15" height="15"><use href="#i-check"/></svg> 개발 반영 요청'; return; }
-            bar.style.display=''; bar.setAttribute('data-status',status); btn.classList.add('req');
-            if(status==='requested'){ btn.innerHTML='🛠 반영 중'; txt.textContent='🛠 반영 진행 중… '+(time||'')+' · 처리가 끝나면 결과가 대화에 등록됩니다.'; }
-            else if(status==='done'){ btn.innerHTML='✅ 반영 완료'; txt.textContent='✅ 반영 완료 처리됨'; }
+            if(status==='none'){ if(bar)bar.style.display='none'; setBtns('<svg width="15" height="15"><use href="#i-check"/></svg> 개발 반영 요청', false); return; }
+            if(bar){ bar.style.display=''; bar.setAttribute('data-status',status); }
+            if(status==='requested'){ setBtns('🛠 반영 중', true); if(txt)txt.textContent='🛠 반영 진행 중… '+(time||'')+' · 처리가 끝나면 결과가 대화에 등록됩니다.'; }
+            else if(status==='done'){ setBtns('✅ 반영 완료', true); if(txt)txt.textContent='✅ 반영 완료 처리됨'; }
         }
         function call(action, note){
             var fd=new FormData(); fd.append('action',action); if(note) fd.append('note',note);
-            btn.disabled=true;
-            fetch(btn.dataset.url,{method:'POST',headers:{'X-CSRF-TOKEN':csrf,'Accept':'application/json'},body:fd})
+            btns.forEach(function(b){b.disabled=true;});
+            fetch(url,{method:'POST',headers:{'X-CSRF-TOKEN':csrf,'Accept':'application/json'},body:fd})
                 .then(function(r){return r.json();})
-                .then(function(d){ btn.disabled=false; if(d.ok){ paint(d.apply_status, d.requested_at);
+                .then(function(d){ btns.forEach(function(b){b.disabled=false;}); if(d.ok){ paint(d.apply_status, d.requested_at);
                     var on=document.querySelector('.sr-thread.on .t'); // 좌측 점 갱신
                     if(on){ var dot=on.querySelector('.sr-dot'); if(dot) dot.remove();
                         if(d.apply_status!=='none'){ var i=document.createElement('i'); i.className='sr-dot'+(d.apply_status==='done'?' done':''); on.insertBefore(i,on.firstChild); } }
@@ -274,17 +282,17 @@
                         }
                     }
                 } })
-                .catch(function(){ btn.disabled=false; alert('처리 중 오류가 발생했습니다.'); });
+                .catch(function(){ btns.forEach(function(b){b.disabled=false;}); alert('처리 중 오류가 발생했습니다.'); });
         }
         // 로드 시 서버 상태 반영
         var init=bar?bar.getAttribute('data-status'):'none';
-        if(init && init!=='none'){ btn.classList.add('req'); btn.innerHTML=(init==='done'?'✅ 반영 완료':'🛠 반영 중'); }
+        if(init && init!=='none'){ setBtns(init==='done'?'✅ 반영 완료':'🛠 반영 중', true); }
 
-        btn.addEventListener('click',function(){
-            if(btn.classList.contains('req')) return; // 이미 요청/완료 상태면 바의 버튼으로 조작
+        btns.forEach(function(ab){ ab.addEventListener('click',function(){
+            if(ab.classList.contains('req')) return; // 이미 요청/완료 상태면 바의 버튼으로 조작
             if(!confirm('이 요청 내용을 개발 담당자에게 반영 요청하시겠어요?\n(담당자에게 앱 알림/이메일로 통지됩니다)')) return;
             call('request');
-        });
+        }); });
         bar && bar.querySelectorAll('.sr-mini').forEach(function(b){
             b.addEventListener('click',function(){
                 var act=b.dataset.act;
@@ -360,9 +368,9 @@
                 // 제목/목록 갱신
                 var tt=document.getElementById('srTitle'); if(tt && res.d.title) tt.textContent=res.d.title;
                 var on=document.querySelector('.sr-thread.on .t'); if(on && res.d.title) on.textContent=res.d.title;
-                // 새 지시가 들어왔으니 '개발 반영 요청'을 다시 눌러 재요청할 수 있게 복귀
-                var reBtn=document.getElementById('srApplyBtn');
-                if(reBtn){ reBtn.classList.remove('req'); reBtn.innerHTML='<svg width="15" height="15"><use href="#i-check"/></svg> 개발 반영 요청'; }
+                // 새 지시가 들어왔으니 '개발 반영 요청'을 다시 눌러 재요청할 수 있게 복귀(상단+하단 버튼)
+                ['srApplyBtn','srApplyBtn2'].forEach(function(id){ var reBtn=document.getElementById(id);
+                    if(reBtn){ reBtn.classList.remove('req'); reBtn.innerHTML='<svg width="15" height="15"><use href="#i-check"/></svg> 개발 반영 요청'; } });
                 var reBar=document.getElementById('srApplyBar');
                 if(reBar){ reBar.style.display='none'; reBar.setAttribute('data-status','none'); }
             })
