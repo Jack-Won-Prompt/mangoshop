@@ -37,15 +37,17 @@
 </section>
 @endif
 
-{{-- ===== 2. 안내 스트립 ===== --}}
+{{-- ===== 2. 안내 스트립 (관리자 사이트설정에서 편집) ===== --}}
+@php($strip = collect($site['home_strip'] ?? [])->filter(fn ($s) => !empty($s['title']) || !empty($s['desc'])))
+@if($strip->count())
 <div class="mg-strip">
     <div class="mg-wrap">
-        <div class="item"><span class="ic"><x-icon name="truck" :size="21"/></span><b>당일 발송 · 콜드체인</b> 결제 후 당일 출고, 도착까지 1~2일 소요</div>
-        <div class="item"><span class="ic"><x-icon name="building" :size="21"/></span><b>검증된 수입사 상품</b> 엄선한 수입 과일</div>
-        <div class="item"><span class="ic"><x-icon name="coin" :size="21"/></span><b>수량구간 대량할인</b> 도매회원 구간별 도매가</div>
-        <div class="item"><span class="ic"><x-icon name="doc" :size="21"/></span><b>세금계산서</b> 사업자 발행 지원</div>
+        @foreach($strip as $s)
+            <div class="item"><span class="ic"><x-icon :name="$s['icon'] ?: 'check'" :size="21"/></span><b>{{ $s['title'] ?? '' }}</b> {{ $s['desc'] ?? '' }}</div>
+        @endforeach
     </div>
 </div>
+@endif
 
 {{-- ===== 3. 새로 들어온 과일 (베스트 위로 이동) ===== --}}
 @if($newProducts->count())

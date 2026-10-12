@@ -50,6 +50,11 @@ class SettingController extends Controller
             'home_show_recipe'   => ['nullable', 'boolean'],
             'inquiry_emails'     => ['nullable', 'array'],
             'inquiry_emails.*'   => ['nullable', 'email', 'max:100'],
+            // 메인 혜택 안내 스트립(4칸)
+            'strip'              => ['nullable', 'array'],
+            'strip.*.icon'       => ['nullable', 'string', 'max:30'],
+            'strip.*.title'      => ['nullable', 'string', 'max:40'],
+            'strip.*.desc'       => ['nullable', 'string', 'max:80'],
             // 메인 피처 밴드 2블록 (적립·캐시백 / 수입·유통)
             'feat'               => ['nullable', 'array'],
             'feat.*.kicker'      => ['nullable', 'string', 'max:40'],
@@ -84,17 +89,36 @@ class SettingController extends Controller
         // 팝업 입력(popup_*)은 site 최상위가 아닌 site.popup 으로 묶어 저장
         $plain = array_filter($data, fn ($k) => ! str_starts_with($k, 'popup_'), ARRAY_FILTER_USE_KEY);
 
-        $site = array_merge(config('site'), array_diff_key($plain, array_flip(['banks', 'popular_keywords', 'inquiry_emails', 'home_show_recipe', 'feat'])), [
+        $site = array_merge(config('site'), array_diff_key($plain, array_flip(['banks', 'popular_keywords', 'inquiry_emails', 'home_show_recipe', 'feat', 'strip'])), [
             'banks'            => $banks,
             'popular_keywords' => $keywords,
             'inquiry_emails'   => $inquiryEmails,
             'home_show_recipe' => $request->boolean('home_show_recipe'),   // 체크박스: 미체크=false 명시 저장
             'home_features'    => $this->featuresFrom($request),
+            'home_strip'       => $this->stripFrom($request),
         ]);
 
         Setting::put('site', $site);
 
         return back()->with('ok', '사이트 설정이 저장되었습니다.');
+    }
+
+    /** 메인 혜택 안내 스트립(4칸) 입력을 기존 순서/기본값 위에 병합 */
+    private function stripFrom(Request $request): array
+    {
+        $current = config('site.home_strip', []);
+        $input   = (array) $request->input('strip', []);
+
+        foreach ($input as $i => $s) {
+            $block = $current[$i] ?? [];
+            $current[$i] = [
+                'icon'  => trim((string) ($s['icon'] ?? ($block['icon'] ?? 'check'))) ?: 'check',
+                'title' => trim((string) ($s['title'] ?? ($block['title'] ?? ''))),
+                'desc'  => trim((string) ($s['desc'] ?? ($block['desc'] ?? ''))),
+            ];
+        }
+
+        return array_values($current);
     }
 
     /** 메인 피처 밴드(적립·캐시백 / 수입·유통) 입력을 기존 순서/기본값 위에 병합 */

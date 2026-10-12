@@ -116,6 +116,23 @@
         </div>
     </div>
 
+    {{-- 메인 혜택 안내 스트립 (배너 아래 4칸) --}}
+    @php($strip = $site['home_strip'] ?? [])
+    <div class="adm-card">
+        <div class="h">메인 혜택 안내 스트립 (배너 아래)</div>
+        <div style="padding:20px;display:grid;gap:14px">
+            <div class="ahint">메인 배너 바로 아래 가로 4칸 안내 문구입니다. 아이콘·제목·설명을 수정할 수 있습니다.</div>
+            @foreach($strip as $i => $s)
+                <div style="display:grid;grid-template-columns:150px 1fr 1.4fr;gap:10px;align-items:end;border:1px solid #eef0f4;border-radius:8px;padding:12px">
+                    <div class="afield" style="margin:0"><label>아이콘 키 {{ $i + 1 }}</label><input type="text" name="strip[{{ $i }}][icon]" class="ainput" maxlength="30" value="{{ old("strip.$i.icon", $s['icon'] ?? '') }}" placeholder="truck"></div>
+                    <div class="afield" style="margin:0"><label>제목</label><input type="text" name="strip[{{ $i }}][title]" class="ainput" maxlength="40" value="{{ old("strip.$i.title", $s['title'] ?? '') }}" placeholder="예: 주문 후 순차 발송"></div>
+                    <div class="afield" style="margin:0"><label>설명</label><input type="text" name="strip[{{ $i }}][desc]" class="ainput" maxlength="80" value="{{ old("strip.$i.desc", $s['desc'] ?? '') }}" placeholder="예: 입고 일정에 맞춰 출고"></div>
+                </div>
+            @endforeach
+            <div class="ahint">아이콘 키 예: truck(배송), building(수입사), coin(할인), doc(문서), shield(안전), heart, star, check, tag, box, package, fire</div>
+        </div>
+    </div>
+
     {{-- 메인화면 피처 밴드 (적립·캐시백 / 수입·유통) --}}
     @php($feats = $site['home_features'] ?? [])
     @php($featLabels = ['① 적립·캐시백 영역 (좌측 상단, POINTS & CASHBACK)', '② 수입·유통 영역 (하단, IMPORT & DISTRIBUTION)'])
