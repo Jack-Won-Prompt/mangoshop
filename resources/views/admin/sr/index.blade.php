@@ -108,7 +108,7 @@
 <style>
     .adm-body{padding:0 !important}
     .sr{display:grid;grid-template-columns:260px 1fr;height:calc(100vh - 62px);min-height:520px}
-    .sr-list{border-right:1px solid var(--a-line,#e3e8f1);display:flex;flex-direction:column;background:#fafbfd;min-width:0}
+    .sr-list{border-right:1px solid var(--a-line,#e3e8f1);display:flex;flex-direction:column;background:#fafbfd;min-width:0;min-height:0}
     .sr-new{display:flex;align-items:center;justify-content:center;gap:6px;width:calc(100% - 24px);margin:12px;padding:11px;border:1px solid var(--a-line,#e3e8f1);background:#fff;border-radius:9px;font-weight:700;cursor:pointer;color:#123b26}
     .sr-new:hover{background:#f0f3ee}
     .sr-threads{overflow:auto;flex:1;padding:0 8px 12px}
@@ -119,7 +119,7 @@
     .sr-thread .d{font-size:11px;color:#97a0b8}
     .sr-empty-list{padding:24px 14px;color:#97a0b8;font-size:12.5px;line-height:1.7;text-align:center}
 
-    .sr-chat{display:flex;flex-direction:column;min-width:0;background:#fff}
+    .sr-chat{display:flex;flex-direction:column;min-width:0;min-height:0;background:#fff;overflow:hidden}
     .sr-warn{margin:12px 16px 0;padding:10px 12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;font-size:12.5px;color:#9a3412}
     .sr-blank{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;color:#6b7280}
     .sr-blank-in h3{margin:12px 0 8px;font-size:18px;color:#1f2937}
@@ -144,7 +144,7 @@
     .sr-mini.ghost{border-color:#e3e8f1;color:#6b7280}
     .sr-applybar[data-status="done"] .sr-mini{border-color:#9fd9b4;color:#15803d}
 
-    .sr-msgs{flex:1;overflow:auto;padding:22px 18px;display:flex;flex-direction:column;gap:18px;background:#f7f8fa}
+    .sr-msgs{flex:1;min-height:0;overflow-y:auto;padding:22px 18px;display:flex;flex-direction:column;gap:18px;background:#f7f8fa}
     .sr-msg{display:flex;gap:11px;max-width:900px;width:100%;margin:0 auto}
     .sr-msg.user{flex-direction:row-reverse}
     .sr-ava{flex:none;width:34px;height:34px;border-radius:9px;background:#fff;border:1px solid var(--a-line,#e3e8f1);display:flex;align-items:center;justify-content:center;font-size:17px}
