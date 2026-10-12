@@ -36,14 +36,14 @@
                     <div class="sr-logo">🤖</div>
                     <h3>SR 관리 콘솔</h3>
                     <p>왼쪽 ‘새 요청’을 눌러 대화를 시작하세요. 신규/수정 요청, 버그, 운영 문의를 올리고<br>이미지·PDF·로그·코드 파일을 첨부해 분석받을 수 있습니다.</p>
-                    <div class="sr-model-badge">모델: {{ $model }}</div>
+                    <div class="sr-model-badge">AI 어시스턴트</div>
                 </div>
             </div>
         @else
             <div class="sr-head">
                 <div class="sr-title" id="srTitle">{{ $thread->title }}</div>
                 <div class="sr-head-r">
-                    <span class="sr-model-badge">{{ $thread->model ?: $model }}</span>
+                    <span class="sr-model-badge">AI 어시스턴트</span>
                     <form method="POST" action="{{ route('admin.sr.destroy', $thread) }}" onsubmit="return confirm('이 요청을 삭제할까요?')">@csrf @method('DELETE')
                         <button class="sr-del" type="submit" title="삭제"><x-icon name="trash" :size="15"/></button>
                     </form>
@@ -80,7 +80,7 @@
                     <textarea id="srText" rows="1" placeholder="요청 내용을 입력하세요. (Shift+Enter 줄바꿈, Enter 전송)"></textarea>
                     <button type="submit" id="srSend" class="sr-send"><x-icon name="arrow-right" :size="18"/></button>
                 </div>
-                <div class="sr-hint">Claude {{ $model }} · 첨부: 이미지·PDF·텍스트(코드/로그/CSV), 20MB 이하 · 이 콘솔은 직접 배포하지 않습니다(분석·초안 제공).</div>
+                <div class="sr-hint">첨부: 이미지·PDF·텍스트(코드/로그/CSV), 20MB 이하 · 이 콘솔은 직접 배포하지 않습니다(분석·초안 제공).</div>
             </form>
         @endif
     </section>
