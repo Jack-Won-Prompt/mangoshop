@@ -73,5 +73,6 @@
     <button class="to-top" aria-label="맨 위로"><x-icon name="arrow-right"/></button>
     <script src="{{ asset('js/site.js') }}?v=5" defer></script>
     @stack('scripts')
+    @include('partials.error-beacon')
 </body>
 </html>

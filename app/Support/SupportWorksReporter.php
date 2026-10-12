@@ -26,6 +26,50 @@ class SupportWorksReporter
     /** message 낱말 앞뒤에서 떼어 낼 문장부호. 가운데의 . / \ 는 건드리지 않는다. */
     private const EDGE_PUNCT = '\'"`()\[\]{}<>,.;:!?“”‘’«»';
 
+    /**
+     * 보고·기록 대상 예외인가. 404·검증·인증·CSRF 등 "고칠 것 없는" 예외는 제외.
+     */
+    public static function reportable(Throwable $e): bool
+    {
+        $skip = [
+            \Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class,
+            \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException::class,
+            \Illuminate\Validation\ValidationException::class,
+            \Illuminate\Auth\AuthenticationException::class,
+            \Illuminate\Auth\Access\AuthorizationException::class,
+            \Illuminate\Session\TokenMismatchException::class,
+            \Illuminate\Database\Eloquent\ModelNotFoundException::class,
+            \Illuminate\Http\Exceptions\ThrottleRequestsException::class,
+        ];
+        foreach ($skip as $cls) {
+            if ($e instanceof $cls) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /** 외부(클라이언트) 입력 메시지 마스킹 공개 래퍼. */
+    public static function maskMessagePublic(string $message): string
+    {
+        return self::maskMessage($message);
+    }
+
+    /** 마스킹된 보고 페이로드(로컬 기록·원격 전송 공용). */
+    public static function payload(Throwable $e, ?Request $request = null): array
+    {
+        return [
+            'level'     => 'error',
+            'exception' => get_class($e),
+            'message'   => mb_substr(self::maskMessage($e->getMessage()), 0, 2000),
+            'file'      => $e->getFile(),
+            'line'      => $e->getLine(),
+            'url'       => $request ? self::maskUrl($request) : null,
+            'trace'     => mb_substr(self::trace($e), 0, 8000),
+        ];
+    }
+
     public static function report(Throwable $e, ?Request $request = null): void
     {
         try {
@@ -36,20 +80,12 @@ class SupportWorksReporter
                 return;
             }
 
-            // 404 는 보내지 않는다. 고칠 것이 없고, 봇이 훑고 갈 때마다 쌓인다.
-            if ($e instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException) {
+            // 404 등 고칠 것 없는 예외는 보내지 않는다.
+            if (! self::reportable($e)) {
                 return;
             }
 
-            $payload = [
-                'level'     => 'error',
-                'exception' => get_class($e),
-                'message'   => mb_substr(self::maskMessage($e->getMessage()), 0, 2000),
-                'file'      => $e->getFile(),
-                'line'      => $e->getLine(),
-                'url'       => $request ? self::maskUrl($request) : null,
-                'trace'     => mb_substr(self::trace($e), 0, 8000),
-            ];
+            $payload = self::payload($e, $request);
 
             // 응답을 돌려준 뒤에 보낸다. 콘솔에는 그 시점이 없으므로 바로 보낸다.
             $send = function () use ($url, $token, $payload) {

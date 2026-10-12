@@ -309,6 +309,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('/sr/thread/{thread}/apply-status', [\App\Http\Controllers\Admin\SrController::class, 'applyStatus'])->name('sr.apply');
     Route::get('/sr/thread/{thread}/file/{message}/{idx}', [\App\Http\Controllers\Admin\SrController::class, 'attachment'])->name('sr.attachment');
 
+    // 운영 오류 로그 — 제네릭 CRUD 보다 먼저(전용 경로)
+    Route::get('/errors', [\App\Http\Controllers\Admin\ErrorLogController::class, 'index'])->name('errors.index');
+    Route::get('/errors/{event}', [\App\Http\Controllers\Admin\ErrorLogController::class, 'show'])->name('errors.show');
+    Route::post('/errors/{event}/resolve', [\App\Http\Controllers\Admin\ErrorLogController::class, 'resolve'])->name('errors.resolve');
+    Route::delete('/errors/{event}', [\App\Http\Controllers\Admin\ErrorLogController::class, 'destroy'])->name('errors.destroy');
+
     // 설정 기반 제네릭 CRUD (categories, brands, products, banners, notices, faqs)
     Route::get('/{resource}', [AdminResourceController::class, 'index'])->name('index');
     Route::get('/{resource}/create', [AdminResourceController::class, 'create'])->name('create');
@@ -317,6 +323,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::put('/{resource}/{id}', [AdminResourceController::class, 'update'])->name('update');
     Route::delete('/{resource}/{id}', [AdminResourceController::class, 'destroy'])->name('destroy');
 });
+
+// ===== 화면 스크립트 오류 수집 (공개·CSRF 제외·레이트리밋) =====
+Route::post('/client-error', [\App\Http\Controllers\ClientErrorController::class, 'store'])
+    ->middleware('throttle:30,1')->name('client-error');
 
 // ===== 1:1 실시간 상담 (회원/비회원 공용) =====
 Route::get('/chat/open', [ChatController::class, 'open'])->name('chat.open');

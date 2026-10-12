@@ -49,6 +49,7 @@
 
                 <div class="grp">환경설정</div>
                 <a href="{{ route('admin.sr.index') }}" class="{{ request()->routeIs('admin.sr.*') ? 'on' : '' }}"><x-icon name="headset"/> SR 관리</a>
+                <a href="{{ route('admin.errors.index') }}" class="{{ request()->routeIs('admin.errors.*') ? 'on' : '' }}"><x-icon name="shield"/> 오류 로그</a>
                 <a href="{{ route('admin.settings.edit') }}" class="{{ request()->routeIs('admin.settings.*') ? 'on' : '' }}"><x-icon name="tools"/> 사이트 설정</a>
             </nav>
             <div class="adm-foot">
@@ -73,5 +74,6 @@
             </div>
         </div>
     </div>
+    @include('partials.error-beacon')
 </body>
 </html>

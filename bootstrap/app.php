@@ -30,10 +30,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             'payment/toss/webhook',
             'payment/portone/webhook',
+            'client-error',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->report(function (\Throwable $e) {
             \App\Support\SupportWorksReporter::report($e, request());
+            \App\Support\ErrorReporter::captureServer($e, request());
         });
     })->create();
