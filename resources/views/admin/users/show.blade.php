@@ -36,7 +36,17 @@
                 <div style="background:#f7f9fc;border-radius:10px;padding:14px;margin-bottom:16px;font-size:13.5px;line-height:1.9">
                     <b>상호</b> {{ $user->company_name }}<br>
                     <b>사업자번호</b> {{ $user->biz_no }}<br>
-                    <b>종별</b> {{ $user->biz_type ?? '-' }}
+                    <b>종별</b> {{ $user->biz_type ?? '-' }}<br>
+                    {{-- 사업자등록증 첨부 경로가 있을 때만 새 창 열람 링크 노출 (기존 가입자는 경로가 없어 안내문만 표시) --}}
+                    <b>사업자등록증</b>
+                    @if(!empty($user->biz_license_path))
+                        <a href="{{ asset('storage/'.$user->biz_license_path) }}" target="_blank" rel="noopener" style="color:var(--a-navy);font-weight:700;text-decoration:underline">첨부 서류 보기</a>
+                    @else
+                        <span class="muted">미첨부</span>
+                    @endif
+                    @if($user->biz_status==='pending')
+                        <span class="pill pill-w">서류 검토 중</span>
+                    @endif
                 </div>
             @else
                 <p class="muted" style="margin-bottom:16px;font-size:13.5px">일반 회원입니다. 도매 승인 및 전용가는 도매 회원에만 적용됩니다.</p>

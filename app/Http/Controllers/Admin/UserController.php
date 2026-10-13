@@ -52,6 +52,16 @@ class UserController extends Controller
             'biz_status' => ['required', Rule::in(['pending', 'approved', 'rejected'])],
             'grade'      => ['required', Rule::in(['basic', 'silver', 'gold'])],
         ]);
+
+        // 승인(approved) 시점부터 도매가가 적용되므로, 사업자 회원은 사업자등록증 첨부가
+        // 확인된 건만 승인되도록 관리자 처리 단계에서도 다시 검증한다.
+        // (서류 미첨부 건이 승인되어 도매가가 먼저 노출되는 것을 막기 위함)
+        if ($data['biz_status'] === 'approved'
+            && $user->member_type === 'business'
+            && blank($user->biz_license_path)) {
+            return back()->with('error', '사업자등록증이 첨부되지 않아 승인할 수 없습니다. 첨부 서류 확인 후 다시 처리하세요.');
+        }
+
         $user->update($data);
 
         return back()->with('ok', '회원 정보가 갱신되었습니다.');
@@ -168,6 +178,13 @@ class UserController extends Controller
         ]);
         $data['is_agent'] = $request->boolean('is_agent');
         $data['cashback_rate'] = $data['is_agent'] ? ($data['cashback_rate'] ?? 0) : 0;
+
+        // 일반회원을 사업자회원으로 전환하는 경우, 서류 검토 전이므로 '서류 검토 중'(pending)으로 초기화한다.
+        // 기존 사업자 회원(member_type 변동 없음)의 승인 상태는 그대로 유지된다.
+        if ($data['member_type'] === 'business' && $user->member_type !== 'business') {
+            $data['biz_status'] = 'pending';
+        }
+
         $user->update($data);
 
         return back()->with('ok', '회원 정보가 수정되었습니다.');

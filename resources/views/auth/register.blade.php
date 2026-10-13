@@ -50,7 +50,8 @@
                 {{-- 도매 승인 심사에 필요한 사업자등록증 첨부(사업자 선택 시 필수) --}}
                 <div class="field">
                     <label>사업자등록증 <span class="req">*</span></label>
-                    <input type="file" name="biz_license" id="biz-license" class="input" accept="image/*,.pdf">
+                    {{-- 허용 형식을 JPG/PNG/PDF로 한정(image/* 는 webp·heic 등까지 열려 심사 서류로 부적합) --}}
+                    <input type="file" name="biz_license" id="biz-license" class="input" accept="image/jpeg,image/png,application/pdf">
                     <p class="muted" style="font-size:12px;margin:6px 0 0">※ 이미지(JPG/PNG) 또는 PDF 파일만 첨부할 수 있습니다.</p>
                 </div>
                 @error('biz_license')<p class="muted" style="font-size:12px;color:#d33;margin:0 0 8px">{{ $message }}</p>@enderror
