@@ -132,6 +132,19 @@ class SrController extends Controller
         ]);
     }
 
+    /** 폴링: 특정 메시지 id 이후의 새 메시지 + 현재 반영 상태 (새로고침 없이 결과 수신) */
+    public function poll(Request $request, SrThread $thread)
+    {
+        $after = (int) $request->get('after', 0);
+        $messages = $thread->messages()->where('id', '>', $after)->get()
+            ->map(fn ($m) => $this->present($m))->values();
+
+        return response()->json([
+            'messages'     => $messages,
+            'apply_status' => $thread->apply_status,
+        ]);
+    }
+
     /** 개발 반영 요청 상태 변경 (request | cancel | done) — 실행이 아니라 담당자 처리용 표시+통지 */
     public function applyStatus(Request $request, SrThread $thread)
     {

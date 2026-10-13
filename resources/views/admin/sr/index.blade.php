@@ -68,7 +68,7 @@
 
             <div class="sr-msgs" id="srMsgs">
                 @foreach($messages as $m)
-                    <div class="sr-msg {{ $m->role }}">
+                    <div class="sr-msg {{ $m->role }}" data-id="{{ $m->id }}">
                         <div class="sr-ava">{{ $m->role === 'user' ? '🙋' : '🤖' }}</div>
                         <div class="sr-bubble">
                             @foreach(($m->attachments ?? []) as $i => $a)
@@ -86,7 +86,7 @@
                 @endforeach
             </div>
 
-            <form class="sr-composer" id="srComposer" data-send="{{ route('admin.sr.message', $thread) }}">
+            <form class="sr-composer" id="srComposer" data-send="{{ route('admin.sr.message', $thread) }}" data-poll="{{ route('admin.sr.poll', $thread) }}">
                 <div class="sr-comp-top">
                     <button type="button" class="sr-apply-btn sr-apply-sm" id="srApplyBtn2" data-url="{{ route('admin.sr.apply', $thread) }}"><x-icon name="check" :size="14"/> 개발 반영 요청</button>
                 </div>
@@ -250,6 +250,49 @@
     function scrollBottom(){ if(msgs) msgs.scrollTop=msgs.scrollHeight; }
     scrollBottom();
 
+    // ===== 결과 자동 수신(폴링) — 반영 요청 후 Agent 답변을 새로고침 없이 표시 =====
+    var srPollTimer=null;
+    function srMaxId(){ var ids=[].map.call(document.querySelectorAll('#srMsgs .sr-msg[data-id]'), function(n){return (+n.getAttribute('data-id'))||0;}); return ids.length?Math.max.apply(null,ids):0; }
+    function srAppendMsg(m){
+        var mw=document.getElementById('srMsgs'); if(!mw) return;
+        if(mw.querySelector('.sr-msg[data-id="'+m.id+'"]')) return;      // 중복 방지
+        var p=mw.querySelector('.sr-progress'); if(p) p.remove();         // 진행중 버블 제거
+        var w=document.createElement('div'); w.className='sr-msg '+(m.role==='user'?'user':'assistant'); w.setAttribute('data-id',m.id);
+        var b=document.createElement('div'); b.className='sr-bubble';
+        (m.attachments||[]).forEach(function(a){
+            if(a.image){ var l=document.createElement('a'); l.href=a.url; l.target='_blank'; var im=document.createElement('img'); im.className='sr-att-img'; im.src=a.url; l.appendChild(im); b.appendChild(l); }
+            else { var fl=document.createElement('a'); fl.className='sr-att-file'; fl.href=a.url; fl.target='_blank'; fl.textContent='📎 '+a.name; b.appendChild(fl); }
+        });
+        var body=document.createElement('div'); body.className='sr-body'+(m.role==='assistant'?' md':'');
+        if(m.role==='assistant') body.innerHTML=renderMd(m.content); else body.textContent=m.content;
+        b.appendChild(body);
+        if(m.time){ var tm=document.createElement('div'); tm.className='sr-time'; tm.textContent=m.time; b.appendChild(tm); }
+        var ava=document.createElement('div'); ava.className='sr-ava'; ava.textContent=m.role==='user'?'🙋':'🤖';
+        w.appendChild(ava); w.appendChild(b); mw.appendChild(w); mw.scrollTop=mw.scrollHeight;
+    }
+    function srMarkDone(){
+        var p=document.querySelector('#srMsgs .sr-progress'); if(p) p.remove();
+        ['srApplyBtn','srApplyBtn2'].forEach(function(id){ var bb=document.getElementById(id); if(bb){ bb.classList.add('req'); bb.innerHTML='✅ 반영 완료'; } });
+        var bar2=document.getElementById('srApplyBar'), txt2=document.getElementById('srApplyTxt');
+        if(bar2){ bar2.style.display=''; bar2.setAttribute('data-status','done'); } if(txt2) txt2.textContent='✅ 반영 완료 처리됨';
+    }
+    function srStartPoll(){
+        var cf=document.getElementById('srComposer'); if(!cf || !cf.dataset.poll) return;
+        var pollUrl=cf.dataset.poll;
+        if(srPollTimer) clearInterval(srPollTimer);
+        var until=Date.now()+300000, after=srMaxId();   // 최대 5분
+        srPollTimer=setInterval(function(){
+            if(Date.now()>until){ clearInterval(srPollTimer); srPollTimer=null; return; }
+            fetch(pollUrl+'?after='+after,{headers:{'Accept':'application/json'}})
+                .then(function(r){return r.json();})
+                .then(function(d){
+                    var gotAssistant=false;
+                    (d.messages||[]).forEach(function(m){ srAppendMsg(m); after=Math.max(after,m.id); if(m.role==='assistant') gotAssistant=true; });
+                    if(gotAssistant || d.apply_status==='done'){ clearInterval(srPollTimer); srPollTimer=null; srMarkDone(); }
+                }).catch(function(){});
+        }, 4000);
+    }
+
     // ===== 개발 반영 요청 =====
     (function(){
         var btns=[document.getElementById('srApplyBtn'), document.getElementById('srApplyBtn2')].filter(Boolean);
@@ -277,9 +320,10 @@
                         var mw=document.getElementById('srMsgs');
                         if(mw && !mw.querySelector('.sr-progress')){
                             var pw=document.createElement('div'); pw.className='sr-msg assistant sr-progress';
-                            pw.innerHTML='<div class="sr-ava">🛠</div><div class="sr-bubble"><div class="sr-body"><span class="sr-typing"><i></i><i></i><i></i></span> 반영 진행 중입니다… 처리가 끝나면 결과가 이 대화에 등록됩니다. (잠시 후 새로고침해 확인)</div></div>';
+                            pw.innerHTML='<div class="sr-ava">🛠</div><div class="sr-bubble"><div class="sr-body"><span class="sr-typing"><i></i><i></i><i></i></span> 반영 진행 중입니다… 처리가 끝나면 결과가 이 대화에 자동으로 표시됩니다.</div></div>';
                             mw.appendChild(pw); mw.scrollTop=mw.scrollHeight;
                         }
+                        srStartPoll();   // 결과 자동 수신 시작
                     }
                 } })
                 .catch(function(){ btns.forEach(function(b){b.disabled=false;}); alert('처리 중 오류가 발생했습니다.'); });
@@ -287,6 +331,7 @@
         // 로드 시 서버 상태 반영
         var init=bar?bar.getAttribute('data-status'):'none';
         if(init && init!=='none'){ setBtns(init==='done'?'✅ 반영 완료':'🛠 반영 중', true); }
+        if(init==='requested'){ srStartPoll(); }   // 처리 대기 중이면 로드 시에도 결과 폴링
 
         btns.forEach(function(ab){ ab.addEventListener('click',function(){
             if(ab.classList.contains('req')) return; // 이미 요청/완료 상태면 바의 버튼으로 조작
@@ -351,7 +396,7 @@
 
         // 낙관적 렌더 (이미지는 로컬 미리보기 URL 사용 — 전송 직후 깨짐 방지)
         var localAtts=files.map(function(f){ return {name:f.name, image:/^image\//.test(f.type), url:URL.createObjectURL(f)}; });
-        bubble('user', content, localAtts);
+        var userWrap=bubble('user', content, localAtts);
         text.value=''; text.style.height='auto'; files=[]; renderChips();
         sendBtn.disabled=true;
 
@@ -364,7 +409,9 @@
             .then(function(res){
                 typ.remove(); sendBtn.disabled=false;
                 if(!res.ok){ bubble('assistant','⚠ '+(res.d.error||'오류가 발생했습니다.')); return; }
-                bubble('assistant', res.d.assistant.content);
+                if(res.d.user && userWrap) userWrap.setAttribute('data-id', res.d.user.id);
+                var aWrap=bubble('assistant', res.d.assistant.content);
+                if(res.d.assistant && aWrap) aWrap.setAttribute('data-id', res.d.assistant.id);
                 // 제목/목록 갱신
                 var tt=document.getElementById('srTitle'); if(tt && res.d.title) tt.textContent=res.d.title;
                 var on=document.querySelector('.sr-thread.on .t'); if(on && res.d.title) on.textContent=res.d.title;

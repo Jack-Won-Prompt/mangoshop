@@ -307,6 +307,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('/sr/thread/{thread}/message', [\App\Http\Controllers\Admin\SrController::class, 'message'])->name('sr.message');
     Route::delete('/sr/thread/{thread}', [\App\Http\Controllers\Admin\SrController::class, 'destroy'])->name('sr.destroy');
     Route::post('/sr/thread/{thread}/apply-status', [\App\Http\Controllers\Admin\SrController::class, 'applyStatus'])->name('sr.apply');
+    Route::get('/sr/thread/{thread}/poll', [\App\Http\Controllers\Admin\SrController::class, 'poll'])->name('sr.poll');
     Route::get('/sr/thread/{thread}/file/{message}/{idx}', [\App\Http\Controllers\Admin\SrController::class, 'attachment'])->name('sr.attachment');
 
     // 운영 오류 로그 — 제네릭 CRUD 보다 먼저(전용 경로)
