@@ -8,7 +8,8 @@
         <h2>회원가입</h2>
         <p class="sub">가입 즉시 {{ number_format($site['signup_point']) }}원 적립금 지급</p>
 
-        <form method="POST" action="{{ route('register.attempt') }}">
+        {{-- 사업자등록증 파일 전송을 위해 multipart 인코딩 필요 --}}
+        <form method="POST" action="{{ route('register.attempt') }}" enctype="multipart/form-data">
             @csrf
             {{-- 스팸 방지 허니팟(사람에겐 숨김) --}}
             <div style="position:absolute;left:-9999px;top:-9999px" aria-hidden="true">
@@ -46,6 +47,13 @@
                     <div class="field"><label>사업자등록번호</label><input type="text" name="biz_no" class="input" value="{{ old('biz_no') }}" placeholder="000-00-00000"></div>
                     <div class="field"><label>업태/종별</label><input type="text" name="biz_type" class="input" value="{{ old('biz_type') }}" placeholder="예: 의원"></div>
                 </div>
+                {{-- 도매 승인 심사에 필요한 사업자등록증 첨부(사업자 선택 시 필수) --}}
+                <div class="field">
+                    <label>사업자등록증 <span class="req">*</span></label>
+                    <input type="file" name="biz_license" id="biz-license" class="input" accept="image/*,.pdf">
+                    <p class="muted" style="font-size:12px;margin:6px 0 0">※ 이미지(JPG/PNG) 또는 PDF 파일만 첨부할 수 있습니다.</p>
+                </div>
+                @error('biz_license')<p class="muted" style="font-size:12px;color:#d33;margin:0 0 8px">{{ $message }}</p>@enderror
                 <p class="muted" style="font-size:12px;margin:0">※ 관리자 확인 후 승인되며, 승인 시 도매 전용가가 적용됩니다.</p>
             </div>
 
@@ -106,6 +114,25 @@
     .agree-content a{color:var(--primary,#ff6b00);font-weight:600}
 </style>
 <script>
+(function(){
+    // 회원 구분 라디오에 따라 사업자 영역 표시/숨김 + 사업자등록증 필수 여부 전환
+    var radios=document.querySelectorAll('input[name="member_type"]');
+    var box=document.getElementById('biz-fields');
+    var file=document.getElementById('biz-license');
+    if(!radios.length||!box)return;
+    function syncBiz(){
+        var isBiz=false;
+        Array.prototype.forEach.call(radios,function(r){ if(r.checked&&r.value==='business') isBiz=true; });
+        box.style.display=isBiz?'block':'none';
+        if(file){
+            // 숨겨진 상태에서 required가 남아 있으면 제출이 막히므로 함께 해제
+            if(isBiz){ file.setAttribute('required','required'); }
+            else{ file.removeAttribute('required'); file.value=''; }
+        }
+    }
+    Array.prototype.forEach.call(radios,function(r){ r.addEventListener('change',syncBiz); });
+    syncBiz();
+})();
 (function(){
     var all=document.getElementById('agreeAll');
     if(!all)return;
