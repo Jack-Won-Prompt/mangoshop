@@ -40,11 +40,26 @@
                 </div>
             </div>
         @else
+            @php
+                // 버튼을 켤지는 마지막 글 하나로 정한다.
+                // 마지막이 관리자 글이면 아직 답을 기다리는 중이라 반영할 것이 정해지지 않았다.
+                $srLast = $messages->last();
+                $srCanApply = $srLast && $srLast->role === 'assistant' && $srLast->canApply();
+                $srApplyHint = ! $srLast
+                    ? '요청 내용을 먼저 적어 주세요'
+                    : ($srLast->role !== 'assistant'
+                        ? '어시스턴트 답변을 기다리는 중입니다'
+                        : '아직 반영할 내용이 정해지지 않았습니다. 대화를 이어가 주세요');
+            @endphp
+
             <div class="sr-head">
                 <div class="sr-title" id="srTitle">{{ $thread->title }}</div>
                 <div class="sr-head-r">
                     <span class="sr-model-badge">AI 어시스턴트</span>
-                    <button type="button" class="sr-apply-btn" id="srApplyBtn" data-url="{{ route('admin.sr.apply', $thread) }}"><x-icon name="check" :size="15"/> 개발 반영 요청</button>
+                    {{-- 어시스턴트가 "반영할 만하다" 고 답했을 때만 누를 수 있다.
+                         아직 되묻는 중이거나 단순 안내인 건을 담당자에게 넘기지 않기 위함이다. --}}
+                    <button type="button" class="sr-apply-btn" id="srApplyBtn" data-url="{{ route('admin.sr.apply', $thread) }}"
+                            @disabled(! $srCanApply) title="{{ $srCanApply ? '담당자에게 반영을 요청합니다' : $srApplyHint }}"><x-icon name="check" :size="15"/> 개발 반영 요청</button>
                     <form method="POST" action="{{ route('admin.sr.destroy', $thread) }}" onsubmit="return confirm('이 요청을 삭제할까요?')">@csrf @method('DELETE')
                         <button class="sr-del" type="submit" title="삭제"><x-icon name="trash" :size="15"/></button>
                     </form>
@@ -79,7 +94,7 @@
                                     <a href="{{ $url }}" target="_blank" class="sr-att-file">📎 {{ $a['name'] ?? 'file' }}</a>
                                 @endif
                             @endforeach
-                            <div class="sr-body" data-raw="{{ $m->role === 'assistant' ? 'md' : 'text' }}">{{ $m->content }}</div>
+                            <div class="sr-body" data-raw="{{ $m->role === 'assistant' ? 'md' : 'text' }}">{{ $m->displayContent() }}</div>
                             @if($m->created_at)<div class="sr-time">{{ $m->created_at->format('Y-m-d H:i') }}</div>@endif
                         </div>
                     </div>
@@ -88,7 +103,8 @@
 
             <form class="sr-composer" id="srComposer" data-send="{{ route('admin.sr.message', $thread) }}" data-poll="{{ route('admin.sr.poll', $thread) }}">
                 <div class="sr-comp-top">
-                    <button type="button" class="sr-apply-btn sr-apply-sm" id="srApplyBtn2" data-url="{{ route('admin.sr.apply', $thread) }}"><x-icon name="check" :size="14"/> 개발 반영 요청</button>
+                    <button type="button" class="sr-apply-btn sr-apply-sm" id="srApplyBtn2" data-url="{{ route('admin.sr.apply', $thread) }}"
+                            @disabled(! $srCanApply) title="{{ $srCanApply ? '담당자에게 반영을 요청합니다' : $srApplyHint }}"><x-icon name="check" :size="14"/> 개발 반영 요청</button>
                 </div>
                 <div class="sr-atts" id="srAtts"></div>
                 <div class="sr-input-row">
@@ -135,6 +151,9 @@
     .sr-apply-btn{display:inline-flex;align-items:center;gap:5px;border:1px solid #123b26;background:#123b26;color:#fff;border-radius:8px;padding:7px 12px;font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap}
     .sr-apply-btn:hover{background:#0d2d1d}
     .sr-apply-btn.req{background:#fff;color:#123b26}
+    /* 아직 반영할 것이 정해지지 않았을 때 — 왜 못 누르는지는 버튼에 얹은 설명으로 알린다 */
+    .sr-apply-btn:disabled{background:#eceef1;border-color:#dfe3e8;color:#9aa1ab;cursor:not-allowed}
+    .sr-apply-btn:disabled:hover{background:#eceef1}
     .sr-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#e0892f;margin-right:6px;vertical-align:middle}
     .sr-dot.done{background:#22a35a}
     .sr-applybar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:9px 18px;background:#fff7ed;border-bottom:1px solid #fde4c8;font-size:12.5px;color:#9a3412}
@@ -288,6 +307,8 @@
                 .then(function(d){
                     var gotAssistant=false;
                     (d.messages||[]).forEach(function(m){ srAppendMsg(m); after=Math.max(after,m.id); if(m.role==='assistant') gotAssistant=true; });
+                    // 새로 들어온 답에 맞춰 '개발 반영 요청'을 켤지 다시 정한다
+                    if(window.srApplyUpdate) window.srApplyUpdate(d.messages||[]);
                     if(gotAssistant || d.apply_status==='done'){ clearInterval(srPollTimer); srPollTimer=null; srMarkDone(); }
                 }).catch(function(){});
         }, 4000);
@@ -299,9 +320,25 @@
         var bar=document.getElementById('srApplyBar'), txt=document.getElementById('srApplyTxt');
         if(!btns.length) return;
         var url=btns[0].dataset.url;
+        var applyOk={{ $srCanApply ? 'true' : 'false' }};
+        var applyHint=@json($srApplyHint);
         function setBtns(html, req){ btns.forEach(function(b){ if(req===true)b.classList.add('req'); if(req===false)b.classList.remove('req'); if(html)b.innerHTML=html; }); }
+        // 아직 반영 요청 전일 때만 켜고 끈다. 이미 요청·완료 상태면 그 표시를 그대로 둔다.
+        function gate(){
+            if(bar && bar.getAttribute('data-status')!=='none' && bar.style.display!=='none') return;
+            btns.forEach(function(b){ b.disabled=!applyOk; b.title=applyOk?'담당자에게 반영을 요청합니다':applyHint; });
+        }
+        // 새 답변이 올 때마다 다시 판단한다. 마지막 글이 어시스턴트 답이어야 하고, 반영할 것이 있어야 한다.
+        window.srApplyUpdate=function(list){
+            if(!list||!list.length) return;
+            var last=list[list.length-1];
+            applyOk = (last.role==='assistant') && !!last.can_apply;
+            applyHint = (last.role!=='assistant') ? '어시스턴트 답변을 기다리는 중입니다'
+                : '아직 반영할 내용이 정해지지 않았습니다. 대화를 이어가 주세요';
+            gate();
+        };
         function paint(status, time){
-            if(status==='none'){ if(bar)bar.style.display='none'; setBtns('<svg width="15" height="15"><use href="#i-check"/></svg> 개발 반영 요청', false); return; }
+            if(status==='none'){ if(bar)bar.style.display='none'; setBtns('<svg width="15" height="15"><use href="#i-check"/></svg> 개발 반영 요청', false); gate(); return; }
             if(bar){ bar.style.display=''; bar.setAttribute('data-status',status); }
             if(status==='requested'){ setBtns('🛠 반영 중', true); if(txt)txt.textContent='🛠 반영 진행 중… '+(time||'')+' · 처리가 끝나면 결과가 대화에 등록됩니다.'; }
             else if(status==='done'){ setBtns('✅ 반영 완료', true); if(txt)txt.textContent='✅ 반영 완료 처리됨'; }
@@ -311,7 +348,9 @@
             btns.forEach(function(b){b.disabled=true;});
             fetch(url,{method:'POST',headers:{'X-CSRF-TOKEN':csrf,'Accept':'application/json'},body:fd})
                 .then(function(r){return r.json();})
-                .then(function(d){ btns.forEach(function(b){b.disabled=false;}); if(d.ok){ paint(d.apply_status, d.requested_at);
+                .then(function(d){ btns.forEach(function(b){b.disabled=false;});
+                    if(!d.ok){ gate(); alert(d.message||'처리하지 못했습니다.'); return; }
+                    if(d.ok){ paint(d.apply_status, d.requested_at);
                     var on=document.querySelector('.sr-thread.on .t'); // 좌측 점 갱신
                     if(on){ var dot=on.querySelector('.sr-dot'); if(dot) dot.remove();
                         if(d.apply_status!=='none'){ var i=document.createElement('i'); i.className='sr-dot'+(d.apply_status==='done'?' done':''); on.insertBefore(i,on.firstChild); } }
@@ -420,6 +459,8 @@
                     if(reBtn){ reBtn.classList.remove('req'); reBtn.innerHTML='<svg width="15" height="15"><use href="#i-check"/></svg> 개발 반영 요청'; } });
                 var reBar=document.getElementById('srApplyBar');
                 if(reBar){ reBar.style.display='none'; reBar.setAttribute('data-status','none'); }
+                // 이번 답이 반영할 만한 건인지에 따라 버튼을 켜고 끈다
+                if(window.srApplyUpdate && res.d.assistant) window.srApplyUpdate([res.d.assistant]);
             })
             .catch(function(){ typ.remove(); sendBtn.disabled=false; bubble('assistant','⚠ 네트워크 오류. 다시 시도해 주세요.'); });
     });

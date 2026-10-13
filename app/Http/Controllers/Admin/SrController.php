@@ -154,6 +154,16 @@ class SrController extends Controller
         ]);
 
         if ($data['action'] === 'request') {
+            // 화면에서 버튼을 잠가 두지만, 주소를 직접 부르면 그것만으로는 막히지 않는다.
+            // 어시스턴트가 "반영할 만하다" 고 답한 건만 담당자에게 넘긴다.
+            $last = $thread->messages()->latest('id')->first();
+            if (! $last || ! $last->canApply()) {
+                return response()->json([
+                    'ok'      => false,
+                    'message' => '아직 반영할 내용이 정해지지 않았습니다. 어시스턴트와 대화를 이어가 주세요.',
+                ], 422);
+            }
+
             $thread->update([
                 'apply_status'       => 'requested',
                 'apply_note'         => $data['note'] ?? null,
@@ -260,7 +270,8 @@ class SrController extends Controller
         return [
             'id'          => $m->id,
             'role'        => $m->role,
-            'content'     => (string) $m->content,
+            'content'     => $m->displayContent(),
+            'can_apply'   => $m->canApply(),
             'attachments' => $atts,
             'time'        => $m->created_at?->format('Y-m-d H:i'),
         ];
@@ -281,6 +292,13 @@ class SrController extends Controller
 - 불확실하면 추측하지 말고 무엇을 더 확인해야 하는지 쉬운 말로 되묻는다.
 - 실제 구현·반영은 개발 담당자가 처리한다는 전제로, 관리자가 의사결정에 필요한 내용 위주로 돕는다.
 - 방향이 정리되면, 관리자가 원할 경우 화면 상단의 "개발 반영 요청" 버튼을 눌러 담당자에게 반영을 요청할 수 있음을 한 줄로 안내해도 좋다(강요하지 말 것).
+
+마지막 줄 표시(필수):
+답변 맨 끝에 아래 둘 중 하나를 그대로 한 줄 붙인다. 이 표시는 관리자 화면에 보이지 않으며,
+"개발 반영 요청" 버튼을 누를 수 있게 할지 판단하는 데만 쓴다. 다른 말을 덧붙이지 않는다.
+- 개발자가 손봐서 반영할 수 있을 만큼 할 일이 또렷해졌으면: [[APPLY:YES]]
+- 단순 안내·설명이거나, 아직 되묻는 중이거나, 반영할 것이 없으면: [[APPLY:NO]]
+망설여지면 [[APPLY:NO]] 를 쓴다. 아직 정리되지 않은 것을 담당자에게 넘기지 않기 위함이다.
 TXT;
     }
 }
