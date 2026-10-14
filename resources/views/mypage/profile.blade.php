@@ -7,7 +7,8 @@
     <div class="my-layout">
         @include('partials.mynav')
         <div>
-            <form method="POST" action="{{ route('mypage.profile.update') }}" class="form-card">
+            {{-- 반려 시 사업자등록증 재업로드가 같은 폼에서 이뤄지므로 enctype 지정 (폼 중첩은 HTML상 불가) --}}
+            <form method="POST" action="{{ route('mypage.profile.update') }}" class="form-card" enctype="multipart/form-data">
                 @csrf @method('PUT')
                 <h3><x-icon name="user"/> 기본정보</h3>
                 <div class="row2">
@@ -19,7 +20,34 @@
                 @if($user->member_type==='business')
                     <div style="background:var(--navy-50);border-radius:10px;padding:14px;margin-bottom:16px;font-size:13.5px">
                         <b style="color:var(--navy-800)">사업자정보</b> · {{ $user->company_name }} ({{ $user->biz_no }})
-                        @if($user->biz_status==='approved')<span class="badge badge-new">승인완료</span>@else<span class="badge badge-hot">승인대기</span>@endif
+                        {{-- 심사 상태를 대기/승인/반려 세 가지로 구분해 표시 --}}
+                        @if($user->biz_status === 'approved')
+                            <span class="badge badge-new">승인완료</span>
+                        @elseif($user->biz_status === 'rejected')
+                            <span class="badge badge-hot">반려됨</span>
+                        @else
+                            <span class="badge badge-hot">승인대기</span>
+                        @endif
+
+                        @if($user->biz_submitted_at)
+                            <div style="margin-top:6px;color:var(--slate-500);font-size:12.5px">제출일시 : {{ $user->biz_submitted_at }}</div>
+                        @endif
+
+                        @if($user->biz_status === 'rejected')
+                            {{-- 반려 사유를 알려주고 바로 다시 올릴 수 있도록 재업로드 칸 제공 --}}
+                            <div style="margin-top:10px;color:#b42318">
+                                반려 사유 : {{ $user->biz_reject_reason ?: '관리자에게 문의해 주세요.' }}
+                            </div>
+                            <div class="field" style="margin-top:12px;margin-bottom:0">
+                                <label>사업자등록증 재업로드</label>
+                                <input type="file" name="biz_license" class="input" accept=".pdf,image/*">
+                                <div style="margin-top:6px;color:var(--slate-500);font-size:12.5px">PDF 또는 이미지 파일만 가능하며, 용량은 10MB 이하여야 합니다.</div>
+                            </div>
+                        @elseif($user->biz_status !== 'approved')
+                            <div style="margin-top:8px;color:var(--slate-500);font-size:12.5px">
+                                제출하신 사업자등록증을 관리자가 확인 중입니다. 승인 전까지는 도매가가 표시되지 않습니다.
+                            </div>
+                        @endif
                     </div>
                 @endif
 

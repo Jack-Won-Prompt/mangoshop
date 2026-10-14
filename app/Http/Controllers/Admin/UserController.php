@@ -51,6 +51,8 @@ class UserController extends Controller
         $data = $request->validate([
             'biz_status' => ['required', Rule::in(['pending', 'approved', 'rejected'])],
             'grade'      => ['required', Rule::in(['basic', 'silver', 'gold'])],
+            // 반려 처리 시에는 회원에게 안내하고 재업로드를 유도해야 하므로 사유를 필수로 받는다.
+            'biz_reject_reason' => ['required_if:biz_status,rejected', 'nullable', 'string', 'max:200'],
         ]);
 
         // 승인(approved) 시점부터 도매가가 적용되므로, 사업자 회원은 사업자등록증 첨부가
@@ -62,7 +64,26 @@ class UserController extends Controller
             return back()->with('error', '사업자등록증이 첨부되지 않아 승인할 수 없습니다. 첨부 서류 확인 후 다시 처리하세요.');
         }
 
+        if ($data['biz_status'] === 'approved') {
+            // 승인되면 도매가가 적용되도록 도매(사업자) 회원으로 활성화한다.
+            // 서류가 실제로 제출된 건만 전환해, 서류 없이 도매가가 열리는 상황을 막는다.
+            if (filled($user->biz_license_path)) {
+                $data['member_type'] = 'business';
+            }
+            // 이전 반려 이력이 남아 마이페이지에 반려 사유가 계속 보이지 않도록 비운다.
+            $data['biz_reject_reason'] = null;
+        }
+
+        if ($data['biz_status'] === 'pending') {
+            // 재심사(대기)로 되돌릴 때도 지난 반려 사유는 지운다.
+            $data['biz_reject_reason'] = null;
+        }
+
         $user->update($data);
+
+        if ($data['biz_status'] === 'rejected') {
+            return back()->with('ok', '사업자등록증 심사를 반려 처리했습니다. 회원은 마이페이지에서 사유 확인 후 재업로드할 수 있습니다.');
+        }
 
         return back()->with('ok', '회원 정보가 갱신되었습니다.');
     }

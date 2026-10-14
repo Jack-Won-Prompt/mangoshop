@@ -52,7 +52,8 @@
                     <label>사업자등록증 <span class="req">*</span></label>
                     {{-- 허용 형식을 JPG/PNG/PDF로 한정(image/* 는 webp·heic 등까지 열려 심사 서류로 부적합) --}}
                     <input type="file" name="biz_license" id="biz-license" class="input" accept="image/jpeg,image/png,application/pdf">
-                    <p class="muted" style="font-size:12px;margin:6px 0 0">※ 이미지(JPG/PNG) 또는 PDF 파일만 첨부할 수 있습니다.</p>
+                    {{-- 서버 검증 기준(PDF/이미지, 10MB 이하)을 화면에도 그대로 안내 --}}
+                    <p class="muted" style="font-size:12px;margin:6px 0 0">※ 이미지(JPG/PNG) 또는 PDF 파일만 첨부할 수 있으며, 용량은 10MB 이하여야 합니다.</p>
                 </div>
                 @error('biz_license')<p class="muted" style="font-size:12px;color:#d33;margin:0 0 8px">{{ $message }}</p>@enderror
                 <p class="muted" style="font-size:12px;margin:0">※ 관리자 확인 후 승인되며, 승인 시 도매 전용가가 적용됩니다.</p>
@@ -133,6 +134,16 @@
     }
     Array.prototype.forEach.call(radios,function(r){ r.addEventListener('change',syncBiz); });
     syncBiz();
+    if(file){
+        // 10MB를 넘는 파일은 제출 전에 걸러내어 업로드 실패로 가입이 되돌아가는 일을 줄임
+        file.addEventListener('change',function(){
+            var f=file.files&&file.files[0];
+            if(f&&f.size>10*1024*1024){
+                alert('사업자등록증 파일은 10MB 이하만 첨부할 수 있습니다.');
+                file.value='';
+            }
+        });
+    }
 })();
 (function(){
     var all=document.getElementById('agreeAll');
