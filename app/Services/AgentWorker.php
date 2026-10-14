@@ -214,7 +214,7 @@ TXT;
 
         $user .= "\n[파일 목록]\n".$this->fileIndex();
 
-        return $this->groundFiles($this->ask($system, $user, (string) Setting::scalar('agent_model'), 8000));
+        return $this->groundFiles($this->ask($system, $user, (string) Setting::scalar('agent_model'), 32000));
     }
 
     /**
@@ -239,7 +239,7 @@ TXT;
         // ① 어디를 뒤져야 하는지 찾을 말을 받는다
         $hits = [];
         try {
-            $locate = $this->ask($this->locateSystem(), $body."\n[파일 목록]\n".$this->fileIndex(), $model, 2000);
+            $locate = $this->ask($this->locateSystem(), $body."\n[파일 목록]\n".$this->fileIndex(), $model, 8000, 'low');
             $hits = $this->searchRepo((array) ($locate['keywords'] ?? []));
         } catch (Throwable $e) {
             report($e);   // 못 찾아도 ②는 파일 목록만으로 진행한다
@@ -250,7 +250,7 @@ TXT;
             ."\n[파일 목록]\n".$this->fileIndex();
 
         // 한도가 좁으면 JSON 이 중간에 끊겨 통째로 못 읽는다. 실제로 그렇게 두 번 실패했다.
-        $analysis = $this->ask($this->planSystem(), $user, $model, 8000);
+        $analysis = $this->ask($this->planSystem(), $user, $model, 32000);
         $analysis['_tokens'] = (int) ($analysis['_tokens'] ?? 0) + (int) ($locate['_tokens'] ?? 0);
 
         return $this->groundFiles($analysis);
@@ -604,7 +604,7 @@ TXT;
         // 답변은 글 한 덩이면 된다. 예전에는 JSON 으로 받았는데, 모델이 형식을 안 지키고
         // 그냥 답변만 보내면 읽기에 실패해 통째로 버려졌다. 실제로 멀쩡한 답이 그렇게 버려졌다.
         try {
-            $text = trim($this->askText($system, $user, (string) Setting::scalar('agent_model'), 1500));
+            $text = trim($this->askText($system, $user, (string) Setting::scalar('agent_model'), 8000, 'low'));
             if ($text !== '') {
                 return $text;
             }
@@ -624,9 +624,9 @@ TXT;
      * 형식을 정해 받을 필요가 없는 자리에 쓴다. 답변 글처럼 받은 것을 그대로 쓰는 경우,
      * 굳이 JSON 으로 감싸 받으면 모델이 형식을 안 지킬 때 멀쩡한 답까지 버리게 된다.
      */
-    private function askText(string $system, string $user, string $model, int $maxTokens): string
+    private function askText(string $system, string $user, string $model, int $maxTokens, ?string $effort = null): string
     {
-        $res = $this->call($system, $user, $model, $maxTokens);
+        $res = $this->call($system, $user, $model, $maxTokens, $effort);
 
         return $res['text'];
     }
@@ -659,8 +659,16 @@ TXT;
         }
     }
 
-    /** 한 번 부르고 글과 끝난 까닭을 함께 돌려준다 */
-    private function call(string $system, string $user, string $model, int $maxTokens): array
+    /**
+     * 한 번 부르고 글과 끝난 까닭을 함께 돌려준다.
+     *
+     * 지금 쓰는 모델들은 "생각" 이 기본으로 켜져 있고, 그 생각도 max_tokens 를 함께 쓴다.
+     * 한도가 빠듯하면 생각만 하다 한도에 걸려 글이 빈 채로 돌아온다(실제로 그렇게 실패했다).
+     * 그래서 한도를 넉넉히 주고, 깊이 생각할 까닭이 없는 자리는 effort 를 낮춰 아껴 쓴다.
+     *
+     * @param  string|null  $effort  low|medium|high — 쓸 수 있는 모델에서만 보낸다
+     */
+    private function call(string $system, string $user, string $model, int $maxTokens, ?string $effort = null): array
     {
         $key = self::apiKey();
         if ($key === '') {
@@ -670,16 +678,23 @@ TXT;
             $model = 'claude-sonnet-5';
         }
 
-        $res = Http::withHeaders([
-            'x-api-key' => $key,
-            'anthropic-version' => '2023-06-01',
-            'content-type' => 'application/json',
-        ])->timeout(self::ANALYZE_TIMEOUT)->post(self::API_URL, [
+        $body = [
             'model' => $model,
             'max_tokens' => $maxTokens,
             'system' => $system,
             'messages' => [['role' => 'user', 'content' => $user]],
-        ]);
+        ];
+
+        // effort 는 모델을 가린다. 받지 않는 모델에 보내면 400 이 난다.
+        if ($effort && ! str_starts_with($model, 'claude-haiku-4-5')) {
+            $body['output_config'] = ['effort' => $effort];
+        }
+
+        $res = Http::withHeaders([
+            'x-api-key' => $key,
+            'anthropic-version' => '2023-06-01',
+            'content-type' => 'application/json',
+        ])->timeout(self::ANALYZE_TIMEOUT)->post(self::API_URL, $body);
 
         if (! $res->successful()) {
             throw new \RuntimeException('Claude 호출 실패 ('.$res->status().'): '.mb_substr($res->body(), 0, 300));
@@ -697,17 +712,22 @@ TXT;
     }
 
     /** Claude 에게 묻는다 */
-    private function ask(string $system, string $user, string $model, int $maxTokens): array
+    private function ask(string $system, string $user, string $model, int $maxTokens, ?string $effort = null): array
     {
-        $out = $this->call($system, $user, $model, $maxTokens);
+        $out = $this->call($system, $user, $model, $maxTokens, $effort);
         $text = $out['text'];
 
         $parsed = self::extractJson($text);
         if (! $parsed) {
-            // 길이에 걸려 끊긴 것과 형식을 안 지킨 것은 손쓸 방법이 다르다. 구분해서 남긴다.
-            throw new \RuntimeException($out['cut']
-                ? '답이 길이 한도에 걸려 끊겼습니다 (한도 '.$maxTokens.'). 끝부분: '.mb_substr($text, -200)
-                : '응답을 읽지 못했습니다: '.mb_substr($text, 0, 300));
+            // 손쓸 방법이 다르므로 세 갈래로 나눠 남긴다.
+            //  · 글이 아예 비었는데 한도에 걸렸다 — 생각만 하다 예산을 다 썼다. 한도를 올려야 한다.
+            //  · 글이 있는데 끊겼다 — 답이 길어 잘렸다. 한도를 올리거나 시키는 일을 줄여야 한다.
+            //  · 끊기지도 않았는데 못 읽었다 — 형식을 안 지켰다. 시키는 말을 손봐야 한다.
+            throw new \RuntimeException(match (true) {
+                $out['cut'] && trim($text) === '' => '생각만 하다 한도('.$maxTokens.')를 다 썼습니다. 글이 비어 돌아왔습니다.',
+                (bool) $out['cut'] => '답이 길이 한도('.$maxTokens.')에 걸려 끊겼습니다. 끝부분: '.mb_substr($text, -200),
+                default => '응답을 읽지 못했습니다: '.mb_substr($text, 0, 300),
+            });
         }
 
         $parsed['_tokens'] = $out['tokens'];
