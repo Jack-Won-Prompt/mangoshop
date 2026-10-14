@@ -444,7 +444,8 @@ TXT;
     private function callModel(string $system, string $user, AgentTask $task): string
     {
         $key = AgentWorker::apiKey();
-        $model = (string) \App\Models\Setting::get('agent_model_fix');
+        // get() 은 값을 배열로도 돌려준다. 설정값 하나를 글자로 쓸 때는 scalar() 를 쓴다.
+        $model = (string) \App\Models\Setting::scalar('agent_model_fix');
         if (! in_array($model, AgentWorker::MODELS, true)) {
             $model = 'claude-opus-5';
         }
