@@ -212,7 +212,7 @@ TXT;
 
         $user .= "\n[파일 목록]\n".$this->fileIndex();
 
-        return $this->groundFiles($this->ask($system, $user, (string) Setting::scalar('agent_model'), 4000));
+        return $this->groundFiles($this->ask($system, $user, (string) Setting::scalar('agent_model'), 8000));
     }
 
     /**
@@ -247,7 +247,8 @@ TXT;
         $user = $body."\n[찾은 자리]\n".($hits ? $this->snippetText($hits) : '(찾지 못했습니다. 아래 목록에서 골라 주십시오.)')
             ."\n[파일 목록]\n".$this->fileIndex();
 
-        $analysis = $this->ask($this->planSystem(), $user, $model, 4000);
+        // 한도가 좁으면 JSON 이 중간에 끊겨 통째로 못 읽는다. 실제로 그렇게 두 번 실패했다.
+        $analysis = $this->ask($this->planSystem(), $user, $model, 8000);
         $analysis['_tokens'] = (int) ($analysis['_tokens'] ?? 0) + (int) ($locate['_tokens'] ?? 0);
 
         return $this->groundFiles($analysis);
@@ -587,8 +588,7 @@ TXT;
 파일 이름, 줄 번호, 클래스 이름, 영어 기술 용어를 쓰지 마십시오.
 사람이 직접 쓴 것처럼 자연스러운 존댓말로 3~6문장.
 
-아래 형식의 JSON 한 덩이만 답하십시오.
-{"cause": "한 줄 요약", "answer": "답변 본문"}
+답변 본문만 쓰십시오. 머리말도, 따옴표도, 울타리도 붙이지 마십시오.
 TXT;
 
         $user = "[상태] {$state}\n\n"
@@ -599,9 +599,10 @@ TXT;
             .'[하려던 일 — 계획일 뿐, 다 됐다는 뜻이 아님]'."\n".($analysis['how'] ?? '-')."\n"
             .($already ? "\n이미 앞서 답변을 보냈습니다. 이어지는 안내로 쓰십시오.\n" : '');
 
+        // 답변은 글 한 덩이면 된다. 예전에는 JSON 으로 받았는데, 모델이 형식을 안 지키고
+        // 그냥 답변만 보내면 읽기에 실패해 통째로 버려졌다. 실제로 멀쩡한 답이 그렇게 버려졌다.
         try {
-            $res = $this->ask($system, $user, (string) Setting::scalar('agent_model'), 1500);
-            $text = trim((string) ($res['answer'] ?? ''));
+            $text = trim($this->askText($system, $user, (string) Setting::scalar('agent_model'), 1500));
             if ($text !== '') {
                 return $text;
             }
@@ -615,8 +616,21 @@ TXT;
         return $draft."\n\n".$did;
     }
 
-    /** Claude 에게 묻는다 */
-    private function ask(string $system, string $user, string $model, int $maxTokens): array
+    /**
+     * Claude 에게 묻고 글만 받아 온다.
+     *
+     * 형식을 정해 받을 필요가 없는 자리에 쓴다. 답변 글처럼 받은 것을 그대로 쓰는 경우,
+     * 굳이 JSON 으로 감싸 받으면 모델이 형식을 안 지킬 때 멀쩡한 답까지 버리게 된다.
+     */
+    private function askText(string $system, string $user, string $model, int $maxTokens): string
+    {
+        $res = $this->call($system, $user, $model, $maxTokens);
+
+        return $res['text'];
+    }
+
+    /** 한 번 부르고 글과 끝난 까닭을 함께 돌려준다 */
+    private function call(string $system, string $user, string $model, int $maxTokens): array
     {
         $key = self::apiKey();
         if ($key === '') {
@@ -642,16 +656,31 @@ TXT;
         }
 
         // 생각 블록이 먼저 올 수 있으므로 text 블록만 골라 잇는다
-        $text = collect($res->json('content') ?? [])
-            ->filter(fn ($c) => ($c['type'] ?? '') === 'text')
-            ->pluck('text')->implode("\n");
+        return [
+            'text' => collect($res->json('content') ?? [])
+                ->filter(fn ($c) => ($c['type'] ?? '') === 'text')
+                ->pluck('text')->implode("\n"),
+            'cut' => $res->json('stop_reason') === 'max_tokens',
+            'tokens' => (int) ($res->json('usage.input_tokens') ?? 0)
+                + (int) ($res->json('usage.output_tokens') ?? 0),
+        ];
+    }
+
+    /** Claude 에게 묻는다 */
+    private function ask(string $system, string $user, string $model, int $maxTokens): array
+    {
+        $out = $this->call($system, $user, $model, $maxTokens);
+        $text = $out['text'];
 
         $parsed = self::extractJson($text);
         if (! $parsed) {
-            throw new \RuntimeException('응답을 읽지 못했습니다: '.mb_substr($text, 0, 300));
+            // 길이에 걸려 끊긴 것과 형식을 안 지킨 것은 손쓸 방법이 다르다. 구분해서 남긴다.
+            throw new \RuntimeException($out['cut']
+                ? '답이 길이 한도에 걸려 끊겼습니다 (한도 '.$maxTokens.'). 끝부분: '.mb_substr($text, -200)
+                : '응답을 읽지 못했습니다: '.mb_substr($text, 0, 300));
         }
 
-        $parsed['_tokens'] = (int) ($res->json('usage.input_tokens') ?? 0) + (int) ($res->json('usage.output_tokens') ?? 0);
+        $parsed['_tokens'] = $out['tokens'];
 
         return $parsed;
     }
