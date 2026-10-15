@@ -214,7 +214,60 @@
     .sr-typing i:nth-child(2){animation-delay:.15s}.sr-typing i:nth-child(3){animation-delay:.3s}
     @keyframes srb{0%,60%,100%{opacity:.3}30%{opacity:1}}
     @media(max-width:860px){.sr{grid-template-columns:1fr;height:auto}.sr-list{display:none}}
+    /* 답변이 도착했을 때 띄우는 알림 */
+    .sr-toasts{position:fixed;right:18px;bottom:18px;z-index:9999;display:flex;flex-direction:column;gap:10px;width:320px;max-width:calc(100vw - 36px)}
+    .sr-toast{position:relative;background:#123b26;color:#fff;border-radius:12px;padding:13px 34px 13px 15px;box-shadow:0 10px 30px rgba(18,59,38,.3);cursor:pointer;opacity:0;transform:translateY(12px);transition:opacity .2s ease,transform .2s ease}
+    .sr-toast.on{opacity:1;transform:none}
+    .sr-toast b{display:block;font-size:13px;font-weight:700;margin-bottom:3px}
+    .sr-toast span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:12px;line-height:1.5;color:#cfe3d7}
+    .sr-toast u{position:absolute;top:8px;right:10px;font-size:14px;line-height:1;color:#9ebcab;text-decoration:none;cursor:pointer}
+    .sr-toast u:hover{color:#fff}
 </style>
+
+<script>
+// SR 답변이 도착하면 관리자가 알 수 있게 알린다 (토스트 + 다른 탭일 때 제목 깜빡임)
+(function(){
+    var wrap=null, titleTimer=null, baseTitle=document.title;
+    function box(){
+        if(!wrap || !wrap.isConnected){ wrap=document.createElement('div'); wrap.className='sr-toasts'; document.body.appendChild(wrap); }
+        return wrap;
+    }
+    function blink(){
+        if(titleTimer) return;
+        var on=false;
+        titleTimer=setInterval(function(){ on=!on; document.title=on?'🔔 새 답변 도착':baseTitle; }, 900);
+    }
+    function stopBlink(){
+        if(!titleTimer) return;
+        clearInterval(titleTimer); titleTimer=null; document.title=baseTitle;
+    }
+    document.addEventListener('visibilitychange',function(){ if(!document.hidden) stopBlink(); });
+    window.addEventListener('focus', stopBlink);
+
+    // 마크다운 기호를 걷어내고 미리보기 한 줄을 만든다
+    window.srToastText=function(s){
+        return String(s||'').replace(/```[\s\S]*?```/g,' ').replace(/[#*`>|]/g,'')
+            .replace(/\s+/g,' ').trim().slice(0,90);
+    };
+
+    window.srToast=function(title, body, onClick){
+        var t=document.createElement('div'); t.className='sr-toast';
+        var h=document.createElement('b'); h.textContent=title; t.appendChild(h);
+        if(body){ var s=document.createElement('span'); s.textContent=body; t.appendChild(s); }
+        var x=document.createElement('u'); x.textContent='✕'; t.appendChild(x);
+        var gone=false;
+        function hide(){ if(gone) return; gone=true; t.classList.remove('on');
+            setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); }, 220); }
+        x.addEventListener('click',function(e){ e.stopPropagation(); hide(); });
+        t.addEventListener('click',function(){ stopBlink(); if(onClick) onClick(); hide(); });
+        box().appendChild(t);
+        requestAnimationFrame(function(){ t.classList.add('on'); });
+        setTimeout(hide, 9000);
+        if(document.hidden) blink();
+        return t;
+    };
+})();
+</script>
 
 <script>
 (function(){
@@ -272,6 +325,18 @@
     // ===== 결과 자동 수신(폴링) — 반영 요청 후 Agent 답변을 새로고침 없이 표시 =====
     var srPollTimer=null;
     function srMaxId(){ var ids=[].map.call(document.querySelectorAll('#srMsgs .sr-msg[data-id]'), function(n){return (+n.getAttribute('data-id'))||0;}); return ids.length?Math.max.apply(null,ids):0; }
+    // 답변 한 건이 새로 들어오면 알림을 띄운다. 누르면 그 답으로 이동한다.
+    function srAnswerToast(m){
+        if(!m || !window.srToast) return;
+        var tt=document.getElementById('srTitle'), nm=tt?tt.textContent.trim():'';
+        if(nm.length>18) nm=nm.slice(0,18)+'…';
+        srToast('SR 답변이 도착했습니다' + (nm ? ' — ' + nm : ''),
+            window.srToastText(m.content),
+            function(){
+                var el=document.querySelector('#srMsgs .sr-msg[data-id="'+m.id+'"]');
+                if(el && el.scrollIntoView) el.scrollIntoView({behavior:'smooth', block:'center'});
+            });
+    }
     function srAppendMsg(m){
         var mw=document.getElementById('srMsgs'); if(!mw) return;
         if(mw.querySelector('.sr-msg[data-id="'+m.id+'"]')) return;      // 중복 방지
@@ -299,19 +364,24 @@
         var cf=document.getElementById('srComposer'); if(!cf || !cf.dataset.poll) return;
         var pollUrl=cf.dataset.poll;
         if(srPollTimer) clearInterval(srPollTimer);
-        var until=Date.now()+300000, after=srMaxId();   // 최대 5분
-        srPollTimer=setInterval(function(){
+        var started=Date.now(), until=started+1800000, after=srMaxId(), slow=false;   // 최대 30분
+        function tick(){
             if(Date.now()>until){ clearInterval(srPollTimer); srPollTimer=null; return; }
+            // 처음 2분은 촘촘히 보고, 그 뒤로는 10초 간격으로 늦춘다
+            if(!slow && Date.now()-started>120000){ slow=true; clearInterval(srPollTimer); srPollTimer=setInterval(tick, 10000); }
             fetch(pollUrl+'?after='+after,{headers:{'Accept':'application/json'}})
                 .then(function(r){return r.json();})
                 .then(function(d){
                     var gotAssistant=false;
-                    (d.messages||[]).forEach(function(m){ srAppendMsg(m); after=Math.max(after,m.id); if(m.role==='assistant') gotAssistant=true; });
+                    var newAnswer=null;
+                    (d.messages||[]).forEach(function(m){ srAppendMsg(m); after=Math.max(after,m.id); if(m.role==='assistant'){ gotAssistant=true; newAnswer=m; } });
+                    if(newAnswer) srAnswerToast(newAnswer);
                     // 새로 들어온 답에 맞춰 '개발 반영 요청'을 켤지 다시 정한다
                     if(window.srApplyUpdate) window.srApplyUpdate(d.messages||[]);
                     if(gotAssistant || d.apply_status==='done'){ clearInterval(srPollTimer); srPollTimer=null; srMarkDone(); }
                 }).catch(function(){});
-        }, 4000);
+        }
+        srPollTimer=setInterval(tick, 4000);
     }
 
     // ===== 개발 반영 요청 =====
@@ -452,6 +522,7 @@
                 if(!res.ok){ bubble('assistant','⚠ '+(res.d.error||'오류가 발생했습니다.')); return; }
                 if(res.d.user && userWrap) userWrap.setAttribute('data-id', res.d.user.id);
                 var aWrap=bubble('assistant', res.d.assistant.content);
+                if(document.hidden && res.d.assistant) srAnswerToast(res.d.assistant);   // 다른 탭을 보고 있었다면 알린다
                 if(res.d.assistant && aWrap) aWrap.setAttribute('data-id', res.d.assistant.id);
                 // 제목/목록 갱신
                 var tt=document.getElementById('srTitle'); if(tt && res.d.title) tt.textContent=res.d.title;
