@@ -95,6 +95,117 @@ class ClaudeClient
         return $blocks;
     }
 
+    /** 한 변이 이보다 길면 보내기 전에 줄인다 (API 는 8000 을 넘기면 통째로 거절한다) */
+    private const IMAGE_MAX_EDGE = 1568;
+
+    /**
+     * 그림 첨부를 보낼 수 있는 크기로 줄여 블록으로 만든다.
+     *
+     * 큰 사진을 그대로 보내면 "한 변이 8000 픽셀을 넘는다" 며 요청 전체가 거절된다.
+     * 지난 글까지 매번 다시 보내는 구조라, 한 장이 걸리면 그 대화는 그때부터 아무 말도
+     * 주고받지 못한다. 실제로 그렇게 막힌 대화가 있었다.
+     *
+     * 1568 픽셀로 줄이는 까닭은 그보다 크게 보내도 받는 쪽에서 어차피 줄이기 때문이다.
+     * 미리 줄이면 거절도 피하고 보내는 양도 준다.
+     *
+     * 줄이지 못하는 그림은 글로 바꿔 알린다. 한 장 때문에 대화가 멈추는 것보다 낫다.
+     */
+    private function imageBlock(string $path, string $mime, string $name): ?array
+    {
+        $raw = (string) Storage::disk('local')->get($path);
+        $size = @getimagesizefromstring($raw);
+
+        // 크기를 못 읽으면 줄일 수도 없다. 그대로 보내되 한도를 넘지 않는 것만.
+        if (! $size) {
+            return $this->rawImageBlock($raw, $mime);
+        }
+
+        [$w, $h] = $size;
+        if ($w <= self::IMAGE_MAX_EDGE && $h <= self::IMAGE_MAX_EDGE) {
+            return $this->rawImageBlock($raw, $mime);
+        }
+
+        $small = $this->shrink($raw, $w, $h, $mime);
+        if ($small === null) {
+            return [
+                'type' => 'text',
+                'text' => "[첨부 그림 '{$name}' 은 너무 커서({$w}×{$h}) 함께 보내지 못했습니다. "
+                    .'내용을 글로 설명해 주시면 그에 맞춰 답하겠습니다.]',
+            ];
+        }
+
+        return [
+            'type'   => 'image',
+            'source' => ['type' => 'base64', 'media_type' => $small['mime'], 'data' => base64_encode($small['body'])],
+        ];
+    }
+
+    /** 줄이지 않고 그대로 — 다만 한도를 넘는 것은 보내지 않는다 */
+    private function rawImageBlock(string $raw, string $mime): ?array
+    {
+        $size = @getimagesizefromstring($raw);
+        if ($size && (max($size[0], $size[1]) > 8000)) {
+            return null;   // 보내면 요청 전체가 거절된다
+        }
+
+        return [
+            'type'   => 'image',
+            'source' => ['type' => 'base64', 'media_type' => $mime, 'data' => base64_encode($raw)],
+        ];
+    }
+
+    /**
+     * 긴 변을 기준으로 줄인다.
+     *
+     * @return array{body:string, mime:string}|null 줄이지 못하면 null
+     */
+    private function shrink(string $raw, int $w, int $h, string $mime): ?array
+    {
+        if (! function_exists('imagecreatefromstring')) {
+            return null;
+        }
+
+        $src = @imagecreatefromstring($raw);
+        if (! $src) {
+            return null;
+        }
+
+        $scale = self::IMAGE_MAX_EDGE / max($w, $h);
+        $nw = max(1, (int) round($w * $scale));
+        $nh = max(1, (int) round($h * $scale));
+
+        $dst = @imagecreatetruecolor($nw, $nh);
+        if (! $dst) {
+            return null;
+        }
+
+        // 투명한 자리가 검게 되지 않도록
+        imagealphablending($dst, false);
+        imagesavealpha($dst, true);
+        imagecopyresampled($dst, $src, 0, 0, 0, 0, $nw, $nh, $w, $h);
+
+        // gif 는 색을 적게 쓰므로 png 로 내보낸다. webp 를 못 쓰는 서버도 있어 확인한다.
+        $out = $mime;
+        if ($out === 'image/gif' || ($out === 'image/webp' && ! function_exists('imagewebp'))) {
+            $out = 'image/png';
+        }
+
+        ob_start();
+        match ($out) {
+            'image/png'  => imagepng($dst, null, 6),
+            'image/webp' => imagewebp($dst, null, 85),
+            default      => imagejpeg($dst, null, 85),
+        };
+        $body = (string) ob_get_clean();
+
+        // imagedestroy 는 PHP 8 부터 하는 일이 없고 8.5 에서는 경고까지 난다. 부르지 않는다.
+        if ($body === '') {
+            return null;
+        }
+
+        return ['body' => $body, 'mime' => $out === 'image/gif' ? 'image/png' : $out];
+    }
+
     /** 첨부 파일 → image / document / text 블록 */
     private function attachmentBlock(array $att): ?array
     {
@@ -105,14 +216,7 @@ class ClaudeClient
         }
 
         if (in_array($mime, ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], true)) {
-            return [
-                'type'   => 'image',
-                'source' => [
-                    'type'       => 'base64',
-                    'media_type' => $mime,
-                    'data'       => base64_encode(Storage::disk('local')->get($path)),
-                ],
-            ];
+            return $this->imageBlock($path, $mime, (string) ($att['name'] ?? basename($path)));
         }
 
         if ($mime === 'application/pdf') {
