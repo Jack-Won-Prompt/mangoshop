@@ -18,6 +18,9 @@ class User extends Authenticatable
         'company_name', 'biz_no', 'biz_type', 'biz_status', 'grade',
         'point', 'is_admin', 'is_agent', 'cashback_rate', 'withdrawn_at',
         'marketing_agree', 'marketing_agreed_at',
+        // 도매 회원 사업자등록증 심사 — 표에만 더하고 여기 적지 않으면 저장할 때 조용히 버려진다
+        'business_license_path', 'business_license_status',
+        'business_license_reject_reason', 'business_license_submitted_at',
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -31,6 +34,7 @@ class User extends Authenticatable
             'is_agent'          => 'boolean',
             'cashback_rate'     => 'decimal:2',
             'withdrawn_at'      => 'datetime',
+            'business_license_submitted_at' => 'datetime',
             'marketing_agree'   => 'boolean',
             'marketing_agreed_at' => 'datetime',
         ];
