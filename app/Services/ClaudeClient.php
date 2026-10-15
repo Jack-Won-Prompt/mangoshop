@@ -52,7 +52,9 @@ class ClaudeClient
             'x-api-key'         => (string) config('services.anthropic.key'),
             'anthropic-version' => (string) config('services.anthropic.version', '2023-06-01'),
             'content-type'      => 'application/json',
-        ])->timeout(120)->post(rtrim((string) config('services.anthropic.base'), '/').'/v1/messages', $payload);
+            // 그림이 여러 장 붙은 대화는 보내는 데만도 시간이 걸린다.
+            // 120초에서는 큰 대화가 끊겼다. 고치는 쪽(Agent)과 같은 300초로 맞춘다.
+        ])->timeout(300)->post(rtrim((string) config('services.anthropic.base'), '/').'/v1/messages', $payload);
 
         if ($res->failed()) {
             $err = $res->json('error.message') ?: ('HTTP '.$res->status());
@@ -234,14 +236,20 @@ class ClaudeClient
         return $out;
     }
 
-    /** 내보낼 형식 — gif 와 webp 를 못 쓰는 서버는 png 로 */
+    /**
+     * 내보낼 형식.
+     *
+     * 웹피(webp)를 쓸 수 있으면 그것으로 낸다. 화면 캡처처럼 글씨가 많은 그림에서
+     * jpg 보다 글씨가 또렷하면서 png 보다 훨씬 작다. 투명한 자리도 지킨다.
+     * 못 쓰는 서버에서는, 투명할 수 있는 png·gif 는 png 로, 나머지는 jpg 로 낸다.
+     */
     private function outputMime(string $mime): string
     {
-        if ($mime === 'image/gif' || ($mime === 'image/webp' && ! function_exists('imagewebp'))) {
-            return 'image/png';
+        if (function_exists('imagewebp')) {
+            return 'image/webp';
         }
 
-        return $mime;
+        return in_array($mime, ['image/png', 'image/gif'], true) ? 'image/png' : 'image/jpeg';
     }
 
     /**
@@ -267,11 +275,19 @@ class ClaudeClient
         }
 
         [$w, $h] = $size;
-        if ($w <= self::IMAGE_MAX_EDGE && $h <= self::IMAGE_MAX_EDGE) {
+
+        // 크기가 작아도 다시 저장해 본다.
+        // 화면 캡처 png 는 한 장에 2~3MB 가 예사인데, 다시 저장하면 수백 KB 로 준다.
+        // 지난 글까지 매번 다시 보내는 구조라, 그림이 쌓이면 보내는 양이 금방 커지고
+        // 큰 요청은 제한 시간에 걸려 끊긴다. 실제로 한 대화가 12.75MB 까지 갔다.
+        $small = $this->shrink($raw, $w, $h, $mime);
+
+        // 다시 저장했는데 되레 커졌다면 원본이 낫다. 줄일 필요가 없던 그림만 해당한다.
+        $fits = $w <= self::IMAGE_MAX_EDGE && $h <= self::IMAGE_MAX_EDGE;
+        if ($fits && ($small === null || strlen($small['body']) >= strlen($raw))) {
             return $this->rawImageBlock($raw, $mime);
         }
 
-        $small = $this->shrink($raw, $w, $h, $mime);
         if ($small === null) {
             return [
                 'type' => 'text',
@@ -316,7 +332,8 @@ class ClaudeClient
             return null;
         }
 
-        $scale = self::IMAGE_MAX_EDGE / max($w, $h);
+        // 이미 작은 그림은 크기를 그대로 두고 다시 저장만 한다
+        $scale = min(1.0, self::IMAGE_MAX_EDGE / max($w, $h));
         $nw = max(1, (int) round($w * $scale));
         $nh = max(1, (int) round($h * $scale));
 
@@ -330,7 +347,6 @@ class ClaudeClient
         imagesavealpha($dst, true);
         imagecopyresampled($dst, $src, 0, 0, 0, 0, $nw, $nh, $w, $h);
 
-        // gif 는 색을 적게 쓰므로 png 로 내보낸다. webp 를 못 쓰는 서버도 있어 확인한다.
         $out = $this->outputMime($mime);
 
         ob_start();
