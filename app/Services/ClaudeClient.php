@@ -79,8 +79,8 @@ class ClaudeClient
         // 첨부는 사용자 메시지에만 포함
         if ($role === 'user') {
             foreach ((array) ($m['attachments'] ?? []) as $att) {
-                $block = $this->attachmentBlock($att);
-                if ($block) {
+                // 세로로 긴 화면 캡처는 여러 장으로 잘라 보내므로 하나가 여러 블록이 될 수 있다
+                foreach ($this->attachmentBlocks($att) as $block) {
                     $blocks[] = $block;
                 }
             }
@@ -97,6 +97,152 @@ class ClaudeClient
 
     /** 한 변이 이보다 길면 보내기 전에 줄인다 (API 는 8000 을 넘기면 통째로 거절한다) */
     private const IMAGE_MAX_EDGE = 1568;
+
+    /** 긴 변이 짧은 변의 이 배수를 넘으면 세로로 긴 화면 캡처로 보고 잘라 보낸다 */
+    private const IMAGE_SLICE_RATIO = 2.5;
+
+    /** 잘라 보낼 때 최대 장수 — 너무 잘게 나누면 보내는 양만 늘어난다 */
+    private const IMAGE_SLICE_MAX = 4;
+
+    /**
+     * 첨부 하나를 블록 여럿으로 바꾼다.
+     *
+     * 모바일 전체 화면 캡처는 860×17409 처럼 세로로 아주 길다.
+     * 긴 변만 보고 줄이면 77×1568 이 되어 글씨를 전혀 읽을 수 없다.
+     * 보내기는 하지만 읽히지 않으니 없는 것과 마찬가지다.
+     * 그래서 그런 그림은 위에서부터 몇 조각으로 잘라, 각 조각을 읽을 수 있는 크기로 보낸다.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function attachmentBlocks(array $att): array
+    {
+        $mime = strtolower((string) ($att['mime'] ?? ''));
+        $path = $att['path'] ?? null;
+
+        if (! in_array($mime, ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], true)
+            || ! $path || ! Storage::disk('local')->exists($path)) {
+            $one = $this->attachmentBlock($att);
+
+            return $one ? [$one] : [];
+        }
+
+        $raw = (string) Storage::disk('local')->get($path);
+        $size = @getimagesizefromstring($raw);
+        if (! $size) {
+            $one = $this->attachmentBlock($att);
+
+            return $one ? [$one] : [];
+        }
+
+        [$w, $h] = $size;
+        $long = max($w, $h);
+        $short = max(1, min($w, $h));
+
+        if ($long / $short < self::IMAGE_SLICE_RATIO) {
+            $one = $this->attachmentBlock($att);
+
+            return $one ? [$one] : [];
+        }
+
+        $slices = $this->sliceTall($raw, $w, $h, $mime);
+        if (! $slices) {
+            $one = $this->attachmentBlock($att);
+
+            return $one ? [$one] : [];
+        }
+
+        $name = (string) ($att['name'] ?? basename($path));
+        $blocks = [['type' => 'text', 'text' => "[{$name} — 세로로 긴 화면이라 위에서부터 "
+            .count($slices).'조각으로 나눠 올립니다]']];
+        foreach ($slices as $s) {
+            $blocks[] = ['type' => 'image',
+                'source' => ['type' => 'base64', 'media_type' => $s['mime'], 'data' => base64_encode($s['body'])]];
+        }
+
+        return $blocks;
+    }
+
+    /**
+     * 세로로 긴 그림을 위에서부터 몇 조각으로 자른다.
+     *
+     * 조각마다 조금씩 겹치게 해, 자른 자리에 걸친 글이 어느 한쪽에서는 온전히 보이게 한다.
+     *
+     * @return array<int, array{body:string, mime:string}>
+     */
+    private function sliceTall(string $raw, int $w, int $h, string $mime): array
+    {
+        if (! function_exists('imagecreatefromstring')) {
+            return [];
+        }
+        $src = @imagecreatefromstring($raw);
+        if (! $src) {
+            return [];
+        }
+
+        $tall = $h >= $w;                       // 세로로 긴가, 가로로 긴가
+        $long = $tall ? $h : $w;
+        $short = $tall ? $w : $h;
+
+        // 짧은 변을 1568 안쪽으로 맞췄을 때, 조각 하나가 담을 수 있는 긴 변의 길이
+        $scale = min(1.0, self::IMAGE_MAX_EDGE / $short);
+        $chunk = (int) floor(self::IMAGE_MAX_EDGE / $scale);
+        if ($chunk < 1) {
+            return [];
+        }
+
+        $count = min(self::IMAGE_SLICE_MAX, (int) ceil($long / $chunk));
+        $overlap = (int) round($chunk * 0.06);   // 자른 자리에 걸친 글을 위해 조금 겹친다
+
+        $out = [];
+        for ($i = 0; $i < $count; $i++) {
+            $from = max(0, $i * $chunk - ($i > 0 ? $overlap : 0));
+            $len = min($chunk + $overlap, $long - $from);
+            if ($len <= 0) {
+                break;
+            }
+
+            $dw = $tall ? $w : $len;
+            $dh = $tall ? $len : $h;
+            $tw = max(1, (int) round($dw * $scale));
+            $th = max(1, (int) round($dh * $scale));
+
+            $dst = @imagecreatetruecolor($tw, $th);
+            if (! $dst) {
+                return [];
+            }
+            imagealphablending($dst, false);
+            imagesavealpha($dst, true);
+            imagecopyresampled($dst, $src,
+                0, 0,
+                $tall ? 0 : $from, $tall ? $from : 0,
+                $tw, $th, $dw, $dh);
+
+            $fmt = $this->outputMime($mime);
+            ob_start();
+            match ($fmt) {
+                'image/png'  => imagepng($dst, null, 6),
+                'image/webp' => imagewebp($dst, null, 85),
+                default      => imagejpeg($dst, null, 85),
+            };
+            $body = (string) ob_get_clean();
+            if ($body === '') {
+                return [];
+            }
+            $out[] = ['body' => $body, 'mime' => $fmt];
+        }
+
+        return $out;
+    }
+
+    /** 내보낼 형식 — gif 와 webp 를 못 쓰는 서버는 png 로 */
+    private function outputMime(string $mime): string
+    {
+        if ($mime === 'image/gif' || ($mime === 'image/webp' && ! function_exists('imagewebp'))) {
+            return 'image/png';
+        }
+
+        return $mime;
+    }
 
     /**
      * 그림 첨부를 보낼 수 있는 크기로 줄여 블록으로 만든다.
@@ -185,10 +331,7 @@ class ClaudeClient
         imagecopyresampled($dst, $src, 0, 0, 0, 0, $nw, $nh, $w, $h);
 
         // gif 는 색을 적게 쓰므로 png 로 내보낸다. webp 를 못 쓰는 서버도 있어 확인한다.
-        $out = $mime;
-        if ($out === 'image/gif' || ($out === 'image/webp' && ! function_exists('imagewebp'))) {
-            $out = 'image/png';
-        }
+        $out = $this->outputMime($mime);
 
         ob_start();
         match ($out) {
@@ -203,7 +346,7 @@ class ClaudeClient
             return null;
         }
 
-        return ['body' => $body, 'mime' => $out === 'image/gif' ? 'image/png' : $out];
+        return ['body' => $body, 'mime' => $out];
     }
 
     /** 첨부 파일 → image / document / text 블록 */
