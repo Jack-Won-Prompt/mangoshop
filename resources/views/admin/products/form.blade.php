@@ -26,6 +26,16 @@
                             @foreach($brands as $b)<option value="{{ $b->id }}" {{ (string)$val('brand_id')===(string)$b->id?'selected':'' }}>{{ $b->name }}</option>@endforeach
                         </select></div>
                 </div>
+                {{-- 판매자 연결: 비워 두면(연결 안함) 상품 카드에 판매자명이 노출되지 않습니다 --}}
+                <div class="afield"><label>판매자</label>
+                    <select name="seller_id" class="aselect">
+                        <option value="">연결 안함(본사)</option>
+                        @foreach(($sellers ?? collect()) as $s)
+                            <option value="{{ $s->id }}" {{ (string)$val('seller_id')===(string)$s->id?'selected':'' }}>{{ $s->name ?? $s->company_name ?? ('판매자 #'.$s->id) }}</option>
+                        @endforeach
+                    </select>
+                    <div class="ahint">‘연결 안함(본사)’으로 저장하면 상품 카드에서 판매자명이 사라집니다.</div>
+                </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
                     <div class="afield"><label>상품코드</label><input type="text" name="code" class="ainput" value="{{ $val('code') }}"></div>
                     <div class="afield"><label>슬러그(URL)</label><input type="text" name="slug" class="ainput" value="{{ $val('slug') }}" placeholder="비우면 자동생성"></div>

@@ -161,6 +161,8 @@ class ProductController extends Controller
         return $request->validate([
             'category_id'     => ['required', 'exists:categories,id'],
             'brand_id'        => ['nullable', 'exists:brands,id'],
+            // 판매자 미연결(본사 판매)을 허용하기 위해 nullable 처리
+            'seller_id'       => ['nullable', 'integer'],
             'name'            => ['required', 'string', 'max:250'],
             'slug'            => ['nullable', 'string', 'max:180'],
             'code'            => ['nullable', 'string', 'max:64'],
@@ -198,7 +200,8 @@ class ProductController extends Controller
     /** 필드 매핑 + 슬러그 생성 */
     private function fill(Product $product, array $data, Request $request): void
     {
-        foreach (['category_id', 'brand_id', 'name', 'code', 'unit', 'maker', 'price', 'cost', 'member_price',
+        // seller_id 포함 — 폼에서 '연결 안함' 선택 시 null 로 저장되어 카드에서 판매자명이 사라진다
+        foreach (['category_id', 'brand_id', 'seller_id', 'name', 'code', 'unit', 'maker', 'price', 'cost', 'member_price',
             'wholesale_price', 'tax_type', 'stock', 'moq', 'origin', 'variety', 'grade', 'box_spec', 'weight_kg',
             'sale_status', 'summary', 'badge', 'sort_order'] as $f) {
             $product->{$f} = $data[$f] ?? null;
