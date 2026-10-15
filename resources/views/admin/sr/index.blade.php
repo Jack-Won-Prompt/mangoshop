@@ -59,7 +59,7 @@
                     {{-- 어시스턴트가 "반영할 만하다" 고 답했을 때만 누를 수 있다.
                          아직 되묻는 중이거나 단순 안내인 건을 담당자에게 넘기지 않기 위함이다. --}}
                     <button type="button" class="sr-apply-btn" id="srApplyBtn" data-url="{{ route('admin.sr.apply', $thread) }}"
-                            @disabled(! $srCanApply) title="{{ $srCanApply ? '담당자에게 반영을 요청합니다' : $srApplyHint }}"><x-icon name="check" :size="15"/> 개발 반영 요청</button>
+                            @disabled(! $srCanApply) title="{{ $srCanApply ? '다시 반영을 겁니다 (반영할 만한 답이면 자동으로 걸립니다)' : $srApplyHint }}"><x-icon name="check" :size="15"/> 개발 반영 요청</button>
                     <form method="POST" action="{{ route('admin.sr.destroy', $thread) }}" onsubmit="return confirm('이 요청을 삭제할까요?')">@csrf @method('DELETE')
                         <button class="sr-del" type="submit" title="삭제"><x-icon name="trash" :size="15"/></button>
                     </form>
@@ -104,7 +104,7 @@
             <form class="sr-composer" id="srComposer" data-send="{{ route('admin.sr.message', $thread) }}" data-poll="{{ route('admin.sr.poll', $thread) }}">
                 <div class="sr-comp-top">
                     <button type="button" class="sr-apply-btn sr-apply-sm" id="srApplyBtn2" data-url="{{ route('admin.sr.apply', $thread) }}"
-                            @disabled(! $srCanApply) title="{{ $srCanApply ? '담당자에게 반영을 요청합니다' : $srApplyHint }}"><x-icon name="check" :size="14"/> 개발 반영 요청</button>
+                            @disabled(! $srCanApply) title="{{ $srCanApply ? '다시 반영을 겁니다 (반영할 만한 답이면 자동으로 걸립니다)' : $srApplyHint }}"><x-icon name="check" :size="14"/> 개발 반영 요청</button>
                 </div>
                 <div class="sr-atts" id="srAtts"></div>
                 <div class="sr-input-row">
@@ -326,7 +326,7 @@
         // 아직 반영 요청 전일 때만 켜고 끈다. 이미 요청·완료 상태면 그 표시를 그대로 둔다.
         function gate(){
             if(bar && bar.getAttribute('data-status')!=='none' && bar.style.display!=='none') return;
-            btns.forEach(function(b){ b.disabled=!applyOk; b.title=applyOk?'담당자에게 반영을 요청합니다':applyHint; });
+            btns.forEach(function(b){ b.disabled=!applyOk; b.title=applyOk?'다시 반영을 겁니다 (반영할 만한 답이면 자동으로 걸립니다)':applyHint; });
         }
         // 새 답변이 올 때마다 다시 판단한다. 마지막 글이 어시스턴트 답이어야 하고, 반영할 것이 있어야 한다.
         window.srApplyUpdate=function(list){
@@ -337,6 +337,8 @@
                 : '아직 반영할 내용이 정해지지 않았습니다. 대화를 이어가 주세요';
             gate();
         };
+        // 서버가 스스로 반영을 건 경우에도 같은 그림을 쓸 수 있게 밖으로 내놓는다
+        window.srApplyPaint=function(status, time){ paint(status, time); };
         function paint(status, time){
             if(status==='none'){ if(bar)bar.style.display='none'; setBtns('<svg width="15" height="15"><use href="#i-check"/></svg> 개발 반영 요청', false); gate(); return; }
             if(bar){ bar.style.display=''; bar.setAttribute('data-status',status); }
@@ -461,6 +463,17 @@
                 if(reBar){ reBar.style.display='none'; reBar.setAttribute('data-status','none'); }
                 // 이번 답이 반영할 만한 건인지에 따라 버튼을 켜고 끈다
                 if(window.srApplyUpdate && res.d.assistant) window.srApplyUpdate([res.d.assistant]);
+                // 반영할 만한 답이면 서버가 그 자리에서 반영을 건다. 그 결과를 화면에 옮긴다.
+                if(res.d.apply_status==='requested'){
+                    if(window.srApplyPaint) window.srApplyPaint('requested');
+                    var mw2=document.getElementById('srMsgs');
+                    if(mw2 && !mw2.querySelector('.sr-progress')){
+                        var pw2=document.createElement('div'); pw2.className='sr-msg assistant sr-progress';
+                        pw2.innerHTML='<div class="sr-ava">🛠</div><div class="sr-bubble"><div class="sr-body"><span class="sr-typing"><i></i><i></i><i></i></span> 반영 진행 중입니다… 처리가 끝나면 결과가 이 대화에 자동으로 표시됩니다.</div></div>';
+                        mw2.appendChild(pw2); mw2.scrollTop=mw2.scrollHeight;
+                    }
+                    srStartPoll();
+                }
             })
             .catch(function(){ typ.remove(); sendBtn.disabled=false; bubble('assistant','⚠ 네트워크 오류. 다시 시도해 주세요.'); });
     });

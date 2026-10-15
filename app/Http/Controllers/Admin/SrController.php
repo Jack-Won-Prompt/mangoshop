@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AgentTask;
 use App\Models\SrMessage;
 use App\Models\SrThread;
 use App\Services\ClaudeClient;
@@ -124,12 +125,47 @@ class SrController extends Controller
         ]);
         $thread->update(['last_message_at' => now()]);
 
+        $this->autoRequestApply($thread, $assistant, $request->user());
+
         return response()->json([
-            'ok'        => true,
-            'title'     => $thread->title,
-            'user'      => $this->present($userMsg),
-            'assistant' => $this->present($assistant),
+            'ok'           => true,
+            'title'        => $thread->title,
+            'user'         => $this->present($userMsg),
+            'assistant'    => $this->present($assistant),
+            'apply_status' => $thread->fresh()->apply_status,
         ]);
+    }
+
+    /**
+     * 어시스턴트가 "반영할 만하다" 고 답하면 그 자리에서 반영을 건다.
+     *
+     * 예전에는 관리자가 버튼을 눌러야 했다. 그 버튼이 하던 판단을 어시스턴트가 이미
+     * 답마다 하고 있으므로(반영 가능 여부), 같은 판단을 두 번 거칠 까닭이 없다.
+     * 아직 되묻는 중이거나 단순 안내인 답은 반영 가능으로 표시되지 않아 그냥 지나간다.
+     *
+     * 버튼은 "요청 취소" 와 "완료 처리" 를 위해 그대로 둔다.
+     */
+    private function autoRequestApply(SrThread $thread, SrMessage $assistant, $user): void
+    {
+        if (! $assistant->canApply() || $thread->apply_status === 'requested') {
+            return;
+        }
+
+        try {
+            // 앞서 처리를 마친 일감이 있으면 다시 대기로 돌린다.
+            // 대화가 이어져 새 지시가 들어왔다는 뜻이고, 접수 쪽은 같은 대화를 두 번
+            // 받지 않으므로 여기서 풀어 주지 않으면 두 번째 요청이 영영 묻힌다.
+            AgentTask::where('type', 'sr')->where('ref_id', $thread->id)
+                ->whereIn('status', ['done', 'skipped', 'failed'])
+                ->update(['status' => 'pending', 'attempts' => 0, 'result' => null, 'commit_hash' => null]);
+
+            $thread->update(['apply_status' => 'requested', 'apply_requested_at' => now()]);
+            $this->notifyApplyRequest($thread, $user);
+            \App\Services\AgentIntake::sr($thread);
+        } catch (\Throwable $e) {
+            // 반영을 걸지 못해도 대화 자체는 그대로 남아야 한다
+            report($e);
+        }
     }
 
     /** 폴링: 특정 메시지 id 이후의 새 메시지 + 현재 반영 상태 (새로고침 없이 결과 수신) */
