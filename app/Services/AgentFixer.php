@@ -54,7 +54,7 @@ class AgentFixer
     private const DENY = [
         'config/', '.env',
         // Agent 자기 코드
-        'app/services/agentfixer.php', 'app/services/agentworker.php',
+        'app/services/agentfixer.php', 'app/services/agentworker.php', 'app/services/agentdata.php',
         'app/services/agentintake.php', 'app/services/agenthook.php',
         'app/models/agenttask.php', 'app/models/setting.php',
         'app/http/controllers/agenthookcontroller.php',
@@ -395,6 +395,12 @@ TXT;
      *
      * @return string|null 받아 둔 파일 경로, 받지 못하면 null
      */
+    /** 자료만 바꾸는 쪽(AgentData)도 같은 받아두기를 쓴다 */
+    public function backupNow(): ?string
+    {
+        return $this->backupDb();
+    }
+
     private function backupDb(): ?string
     {
         if (! is_dir(self::BACKUP_DIR) && ! @mkdir(self::BACKUP_DIR, 0750, true)) {

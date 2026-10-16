@@ -156,7 +156,7 @@ class SrController extends Controller
             // 대화가 이어져 새 지시가 들어왔다는 뜻이고, 접수 쪽은 같은 대화를 두 번
             // 받지 않으므로 여기서 풀어 주지 않으면 두 번째 요청이 영영 묻힌다.
             AgentTask::where('type', 'sr')->where('ref_id', $thread->id)
-                ->whereIn('status', ['done', 'skipped', 'failed'])
+                ->whereIn('status', ['done', 'skipped', 'failed', 'needs_ops'])
                 ->update(['status' => 'pending', 'attempts' => 0, 'result' => null, 'commit_hash' => null]);
 
             $thread->update(['apply_status' => 'requested', 'apply_requested_at' => now()]);

@@ -79,7 +79,7 @@ class AgentWorker
         }
 
         $todayDone = AgentTask::whereDate('created_at', today())
-            ->whereIn('status', ['done', 'failed'])->count();
+            ->whereIn('status', ['done', 'failed', 'needs_ops'])->count();
         $dailyLimit = (int) Setting::scalar('agent_daily_limit');
         if ($dailyLimit > 0 && $todayDone >= $dailyLimit) {
             return ['처리' => 0, '건너뜀' => 0, '글' => ["오늘 처리 상한({$dailyLimit}건)에 도달해 쉬어 갑니다."]];
@@ -151,12 +151,18 @@ class AgentWorker
         // 끝까지 가야 한다. 못 끝냈으면 다음 차례에 다시 잡도록 대기로 돌린다.
         // 코드로 고칠 건이 아니라고 판가름 난 것만 그 자리에서 접는다 — 다시 해도 같다.
         // 이미 들어가 있어 손댈 것이 없었던 건은 못 끝낸 것이 아니라 끝난 것이다.
-        $notCode = ! ($analysis['code_change'] ?? true);
+        // 코드 건이 아니라고 해서 접지 않는다. 묻는 말에 답하면 끝나는 건(info)만
+        // 그 자리에서 접고, 자료 건·서버 건은 실제로 되어야 끝난 것으로 본다.
+        // 전에는 코드 건이 아니면 전부 접어 버려, 자료만 바꾸면 끝나는 요청이
+        // 아무도 손대지 않은 채 '반영 완료' 표시를 달고 묻혔다.
+        $kind = self::workKind($analysis);
         $settled = ($fix['fixed'] ?? false) || ($fix['already'] ?? false);
-        $unfinished = ! $notCode && (($fix['blocked'] ?? false) || ! $settled);
+        $needsOps = (bool) ($fix['needs_ops'] ?? false);
+        $unfinished = ! $needsOps && $kind !== 'info' && (($fix['blocked'] ?? false) || ! $settled);
 
         $task->status = match (true) {
-            $notCode => 'skipped',
+            $kind === 'info' => 'skipped',
+            $needsOps => 'needs_ops',
             ! $unfinished => 'done',
             $task->attempts < 3 => 'pending',
             default => 'failed',
@@ -307,12 +313,32 @@ TXT;
   "how": "파일마다 무엇을 어떻게 바꿀지 구체적으로 (담당자용)",
   "confidence": "높음|보통|낮음",
   "code_change": true 또는 false,
+  "work_kind": "code|data|server|info",
+  "data_ops": [{"table": "표 이름", "match": {"집을 칸": "값"}, "set": {"바꿀 칸": "새 값"}}],
   "new_migration": "표 구조를 바꿔야 할 때만. 예: add_license_to_users_table. 아니면 빈 문자열",
   "answer": "요청자에게 그대로 보여 줄 답변. 존댓말 3~6문장."
 }
 
 code_change 는 코드를 고쳐야 하는 요청이면 true 로 두십시오.
 고칠 자리를 끝내 못 찾겠으면 files 를 빈 배열로 두되, cause 에 왜 못 찾았는지 적으십시오.
+
+work_kind 는 이 요청을 끝내려면 무엇을 해야 하는지입니다. 코드 건이 아니어도
+요청은 끝까지 처리되어야 합니다. "코드 건이 아님" 은 손을 떼는 이유가 아닙니다.
+ · code   — 코드를 고쳐야 끝난다. code_change 도 true 로 둡니다.
+ · data   — 코드는 그대로 두고 등록된 자료만 바꾸면 끝난다.
+            (카테고리 그림/이모지 걸기, 공지·FAQ 문구 고치기, 노출 켜고 끄기 같은 것)
+            이때 data_ops 를 채우십시오. code_change 는 false 입니다.
+ · server — 서버 설정·권한·주소처럼 코드 밖에서 손봐야 끝난다. code_change 는 false 입니다.
+            how 에 무엇을 어떻게 해야 하는지 적으십시오. 그대로 담당자에게 전달됩니다.
+ · info   — 묻는 말에 답하면 그것으로 끝난다. 바꿀 것이 없습니다. code_change 는 false 입니다.
+
+data_ops 규칙 (work_kind 가 data 일 때만 채웁니다. 아니면 빈 배열)
+ · 손댈 수 있는 표: categories, brands, banners, notices, faqs, popups, recipe_categories
+   이 밖의 표는 적어도 버려집니다. 회원·주문·결제·정산 자료는 어떤 경우에도 바꿀 수 없습니다.
+ · match 는 정확히 한 줄만 집히게 적으십시오. 두 줄 이상 집히면 아무것도 바꾸지 않습니다.
+ · 대화에 올라온 그림을 걸어야 하면 값에 <attachment:1> 처럼 적으십시오.
+   숫자는 대화에 올라온 차례입니다(첫 번째 그림이 1). 그림 칸에만 쓸 수 있습니다.
+ · 값·금액·비밀번호로 보이는 칸은 적어도 버려집니다.
 
 표 구조를 바꿔야 하는 요청이라면(새 칸·새 표가 있어야 하는 기능)
 new_migration 에 영문 소문자와 밑줄로 된 이름을 적으십시오. 무엇을 하는지 드러나게 적습니다.
@@ -477,6 +503,22 @@ TXT;
     }
 
     /**
+     * 이 요청을 끝내려면 무엇을 해야 하는가 — code / data / server / info.
+     *
+     * 예전 분석 결과에는 work_kind 가 없다. 그때는 code_change 만 있었으므로
+     * 코드 건이면 code, 아니면 info 로 본다(예전 동작과 같다).
+     */
+    private static function workKind(array $analysis): string
+    {
+        $kind = strtolower(trim((string) ($analysis['work_kind'] ?? '')));
+        if (in_array($kind, ['code', 'data', 'server', 'info'], true)) {
+            return $kind;
+        }
+
+        return ($analysis['code_change'] ?? true) ? 'code' : 'info';
+    }
+
+    /**
      * 조건이 맞으면 AgentFixer 에게 수정을 맡긴다.
      *
      * @return array{tried:bool, fixed:bool, blocked:bool, message:string, commit:?string}
@@ -495,9 +537,26 @@ TXT;
         // 손대지 않는 자리(결제·주문·회원·인증, DB 구조·서버 설정)는 경로로 거르고,
         // 잘린 답·지우기만 하는 수정·문법 오류는 검증에서 거르고,
         // 배포 뒤 쇼핑몰이 200 으로 답하지 않으면 즉시 되돌린다.
-        if (! ($analysis['code_change'] ?? true)) {
-            return ['tried' => false, 'fixed' => false, 'blocked' => true, 'commit' => null,
-                'message' => '코드로 고칠 수 있는 건이 아닙니다: '.mb_substr((string) ($analysis['cause'] ?? '-'), 0, 160)];
+        // 코드 건이 아니어도 요청은 끝까지 처리한다.
+        // 자료만 바꾸면 끝나는 건은 Agent 가 직접 바꾸고, 서버에서 손봐야 하는 건은
+        // 완료로 적지 않고 무엇을 해야 하는지 남긴다. 묻는 말이면 답하는 것이 끝이다.
+        $kind = self::workKind($analysis);
+
+        if ($kind === 'data') {
+            $sr = $task->type === 'sr' ? SrThread::find($task->ref_id) : null;
+            $res = (new AgentData)->apply($sr, (array) ($analysis['data_ops'] ?? []));
+
+            return ['tried' => true, 'fixed' => $res['applied'], 'blocked' => ! $res['applied'],
+                'commit' => null, 'message' => $res['message']];
+        }
+        if ($kind === 'server') {
+            return ['tried' => true, 'fixed' => false, 'blocked' => true, 'needs_ops' => true, 'commit' => null,
+                'message' => '서버에서 손봐야 끝나는 건입니다: '
+                    .mb_substr(trim((string) ($analysis['how'] ?: ($analysis['cause'] ?? '-'))), 0, 300)];
+        }
+        if ($kind === 'info') {
+            return ['tried' => true, 'fixed' => false, 'blocked' => false, 'answered' => true, 'commit' => null,
+                'message' => '코드나 자료를 바꿀 일은 없어 안내로 끝냅니다.'];
         }
         if (! ($analysis['files'] ?? []) && trim((string) ($analysis['file'] ?? '')) === '') {
             $dropped = $analysis['_dropped'] ?? [];
@@ -548,8 +607,11 @@ TXT;
 
         $thread->update([
             'last_message_at' => now(),
+            // 실제로 된 것만 완료로 적는다. 묻는 말에 답하면 끝나는 건도 완료다.
+            // 자료·코드·서버 건은 되기 전까지 완료가 아니다 — 전에는 코드 건이
+            // 아니기만 하면 완료로 찍혀, 아무것도 안 된 요청이 ✅ 로 보였다.
             'apply_status' => (($fix['fixed'] ?? false) || ($fix['already'] ?? false)
-                || ! ($analysis['code_change'] ?? false)) ? 'done' : 'requested',
+                || self::workKind($analysis) === 'info') ? 'done' : 'requested',
         ]);
 
         return ($fix['fixed'] ?? false)
@@ -573,7 +635,8 @@ TXT;
         [$state, $did] = match (true) {
             (bool) ($fix['fixed'] ?? false) => ['반영 완료', $fix['message'] ?: '운영에 반영했습니다.'],
             (bool) ($fix['already'] ?? false) => ['이미 반영됨', $fix['message'] ?: '이미 들어가 있었습니다.'],
-            ! (bool) ($analysis['code_change'] ?? false) => ['안내', '코드를 고칠 일은 아니어서 안내로 답변합니다.'],
+            (bool) ($fix['needs_ops'] ?? false) => ['서버 작업 필요', $fix['message'] ?: '서버에서 손봐야 합니다.'],
+            (bool) ($fix['answered'] ?? false) => ['안내', '바꿀 것이 없어 안내로 답변합니다.'],
             default => ['반영 못 함', $fix['message'] ?: '사유 미상'],
         };
 
@@ -587,7 +650,10 @@ TXT;
  · [상태] 가 "이미 반영됨" 면 — 손댈 것 없이 이미 들어가 있었습니다.
    "반영 완료" 와 마찬가지로 끝났다고 쓰되, 새로 고쳤다고는 쓰지 마십시오.
  · [상태] 가 "반영 못 함" 면 — 아직 그대로입니다. 됐다고 쓰면 안 됩니다.
- · [상태] 가 "안내" 면 — 고칠 코드가 없는 건입니다. 안내만 하십시오.
+ · [상태] 가 "안내" 면 — 바꿀 것이 없는 건입니다. 안내만 하십시오.
+ · [상태] 가 "서버 작업 필요" 면 — 코드나 자료가 아니라 서버에서 손봐야 끝나는 건입니다.
+   아직 안 됐습니다. 됐다고 쓰면 안 됩니다. 무엇을 손봐야 하는지 [한 일] 에 적혀 있으니
+   그것을 쉬운 말로 풀어 쓰고, 서버 담당자에게 전달하겠다고 쓰십시오.
 
 [한 일] 에는 실제로 바뀐 파일과, 손대지 못한 파일이 사유와 함께 적혀 있습니다.
 "못 한 것" 에 적힌 자리만 아직 그대로입니다. 그 밖은 다 됐습니다.
