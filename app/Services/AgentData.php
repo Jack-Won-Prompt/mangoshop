@@ -194,7 +194,7 @@ class AgentData
     private function images(SrThread $sr): array
     {
         $out = [];
-        foreach ($sr->messages()->orderBy('id')->get() as $m) {
+        foreach ($sr->messages()->reorder('id')->get() as $m) {
             foreach ((array) $m->attachments as $a) {
                 if (! str_starts_with((string) ($a['mime'] ?? ''), 'image/')) {
                     continue;

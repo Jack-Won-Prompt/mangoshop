@@ -192,7 +192,10 @@ class SrController extends Controller
         if ($data['action'] === 'request') {
             // 화면에서 버튼을 잠가 두지만, 주소를 직접 부르면 그것만으로는 막히지 않는다.
             // 어시스턴트가 "반영할 만하다" 고 답한 건만 담당자에게 넘긴다.
-            $last = $thread->messages()->latest('id')->first();
+            // messages() 에 이미 orderBy('id') 가 걸려 있어 latest('id') 를 덧붙이면
+            // 정렬이 덮이지 않고 뒤에 붙어, 가장 오래된 글(= 요청자의 첫 글)이 잡혔다.
+            // 첫 글은 어시스턴트 답이 아니므로 이 관문은 언제나 막혀 있었다.
+            $last = $thread->messages()->reorder('id', 'desc')->first();
             if (! $last || ! $last->canApply()) {
                 return response()->json([
                     'ok'      => false,
