@@ -198,7 +198,7 @@ class ApiSerializer
         ]);
     }
 
-    public static function categoryBrief(Category $c): array
+    public static function categoryBrief(Category $c, ?Request $request = null): array
     {
         return [
             'id'   => $c->id,
@@ -206,6 +206,7 @@ class ApiSerializer
             'slug' => $c->slug,
             'tagline' => $c->tagline,
             'icon' => $c->icon,
+            'image' => self::image($c->image, $request ?? request()),
             'parent_id' => $c->parent_id,
         ];
     }

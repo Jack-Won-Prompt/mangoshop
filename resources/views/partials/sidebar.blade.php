@@ -6,7 +6,7 @@
             @foreach($navCategories as $cat)
                 @php($isOn = $activeCat && ($activeCat->id === $cat->id || $activeCat->parent_id === $cat->id))
                 <li class="{{ $isOn ? 'on' : '' }}">
-                    <a href="{{ route('catalog.category', $cat->slug) }}"><x-icon :name="$cat->icon ?? 'box'"/>{{ $cat->name }}</a>
+                    <a href="{{ route('catalog.category', $cat->slug) }}"><x-cat-icon :category="$cat" :size="18"/>{{ $cat->name }}</a>
                     @if($isOn && $cat->children->count())
                         <div class="subs">
                             @foreach($cat->children as $sub)

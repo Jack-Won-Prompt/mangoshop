@@ -68,10 +68,9 @@
 {{-- ===== GNB 과일 카테고리 바 ===== --}}
 <nav class="mg-gnb" aria-label="카테고리">
     <div class="mg-wrap">
-        @php($__catIcons = ['mango'=>'cat-mango','avocado'=>'cat-avocado','tropical'=>'cat-pineapple','citrus'=>'cat-citrus','berry'=>'cat-berry','giftset'=>'cat-gift'])
         <ul class="mg-gnb-list">
             @foreach($navCategories as $cat)
-                <li><a href="{{ route('catalog.category', $cat->slug) }}"><span class="ic"><x-icon :name="$__catIcons[$cat->slug] ?? 'grid'" :size="19"/></span>{{ $cat->name }}</a></li>
+                <li><a href="{{ route('catalog.category', $cat->slug) }}"><span class="ic"><x-cat-icon :category="$cat" :size="19"/></span>{{ $cat->name }}</a></li>
             @endforeach
             @if($site['home_show_recipe'] ?? true)<li><a href="{{ route('community.recipes') }}"><span class="ic"><x-icon name="doc" :size="19"/></span>레시피</a></li>@endif
             <li><a href="{{ route('catalog.index', ['grade' => 'wholesale']) }}" class="biz"><span class="ic"><x-icon name="building" :size="19"/></span>사업자 전용몰</a></li>
